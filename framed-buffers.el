@@ -34,12 +34,39 @@
   "Isolate buffers per frame WORK-IN-PROGRESS."
   :group 'frames)
 
-(defun framed-buffers-buffer-list (&optional frame)
+(defcustom framed-buffers-global-buffers '("*scratch*" "*Messages*" "*Backtrace*")
+  "List of buffer names to include in all frames.
+These buffers are shown in the buffer selection prompts even if
+they have not been used by---and thus associated with---the
+current frame.
+
+Otherwise framed buffers are limited to the frame that uses them."
+  :type '(repeat string))
+
+(defun framed-buffers--frame-buffer-list (&optional frame)
   "Produce list of buffers for either specified or current FRAME."
-  (seq-filter (lambda (buf)
-                (and (bufferp buf)
-                     (not (string-prefix-p " " (buffer-name buf)))))
-              (frame-parameter frame 'buffer-list)))
+  (seq-filter
+   (lambda (buf)
+     (and (bufferp buf)
+          (not (string-prefix-p " " (buffer-name buf)))))
+   (frame-parameter frame 'buffer-list)))
+
+(defun framed-buffers--global-buffer-list ()
+  "Return list of `framed-buffers-global-buffers' buffer objects."
+  (mapcar
+   (lambda (name)
+     (get-buffer name))
+   framed-buffers-global-buffers))
+
+(defun framed-buffers-buffer-list (&optional frame)
+  "Return list of buffers that are used by the current frame.
+With optional FRAME as an object that satisfies `framep', return
+the list of buffers that are used by FRAME.
+
+Include `framed-buffers-global-buffers' in the list."
+  (delete-dups
+   (append (framed-buffers--frame-buffer-list frame)
+           (framed-buffers--global-buffer-list))))
 
 (defun framed-buffers--read-buffer-p (buf &optional frame)
   "Return non-nil if BUF belongs to the current FRAME.
