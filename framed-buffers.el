@@ -96,9 +96,10 @@ per-frame filter."
 (defun framed-buffers--buffer-names (&optional frame)
   "Return list of names of `framed-buffers-buffer-list' as strings.
 With optional FRAME, do it for the given frame name."
-  (mapcar (lambda (buf)
-            (buffer-name buf))
-          (framed-buffers-buffer-list frame)))
+  (mapcar
+   (lambda (buf)
+     (buffer-name buf))
+   (framed-buffers-buffer-list frame)))
 
 (defun framed-buffers--buffer-prompt (&optional frame)
   "Prompt for buffer among `framed-buffers--buffer-names'.
@@ -121,20 +122,21 @@ frame name."
 (defun framed-buffers--buffers-with-current ()
   "Return frame list with current one renamed appropriately."
   (let ((frames (make-frame-names-alist)))
-    (mapcar (lambda (frame)
-              (let ((name (car frame))
-                    (obj (cdr frame)))
-                (cond
-                 ((and (eq (selected-frame) obj)
-                       (string-prefix-p " " name))
-                  (setcar frame "Current frame")
-                  frame)
-                 ((eq (selected-frame) obj)
-                  (setcar frame (format "%s (Current frame)" name))
-                  frame)
-                 (t
-                  frame))))
-            frames)))
+    (mapcar
+     (lambda (frame)
+       (let ((name (car frame))
+             (obj (cdr frame)))
+         (cond
+          ((and (eq (selected-frame) obj)
+                (string-prefix-p " " name))
+           (setcar frame "Current frame")
+           frame)
+          ((eq (selected-frame) obj)
+           (setcar frame (format "%s (Current frame)" name))
+           frame)
+          (t
+           frame))))
+     frames)))
 
 (defun framed-buffers--frame-prompt ()
   "Prompt to select a frame among the list of frames."
