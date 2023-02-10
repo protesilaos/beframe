@@ -236,6 +236,7 @@ If FRAME is nil, use the current frame."
 ;;;; Integration with `consult'
 
 (defvar consult-buffer-sources)
+(declare-function consult--buffer-state "consult")
 
 (with-eval-after-load 'consult
   (defface framed-buffers-buffer
