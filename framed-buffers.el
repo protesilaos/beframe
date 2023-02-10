@@ -58,7 +58,7 @@ Otherwise framed buffers are limited to the frame that uses them."
      (get-buffer name))
    framed-buffers-global-buffers))
 
-(defun framed-buffers-buffer-list (&optional frame)
+(defun framed-buffers--buffer-list (&optional frame)
   "Return list of buffers that are used by the current frame.
 With optional FRAME as an object that satisfies `framep', return
 the list of buffers that are used by FRAME.
@@ -67,6 +67,14 @@ Include `framed-buffers-global-buffers' in the list."
   (delete-dups
    (append (framed-buffers--frame-buffer-list frame)
            (framed-buffers--global-buffer-list))))
+
+(defun framed-buffers--buffer-names (&optional frame)
+  "Return list of names of `framed-buffers--buffer-list' as strings.
+With optional FRAME, do it for the given frame name."
+  (mapcar
+   (lambda (buf)
+     (buffer-name buf))
+   (framed-buffers--buffer-list frame)))
 
 (defun framed-buffers--read-buffer-p (buf &optional frame)
   "Return non-nil if BUF belongs to the current FRAME.
@@ -92,14 +100,6 @@ per-frame filter."
                    nil
                    'buffer-name-history
                    def))
-
-(defun framed-buffers--buffer-names (&optional frame)
-  "Return list of names of `framed-buffers-buffer-list' as strings.
-With optional FRAME, do it for the given frame name."
-  (mapcar
-   (lambda (buf)
-     (buffer-name buf))
-   (framed-buffers-buffer-list frame)))
 
 (defun framed-buffers--buffer-prompt (&optional frame)
   "Prompt for buffer among `framed-buffers--buffer-names'.
@@ -204,8 +204,8 @@ Add this to `after-make-frame-functions'."
 
 (defun framed-buffers--frame-parameter-p (buf)
   "Return non-nil if BUF belongs to the current frame.
-BUF is a buffer object among `framed-buffers-buffer-list'."
-  (memq buf (framed-buffers-buffer-list)))
+BUF is a buffer object among `framed-buffers--buffer-list'."
+  (memq buf (framed-buffers--buffer-list)))
 
 (defun framed-buffers--frame-predicate (&optional frame)
   "Set FRAME `buffer-predicate' parameter.
@@ -229,13 +229,13 @@ If FRAME is nil, use the current frame."
         ;; needed for `consult-buffer' and maybe others, but there may
         ;; be a better way.
         ;;
-        ;; (advice-add #'buffer-list :override #'framed-buffers-buffer-list)
+        ;; (advice-add #'buffer-list :override #'framed-buffers--buffer-list)
         )
     (setq read-buffer-function framed-buffers--read-buffer-function
           framed-buffers--read-buffer-function nil)
     (remove-hook 'after-make-frame-functions #'framed-buffers--frame-predicate)
     (remove-hook 'after-make-frame-functions #'framed-buffers--rename-frame)
-    ;; (advice-remove #'buffer-list #'framed-buffers-buffer-list)
+    ;; (advice-remove #'buffer-list #'framed-buffers--buffer-list)
     ))
 
 (provide 'framed-buffers)
