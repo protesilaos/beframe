@@ -156,8 +156,6 @@ Also see `framed-buffers-switch-buffer'."
 
 ;;; Minor mode setup
 
-(declare-function project-name "project")
-
 (defun framed-buffers--rename-frame (frame)
   "Rename FRAME.
 Add this to `after-make-frame-functions'."
