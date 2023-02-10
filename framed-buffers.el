@@ -174,7 +174,11 @@ Either bind this command to a key as an alternative to
 `framed-buffers-mode' which makes all buffer prompts limit the
 candidates to those that belong to the selected frame.
 
-Also see `framed-buffers-switch-buffer'."
+Also see `framed-buffers-switch-buffer'.
+
+Raising and then selecting FRAME does not depend solely on Emacs.
+The window manager must permit such an operation.  See bug#61319:
+<https://debbugs.gnu.org/cgi/bugreport.cgi?bug=61319>."
   (interactive
    (let ((obj (framed-buffers--frame-object (framed-buffers--frame-prompt))))
      (list obj (framed-buffers--buffer-prompt obj))))
