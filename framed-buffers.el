@@ -158,19 +158,18 @@ Also see `framed-buffers-switch-buffer'."
 
 (declare-function project-name "project")
 
-(defun framed-buffers--rename-frame ()
-  "Rename the current frame WORK-IN-PROGRESS."
-  (cond
-   ;; ((and (featurep 'project)
-   ;;       (fboundp 'project-name)
-   ;;       (fboundp 'project-current))
-   ;;  (project-name (project-current nil default-directory)))
-   ((and (not (minibufferp)) (buffer-file-name))
-    (format "%s  %s" (buffer-name) default-directory))
-   ((not (minibufferp))
-    (buffer-name))
-   (t
-    default-directory)))
+(defun framed-buffers--rename-frame (frame)
+  "Rename FRAME.
+Add this to `after-make-frame-functions'."
+  (select-frame frame)
+  (set-frame-name
+   (cond
+    ((and (not (minibufferp)) (buffer-file-name))
+     (format "%s  %s" (buffer-name) default-directory))
+    ((not (minibufferp))
+     (buffer-name))
+    (t
+     default-directory))))
 
 (defun framed-buffers--frame-parameter-p (buf)
   "Return non-nil if BUF belongs to the current frame.
