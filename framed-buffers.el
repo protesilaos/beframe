@@ -227,19 +227,11 @@ If FRAME is nil, use the current frame."
         (setq framed-buffers--read-buffer-function read-buffer-function
               read-buffer-function #'framed-buffers-read-buffer)
         (add-hook 'after-make-frame-functions #'framed-buffers--frame-predicate)
-        (add-hook 'after-make-frame-functions #'framed-buffers--rename-frame)
-        ;; NOTE 2023-01-30: I prefer not to install an advice.  It is
-        ;; needed for `consult-buffer' and maybe others, but there may
-        ;; be a better way.
-        ;;
-        ;; (advice-add #'buffer-list :override #'framed-buffers--buffer-list)
-        )
+        (add-hook 'after-make-frame-functions #'framed-buffers--rename-frame))
     (setq read-buffer-function framed-buffers--read-buffer-function
           framed-buffers--read-buffer-function nil)
     (remove-hook 'after-make-frame-functions #'framed-buffers--frame-predicate)
-    (remove-hook 'after-make-frame-functions #'framed-buffers--rename-frame)
-    ;; (advice-remove #'buffer-list #'framed-buffers--buffer-list)
-    ))
+    (remove-hook 'after-make-frame-functions #'framed-buffers--rename-frame)))
 
 ;;;; Integration with `consult'
 
