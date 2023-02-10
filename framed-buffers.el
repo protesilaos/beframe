@@ -241,5 +241,26 @@ If FRAME is nil, use the current frame."
     ;; (advice-remove #'buffer-list #'framed-buffers--buffer-list)
     ))
 
+;;;; Integration with `consult'
+
+(defvar consult-buffer-sources)
+
+(with-eval-after-load 'consult
+  (defface framed-buffers-buffer
+    '((t :inherit font-lock-string-face))
+    "Face for `consult' framed buffers.")
+
+  (defvar framed-buffers--consult-source
+    `( :name     "Frame-specific buffers (current frame)"
+       :narrow   ?F
+       :category buffer
+       :face     framed-buffers-buffer
+       :history  framed-buffers-history
+       :items    ,#'framed-buffers--buffer-names
+       :action   ,#'switch-to-buffer
+       :state    ,#'consult--buffer-state))
+
+  (add-to-list 'consult-buffer-sources 'framed-buffers--consult-source))
+
 (provide 'framed-buffers)
 ;;; framed-buffers.el ends here
