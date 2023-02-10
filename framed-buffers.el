@@ -87,6 +87,9 @@ it must satisfy `framep'."
     (unless (string-prefix-p " " b)
       (seq-contains-p (framed-buffers--buffer-names frame) b #'string-match-p))))
 
+(defvar framed-buffers-history nil
+  "Minibuffer history of frame specific buffers.")
+
 ;;;###autoload
 (defun framed-buffers-read-buffer (prompt &optional def require-match _predicate)
   "The `read-buffer-function' that limits buffers to frames.
@@ -98,7 +101,7 @@ per-frame filter."
                    #'framed-buffers--read-buffer-p
                    require-match
                    nil
-                   'buffer-name-history
+                   'framed-buffers-history
                    def))
 
 (defun framed-buffers--buffer-prompt (&optional frame)
