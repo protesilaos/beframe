@@ -38,7 +38,6 @@ Current development target is {{{development-version}}}.
     + GitHub: <https://github.com/protesilaos/beframe>
     + GitLab: <https://gitlab.com/protesilaos/beframe>
 + Mailing list: <https://lists.sr.ht/~protesilaos/general-issues>
-+ Video demo: <https://protesilaos.com/codelog/2023-01-16-emacs-beframe-package-demo/>
 + Backronym: Buffers Encapsulated in Frames Realise Advanced
   Management of Emacs.
 
