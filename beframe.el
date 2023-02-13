@@ -47,19 +47,20 @@ Otherwise framed buffers are limited to the frame that uses them."
   :package-version '(beframe . "0.1.0")
   :type '(repeat string))
 
-(defcustom beframe-project-always-in-frame nil
-  "When non-nil, open projects in new frames with `beframe-mode'.
+(defcustom beframe-functions-in-frames (list (compat-function project-prompt-project-dir))
+  "Functions that use new frame when `beframe-mode' is enabled.
 
-When the `beframe-mode' is enabled, install advice around
-`project-prompt-project-dir' so that every prompt for a new
-project is prefixed with `other-frame-prefix'."
+When `beframe-mode' is enabled, install advice around each
+function so that every invocation of it is called with
+`other-frame-prefix'."
   :group 'beframe
   :package-version '(beframe . "0.1.0")
   :initialize #'custom-initialize-default
   :set (lambda (symbol value)
+         (beframe--functions-in-frames :disable)
          (set-default symbol value)
-         (beframe-mode 1))
-  :type 'boolean)
+         (beframe--functions-in-frames))
+  :type '(repeat symbol))
 
 (defun beframe--frame-buffers (&optional frame)
   "Produce list of buffers for either specified or current FRAME."
@@ -238,9 +239,18 @@ If FRAME is nil, use the current frame."
 
 (defun beframe--with-other-frame (&rest app)
   "Apply APP with `other-frame-prefix'.
-Use this as :around advice to commands that must make a new frame."
+Use this as :around advice to commands that must make a new
+frame.  See `beframe-functions-in-frames'."
   (funcall (compat-function other-frame-prefix))
   (apply app))
+
+(defun beframe--functions-in-frames (&optional disable)
+  "Install advice for `beframe-functions-in-frames'.
+With optional DISABLE remove the advice."
+  (dolist (cmd beframe-functions-in-frames)
+    (if disable
+        (advice-remove cmd #'beframe--with-other-frame)
+      (advice-add cmd :around #'beframe--with-other-frame))))
 
 (declare-function project-prompt-project-dir "project")
 
@@ -254,13 +264,12 @@ Use this as :around advice to commands that must make a new frame."
               read-buffer-function #'beframe-read-buffer)
         (add-hook 'after-make-frame-functions #'beframe--frame-predicate)
         (add-hook 'after-make-frame-functions #'beframe--rename-frame)
-        (when beframe-project-always-in-frame
-          (advice-add (compat-function project-prompt-project-dir) :around #'beframe--with-other-frame)))
+        (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
           beframe--read-buffer-function nil)
     (remove-hook 'after-make-frame-functions #'beframe--frame-predicate)
     (remove-hook 'after-make-frame-functions #'beframe--rename-frame)
-    (advice-remove (compat-function project-prompt-project-dir) #'beframe--with-other-frame)))
+    (beframe--functions-in-frames :disable)))
 
 ;;;; Integration with `consult'
 
