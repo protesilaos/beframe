@@ -43,7 +43,7 @@ current frame.
 Otherwise framed buffers are limited to the frame that uses them."
   :type '(repeat string))
 
-(defun framed-buffers--frame-buffer-list (&optional frame)
+(defun framed-buffers--frame-buffers (&optional frame)
   "Produce list of buffers for either specified or current FRAME."
   (seq-filter
    (lambda (buf)
@@ -51,7 +51,7 @@ Otherwise framed buffers are limited to the frame that uses them."
           (not (string-prefix-p " " (buffer-name buf)))))
    (frame-parameter frame 'buffer-list)))
 
-(defun framed-buffers--global-buffer-list ()
+(defun framed-buffers--global-buffers ()
   "Return list of `framed-buffers-global-buffers' buffer objects."
   (mapcar
    (lambda (name)
@@ -65,8 +65,8 @@ the list of buffers that are used by FRAME.
 
 Include `framed-buffers-global-buffers' in the list."
   (delete-dups
-   (append (framed-buffers--frame-buffer-list frame)
-           (framed-buffers--global-buffer-list))))
+   (append (framed-buffers--frame-buffers frame)
+           (framed-buffers--global-buffers))))
 
 (defun framed-buffers--buffer-names (&optional frame)
   "Return list of names of `framed-buffers--buffer-list' as strings.
