@@ -1,10 +1,10 @@
-;;; framed-buffers.el --- WORK-IN-PROGRESS -*- lexical-binding: t -*-
+;;; reframe.el --- WORK-IN-PROGRESS -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2023  Free Software Foundation, Inc.
 
 ;; Author: Protesilaos Stavrou <info@protesilaos.com>
 ;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
-;; URL: https://git.sr.ht/~protesilaos/framed-buffers
+;; URL: https://git.sr.ht/~protesilaos/reframe
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
 ;; Version: 0.0.0
 ;; Package-Requires: ((emacs "27.1") (compat "29.1.3.2"))
@@ -32,36 +32,36 @@
 
 (require 'compat)
 
-(defgroup framed-buffers ()
+(defgroup reframe ()
   "Isolate buffers per frame WORK-IN-PROGRESS."
   :group 'frames)
 
-(defcustom framed-buffers-global-buffers '("*scratch*" "*Messages*" "*Backtrace*")
+(defcustom reframe-global-buffers '("*scratch*" "*Messages*" "*Backtrace*")
   "List of buffer names to include in all frames.
 These buffers are shown in the buffer selection prompts even if
 they have not been used by---and thus associated with---the
 current frame.
 
 Otherwise framed buffers are limited to the frame that uses them."
-  :group 'framed-buffers
-  :package-version '(framed-buffers . "0.1.0")
+  :group 'reframe
+  :package-version '(reframe . "0.1.0")
   :type '(repeat string))
 
-(defcustom framed-buffers-project-always-in-frame nil
-  "When non-nil, open projects in new frames with `framed-buffers-mode'.
+(defcustom reframe-project-always-in-frame nil
+  "When non-nil, open projects in new frames with `reframe-mode'.
 
-When the `framed-buffers-mode' is enabled, install advice around
+When the `reframe-mode' is enabled, install advice around
 `project-prompt-project-dir' so that every prompt for a new
 project is prefixed with `other-frame-prefix'."
-  :group 'framed-buffers
-  :package-version '(framed-buffers . "0.1.0")
+  :group 'reframe
+  :package-version '(reframe . "0.1.0")
   :initialize #'custom-initialize-default
   :set (lambda (symbol value)
          (set-default symbol value)
-         (framed-buffers-mode 1))
+         (reframe-mode 1))
   :type 'boolean)
 
-(defun framed-buffers--frame-buffers (&optional frame)
+(defun reframe--frame-buffers (&optional frame)
   "Produce list of buffers for either specified or current FRAME."
   (seq-filter
    (lambda (buf)
@@ -69,61 +69,61 @@ project is prefixed with `other-frame-prefix'."
           (not (string-prefix-p " " (buffer-name buf)))))
    (frame-parameter frame 'buffer-list)))
 
-(defun framed-buffers--global-buffers ()
-  "Return list of `framed-buffers-global-buffers' buffer objects."
+(defun reframe--global-buffers ()
+  "Return list of `reframe-global-buffers' buffer objects."
   (mapcar
    (lambda (name)
      (get-buffer name))
-   framed-buffers-global-buffers))
+   reframe-global-buffers))
 
-(defun framed-buffers--buffer-list (&optional frame)
+(defun reframe--buffer-list (&optional frame)
   "Return list of buffers that are used by the current frame.
 With optional FRAME as an object that satisfies `framep', return
 the list of buffers that are used by FRAME.
 
-Include `framed-buffers-global-buffers' in the list."
+Include `reframe-global-buffers' in the list."
   (delete-dups
-   (append (framed-buffers--frame-buffers frame)
-           (framed-buffers--global-buffers))))
+   (append (reframe--frame-buffers frame)
+           (reframe--global-buffers))))
 
-(defun framed-buffers--buffer-names (&optional frame)
-  "Return list of names of `framed-buffers--buffer-list' as strings.
+(defun reframe--buffer-names (&optional frame)
+  "Return list of names of `reframe--buffer-list' as strings.
 With optional FRAME, do it for the given frame name."
   (mapcar
    (lambda (buf)
      (buffer-name buf))
-   (framed-buffers--buffer-list frame)))
+   (reframe--buffer-list frame)))
 
-(defun framed-buffers--read-buffer-p (buf &optional frame)
+(defun reframe--read-buffer-p (buf &optional frame)
   "Return non-nil if BUF belongs to the current FRAME.
-BUF is a string or a cons cell, per `framed-buffers-read-buffer'.
+BUF is a string or a cons cell, per `reframe-read-buffer'.
 If optional FRAME is nil, then default to the current one.  Else
 it must satisfy `framep'."
   (let ((b buf))
     (when (consp buf)
       (setq b (car buf)))
     (unless (string-prefix-p " " b)
-      (seq-contains-p (framed-buffers--buffer-names frame) b #'string-match-p))))
+      (seq-contains-p (reframe--buffer-names frame) b #'string-match-p))))
 
-(defvar framed-buffers-history nil
+(defvar reframe-history nil
   "Minibuffer history of frame specific buffers.")
 
 ;;;###autoload
-(defun framed-buffers-read-buffer (prompt &optional def require-match _predicate)
+(defun reframe-read-buffer (prompt &optional def require-match _predicate)
   "The `read-buffer-function' that limits buffers to frames.
 PROMPT, DEF, REQUIRE-MATCH, and PREDICATE are the same as
 `read-buffer'.  The PREDICATE is ignored, however, to apply the
 per-frame filter."
   (completing-read prompt
-                   (framed-buffers--buffer-names)
-                   #'framed-buffers--read-buffer-p
+                   (reframe--buffer-names)
+                   #'reframe--read-buffer-p
                    require-match
                    nil
-                   'framed-buffers-history
+                   'reframe-history
                    def))
 
-(defun framed-buffers--buffer-prompt (&optional frame)
-  "Prompt for buffer among `framed-buffers--buffer-names'.
+(defun reframe--buffer-prompt (&optional frame)
+  "Prompt for buffer among `reframe--buffer-names'.
 
 Use the previous buffer as the default value, such that
 subsequent invocations of this command flip between the current
@@ -135,12 +135,12 @@ frame name."
    "Switch to frame buffer: "
    (other-buffer (current-buffer))
    (confirm-nonexistent-file-or-buffer)
-   ;; NOTE: This predicate is not needed if `framed-buffers-mode' is
+   ;; NOTE: This predicate is not needed if `reframe-mode' is
    ;; non-nil because it sets the `read-buffer-function'.
    (lambda (buf)
-     (framed-buffers--read-buffer-p buf frame))))
+     (reframe--read-buffer-p buf frame))))
 
-(defun framed-buffers--buffers-with-current ()
+(defun reframe--buffers-with-current ()
   "Return frame list with current one renamed appropriately."
   (let ((frames (make-frame-names-alist)))
     (mapcar
@@ -159,34 +159,34 @@ frame name."
            frame))))
      frames)))
 
-(defun framed-buffers--frame-prompt ()
+(defun reframe--frame-prompt ()
   "Prompt to select a frame among the list of frames."
-  (let ((frames (framed-buffers--buffers-with-current)))
+  (let ((frames (reframe--buffers-with-current)))
     (completing-read "Select Frame: " frames nil t nil 'frame-name-history (caar frames))))
 
-(defun framed-buffers--frame-object (frame)
+(defun reframe--frame-object (frame)
   "Retun frame object of named FRAME.
 FRAME is the human-readable representation of a frame."
-  (let* ((frames (framed-buffers--buffers-with-current))
+  (let* ((frames (reframe--buffers-with-current))
          (names (mapcar #'car frames)))
     (when (seq-contains-p names frame #'string-match-p)
       (alist-get frame frames nil nil #'string-match-p))))
 
 ;;;###autoload
-(defun framed-buffers-switch-buffer (buffer)
+(defun reframe-switch-buffer (buffer)
   "Switch to BUFFER in the current frame using completion.
 
 Either bind this command to a key as an alternative to
 `switch-to-buffer', or enable the minor mode
-`framed-buffers-mode' which makes all buffer prompts limit the
+`reframe-mode' which makes all buffer prompts limit the
 candidates to those that belong to the selected frame.
 
-Also see `framed-buffers-switch-buffer-in-frame'."
-  (interactive (list (framed-buffers--buffer-prompt)))
+Also see `reframe-switch-buffer-in-frame'."
+  (interactive (list (reframe--buffer-prompt)))
   (switch-to-buffer buffer))
 
 ;;;###autoload
-(defun framed-buffers-switch-buffer-in-frame (frame buffer)
+(defun reframe-switch-buffer-in-frame (frame buffer)
   "Switch to BUFFER that belongs to FRAME.
 
 BUFFER is selected with completion among a list of buffers that
@@ -194,23 +194,23 @@ belong to FRAME.
 
 Either bind this command to a key as an alternative to
 `switch-to-buffer', or enable the minor mode
-`framed-buffers-mode' which makes all buffer prompts limit the
+`reframe-mode' which makes all buffer prompts limit the
 candidates to those that belong to the selected frame.
 
-Also see `framed-buffers-switch-buffer'.
+Also see `reframe-switch-buffer'.
 
 Raising and then selecting FRAME does not depend solely on Emacs.
 The window manager must permit such an operation.  See bug#61319:
 <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=61319>."
   (interactive
-   (let ((obj (framed-buffers--frame-object (framed-buffers--frame-prompt))))
-     (list obj (framed-buffers--buffer-prompt obj))))
+   (let ((obj (reframe--frame-object (reframe--frame-prompt))))
+     (list obj (reframe--buffer-prompt obj))))
   (select-frame-set-input-focus frame)
   (switch-to-buffer buffer))
 
 ;;; Minor mode setup
 
-(defun framed-buffers--rename-frame (frame)
+(defun reframe--rename-frame (frame)
   "Rename FRAME.
 Add this to `after-make-frame-functions'."
   (select-frame frame)
@@ -223,20 +223,20 @@ Add this to `after-make-frame-functions'."
     (t
      default-directory))))
 
-(defun framed-buffers--frame-parameter-p (buf)
+(defun reframe--frame-parameter-p (buf)
   "Return non-nil if BUF belongs to the current frame.
-BUF is a buffer object among `framed-buffers--buffer-list'."
-  (memq buf (framed-buffers--buffer-list)))
+BUF is a buffer object among `reframe--buffer-list'."
+  (memq buf (reframe--buffer-list)))
 
-(defun framed-buffers--frame-predicate (&optional frame)
+(defun reframe--frame-predicate (&optional frame)
   "Set FRAME `buffer-predicate' parameter.
 If FRAME is nil, use the current frame."
-  (set-frame-parameter frame 'buffer-predicate #'framed-buffers--frame-parameter-p))
+  (set-frame-parameter frame 'buffer-predicate #'reframe--frame-parameter-p))
 
-(defvar framed-buffers--read-buffer-function nil
+(defvar reframe--read-buffer-function nil
   "Last value of `read-buffer-function'.")
 
-(defun framed-buffers--with-other-frame (&rest app)
+(defun reframe--with-other-frame (&rest app)
   "Apply APP with `other-frame-prefix'.
 Use this as :around advice to commands that must make a new frame."
   (funcall (compat-function other-frame-prefix))
@@ -245,22 +245,22 @@ Use this as :around advice to commands that must make a new frame."
 (declare-function project-prompt-project-dir "project")
 
 ;;;###autoload
-(define-minor-mode framed-buffers-mode
+(define-minor-mode reframe-mode
   "Make all buffer prompts limit candidates per frame."
   :global t
-  (if framed-buffers-mode
+  (if reframe-mode
       (progn
-        (setq framed-buffers--read-buffer-function read-buffer-function
-              read-buffer-function #'framed-buffers-read-buffer)
-        (add-hook 'after-make-frame-functions #'framed-buffers--frame-predicate)
-        (add-hook 'after-make-frame-functions #'framed-buffers--rename-frame)
-        (when framed-buffers-project-always-in-frame
-          (advice-add (compat-function project-prompt-project-dir) :around #'framed-buffers--with-other-frame)))
-    (setq read-buffer-function framed-buffers--read-buffer-function
-          framed-buffers--read-buffer-function nil)
-    (remove-hook 'after-make-frame-functions #'framed-buffers--frame-predicate)
-    (remove-hook 'after-make-frame-functions #'framed-buffers--rename-frame)
-    (advice-remove (compat-function project-prompt-project-dir) #'framed-buffers--with-other-frame)))
+        (setq reframe--read-buffer-function read-buffer-function
+              read-buffer-function #'reframe-read-buffer)
+        (add-hook 'after-make-frame-functions #'reframe--frame-predicate)
+        (add-hook 'after-make-frame-functions #'reframe--rename-frame)
+        (when reframe-project-always-in-frame
+          (advice-add (compat-function project-prompt-project-dir) :around #'reframe--with-other-frame)))
+    (setq read-buffer-function reframe--read-buffer-function
+          reframe--read-buffer-function nil)
+    (remove-hook 'after-make-frame-functions #'reframe--frame-predicate)
+    (remove-hook 'after-make-frame-functions #'reframe--rename-frame)
+    (advice-remove (compat-function project-prompt-project-dir) #'reframe--with-other-frame)))
 
 ;;;; Integration with `consult'
 
@@ -268,21 +268,21 @@ Use this as :around advice to commands that must make a new frame."
 (declare-function consult--buffer-state "consult")
 
 (with-eval-after-load 'consult
-  (defface framed-buffers-buffer
+  (defface reframe-buffer
     '((t :inherit font-lock-string-face))
     "Face for `consult' framed buffers.")
 
-  (defvar framed-buffers--consult-source
+  (defvar reframe--consult-source
     `( :name     "Frame-specific buffers (current frame)"
        :narrow   ?F
        :category buffer
-       :face     framed-buffers-buffer
-       :history  framed-buffers-history
-       :items    ,#'framed-buffers--buffer-names
+       :face     reframe-buffer
+       :history  reframe-history
+       :items    ,#'reframe--buffer-names
        :action   ,#'switch-to-buffer
        :state    ,#'consult--buffer-state))
 
-  (add-to-list 'consult-buffer-sources 'framed-buffers--consult-source))
+  (add-to-list 'consult-buffer-sources 'reframe--consult-source))
 
-(provide 'framed-buffers)
-;;; framed-buffers.el ends here
+(provide 'reframe)
+;;; reframe.el ends here
