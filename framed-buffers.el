@@ -7,7 +7,7 @@
 ;; URL: https://git.sr.ht/~protesilaos/framed-buffers
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
 ;; Version: 0.0.0
-;; Package-Requires: ((emacs "27.1"))
+;; Package-Requires: ((emacs "27.1") (compat "29.1.3.2"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -30,6 +30,8 @@
 
 ;;; Code:
 
+(require 'compat)
+
 (defgroup framed-buffers ()
   "Isolate buffers per frame WORK-IN-PROGRESS."
   :group 'frames)
@@ -41,7 +43,23 @@ they have not been used by---and thus associated with---the
 current frame.
 
 Otherwise framed buffers are limited to the frame that uses them."
+  :group 'framed-buffers
+  :package-version '(framed-buffers . "0.1.0")
   :type '(repeat string))
+
+(defcustom framed-buffers-project-always-in-frame nil
+  "When non-nil, open projects in new frames with `framed-buffers-mode'.
+
+When the `framed-buffers-mode' is enabled, install advice around
+`project-prompt-project-dir' so that every prompt for a new
+project is prefixed with `other-frame-prefix'."
+  :group 'framed-buffers
+  :package-version '(framed-buffers . "0.1.0")
+  :initialize #'custom-initialize-default
+  :set (lambda (symbol value)
+         (set-default symbol value)
+         (framed-buffers-mode 1))
+  :type 'boolean)
 
 (defun framed-buffers--frame-buffers (&optional frame)
   "Produce list of buffers for either specified or current FRAME."
@@ -218,6 +236,14 @@ If FRAME is nil, use the current frame."
 (defvar framed-buffers--read-buffer-function nil
   "Last value of `read-buffer-function'.")
 
+(defun framed-buffers--with-other-frame (&rest app)
+  "Apply APP with `other-frame-prefix'.
+Use this as :around advice to commands that must make a new frame."
+  (funcall (compat-function other-frame-prefix))
+  (apply app))
+
+(declare-function project-prompt-project-dir "project")
+
 ;;;###autoload
 (define-minor-mode framed-buffers-mode
   "Make all buffer prompts limit candidates per frame."
@@ -227,11 +253,14 @@ If FRAME is nil, use the current frame."
         (setq framed-buffers--read-buffer-function read-buffer-function
               read-buffer-function #'framed-buffers-read-buffer)
         (add-hook 'after-make-frame-functions #'framed-buffers--frame-predicate)
-        (add-hook 'after-make-frame-functions #'framed-buffers--rename-frame))
+        (add-hook 'after-make-frame-functions #'framed-buffers--rename-frame)
+        (when framed-buffers-project-always-in-frame
+          (advice-add (compat-function project-prompt-project-dir) :around #'framed-buffers--with-other-frame)))
     (setq read-buffer-function framed-buffers--read-buffer-function
           framed-buffers--read-buffer-function nil)
     (remove-hook 'after-make-frame-functions #'framed-buffers--frame-predicate)
-    (remove-hook 'after-make-frame-functions #'framed-buffers--rename-frame)))
+    (remove-hook 'after-make-frame-functions #'framed-buffers--rename-frame)
+    (advice-remove (compat-function project-prompt-project-dir) #'framed-buffers--with-other-frame)))
 
 ;;;; Integration with `consult'
 
