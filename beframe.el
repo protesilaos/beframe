@@ -1,4 +1,4 @@
-;;; beframe.el --- WORK-IN-PROGRESS -*- lexical-binding: t -*-
+;;; beframe.el --- Isolate buffers per frame -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2023  Free Software Foundation, Inc.
 
@@ -26,14 +26,78 @@
 
 ;;; Commentary:
 ;;
-;; WORK-IN-PROGRESS
+;; `beframe' enables a frame-oriented Emacs workflow where each frame
+;; has access to the list of buffers visited therein.  In the interest
+;; of brevity, we call buffers that belong to frames "beframed".
+;; Beframing is achieved in two main ways:
+;;
+;; #+findex: beframe-switch-buffer
+;; 1. By calling the command `beframe-switch-buffer'.  It is like the
+;;    standard `switch-to-buffer' except the list of candidates is
+;;    limited to those that the current frame knows about.
+;;
+;; #+findex: beframe-mode
+;; 2. By enabling the global minor mode `beframe-mode'.  It sets the
+;;    `read-buffer-function' to one that filters buffers per frame.  As
+;;    such, commands like `switch-to-buffer', `next-buffer', and
+;;    `previous-buffer' automatically work in a beframed way.
+;;
+;; Producing multiple frames does not generate multiple buffer lists.
+;; There still is only one global list of buffers.  Beframing them simply
+;; filters the list.
+;;
+;; #+vindex: beframe-global-buffers
+;; The user option `beframe-global-buffers' contains a list of strings
+;; that represent buffers names.  Those buffers are never beframed and
+;; are available in all frames.  The default value contains the buffers
+;; `*scratch*', `*Messages*', and `*Backtrace*'.
+;;
+;; The `beframe-mode' does the following:
+;;
+;; - Sets the value of `read-buffer-function' to a function that
+;;   beframes all commands that read that variable.  This includes the
+;;   likes of `switch-to-buffer', `next-buffer', and `previous-buffer'.
+;;
+;; - Add a filter to newly created frames so that their
+;;   `buffer-predicate' parameter beframes buffers.
+;;
+;; - Renames newly created frames so that they have a potentially more
+;;   meaningful title.
+;;
+;;  #+vindex: beframe-functions-in-frames
+;; - When the user option `beframe-functions-in-frames' contains a list
+;;   of functions, it makes them run with `other-frame-prefix', meaning
+;;   that they are called in a new frame.  The default value of that
+;;   user option affects the `project.el' project-switching selection:
+;;   the new project buffer appears in its own frame and, thus, becomes
+;;   part of a beframed list of buffers, isolated from all other frames.
+;;
+;; Development note: `beframe' is in its early days.  The minor mode may
+;; be revised to have more features and/or greater flexibility.
+;;
+;; The `consult' package by Daniel Mendler (also known as @minad)
+;; provides commands that extend the functionality of the generic
+;; minibuffer.  Among them is `consult-buffer'.  With that command the
+;; user can search for buffers, recent files, and bookmarks, among
+;; others.
+;;
+;; `consult-buffer' displays a global list of buffers and is never
+;; beframed.  This is done by design.  Instead of forcing it to only show
+;; beframed buffers, we get the best of both worlds: (i) a convenient way
+;; to access the global list of buffers and (ii) a new entry to the
+;; `consult-buffer-sources' that registers beframed buffers as their own
+;; group.  Users can narrow directly to this group by typing `F' followed
+;; by `SPC'.
+;;
+;; Backronym: Buffers Encapsulated in Frames Realise Advanced
+;; Management of Emacs.
 
 ;;; Code:
 
 (require 'compat)
 
 (defgroup beframe ()
-  "Isolate buffers per frame WORK-IN-PROGRESS."
+  "Isolate buffers per frame."
   :group 'frames)
 
 (defcustom beframe-global-buffers '("*scratch*" "*Messages*" "*Backtrace*")
