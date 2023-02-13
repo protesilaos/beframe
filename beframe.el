@@ -6,7 +6,7 @@
 ;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
 ;; URL: https://git.sr.ht/~protesilaos/beframe
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
-;; Version: 0.0.0
+;; Version: 0.1.0
 ;; Package-Requires: ((emacs "27.1") (compat "29.1.3.2"))
 
 ;; This file is NOT part of GNU Emacs.
