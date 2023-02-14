@@ -312,9 +312,11 @@ frame.  See `beframe-functions-in-frames'."
   "Install advice for `beframe-functions-in-frames'.
 With optional DISABLE remove the advice."
   (dolist (cmd beframe-functions-in-frames)
-    (if disable
-        (advice-remove cmd #'beframe--with-other-frame)
-      (advice-add cmd :around #'beframe--with-other-frame))))
+    (cond
+     (disable
+      (advice-remove cmd #'beframe--with-other-frame))
+     (beframe-mode
+      (advice-add cmd :around #'beframe--with-other-frame)))))
 
 (declare-function project-prompt-project-dir "project")
 
