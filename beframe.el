@@ -62,7 +62,9 @@
 ;;   `buffer-predicate' parameter beframes buffers.
 ;;
 ;; - Renames newly created frames so that they have a potentially more
-;;   meaningful title.
+;;   meaningful title.  The user option `beframe-rename-function'
+;;   specifies the function that handles this process.  When its value
+;;   is nil, no renaming is performed.
 ;;
 ;;  #+vindex: beframe-functions-in-frames
 ;; - When the user option `beframe-functions-in-frames' contains a list
@@ -119,6 +121,22 @@ function so that every invocation of it is called with
 `other-frame-prefix'."
   :group 'beframe
   :package-version '(beframe . "0.1.0")
+  :initialize #'custom-initialize-default
+  :set (lambda (symbol value)
+         (beframe--functions-in-frames :disable)
+         (set-default symbol value)
+         (beframe--functions-in-frames))
+  :type '(repeat symbol))
+
+(defcustom beframe-rename-function #'beframe-rename-frame
+  "Function that renames new frames when `beframe-mode' is enabled.
+
+The function accepts one argument, the current frame, as is
+called by the `after-make-frame-functions' hook.
+
+If nil, no renaming is performed."
+  :group 'beframe
+  :package-version '(beframe . "0.2.0")
   :initialize #'custom-initialize-default
   :set (lambda (symbol value)
          (beframe--functions-in-frames :disable)
@@ -275,9 +293,8 @@ The window manager must permit such an operation.  See bug#61319:
 
 ;;; Minor mode setup
 
-(defun beframe--rename-frame (frame)
-  "Rename FRAME.
-Add this to `after-make-frame-functions'."
+(defun beframe-rename-frame (frame)
+  "Rename FRAME per `beframe-rename-function'."
   (select-frame frame)
   (set-frame-name
    (cond
@@ -329,12 +346,12 @@ With optional DISABLE remove the advice."
         (setq beframe--read-buffer-function read-buffer-function
               read-buffer-function #'beframe-read-buffer)
         (add-hook 'after-make-frame-functions #'beframe--frame-predicate)
-        (add-hook 'after-make-frame-functions #'beframe--rename-frame)
+        (add-hook 'after-make-frame-functions #'beframe-rename-function)
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
           beframe--read-buffer-function nil)
     (remove-hook 'after-make-frame-functions #'beframe--frame-predicate)
-    (remove-hook 'after-make-frame-functions #'beframe--rename-frame)
+    (remove-hook 'after-make-frame-functions #'beframe-rename-function)
     (beframe--functions-in-frames :disable)))
 
 ;;;; Integration with `consult'
