@@ -346,12 +346,12 @@ With optional DISABLE remove the advice."
         (setq beframe--read-buffer-function read-buffer-function
               read-buffer-function #'beframe-read-buffer)
         (add-hook 'after-make-frame-functions #'beframe--frame-predicate)
-        (add-hook 'after-make-frame-functions #'beframe-rename-function)
+        (add-hook 'after-make-frame-functions beframe-rename-function)
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
           beframe--read-buffer-function nil)
     (remove-hook 'after-make-frame-functions #'beframe--frame-predicate)
-    (remove-hook 'after-make-frame-functions #'beframe-rename-function)
+    (remove-hook 'after-make-frame-functions beframe-rename-function)
     (beframe--functions-in-frames :disable)))
 
 ;;;; Integration with `consult'
