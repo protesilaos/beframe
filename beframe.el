@@ -31,12 +31,10 @@
 ;; of brevity, we call buffers that belong to frames "beframed".
 ;; Beframing is achieved in two main ways:
 ;;
-;; #+findex: beframe-switch-buffer
 ;; 1. By calling the command `beframe-switch-buffer'.  It is like the
 ;;    standard `switch-to-buffer' except the list of candidates is
 ;;    limited to those that the current frame knows about.
 ;;
-;; #+findex: beframe-mode
 ;; 2. By enabling the global minor mode `beframe-mode'.  It sets the
 ;;    `read-buffer-function' to one that filters buffers per frame.  As
 ;;    such, commands like `switch-to-buffer', `next-buffer', and
@@ -46,7 +44,6 @@
 ;; There still is only one global list of buffers.  Beframing them simply
 ;; filters the list.
 ;;
-;; #+vindex: beframe-global-buffers
 ;; The user option `beframe-global-buffers' contains a list of strings
 ;; that represent buffers names.  Those buffers are never beframed and
 ;; are available in all frames.  The default value contains the buffers
@@ -66,7 +63,6 @@
 ;;   specifies the function that handles this process.  When its value
 ;;   is nil, no renaming is performed.
 ;;
-;;  #+vindex: beframe-functions-in-frames
 ;; - When the user option `beframe-functions-in-frames' contains a list
 ;;   of functions, it makes them run with `other-frame-prefix', meaning
 ;;   that they are called in a new frame.  The default value of that
