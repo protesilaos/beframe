@@ -202,6 +202,79 @@ Everything is in place to set up the package.
 (define-key global-map (kbd "C-x B") #'beframe-switch-buffer)
 #+end_src
 
+** Integration with Consult
+:PROPERTIES:
+:CUSTOM_ID: h:1c2d3d64-aa7b-4585-a418-ccedbb548b38
+:END:
+
+The ~consult~ package by Daniel Mendler provides several commands that
+enhance the standard minibuffer interface of Emacs.  One of them is
+~consult-buffer~ which lists buffers, recent files, bookmarks, and
+possibly other sources in a single interface.  With ~consult-buffer~
+the user can see previews of the given completion candidate and also
+narrow to a specific source.
+
+It is possible to add beframed buffers to the list of sources the
+~consult-buffer~ command reads from. Just add the following to the
+~beframe~ configuration:
+
+#+begin_src emacs-lisp
+(defvar consult-buffer-sources)
+(declare-function consult--buffer-state "consult")
+
+(with-eval-after-load 'consult
+  (defface beframe-buffer
+    '((t :inherit font-lock-string-face))
+    "Face for `consult' framed buffers.")
+
+  (defvar beframe--consult-source
+    `( :name     "Frame-specific buffers (current frame)"
+       :narrow   ?F
+       :category buffer
+       :face     beframe-buffer
+       :history  beframe-history
+       :items    ,#'beframe--buffer-names
+       :action   ,#'switch-to-buffer
+       :state    ,#'consult--buffer-state))
+
+  (add-to-list 'consult-buffer-sources 'beframe--consult-source))
+#+end_src
+
+** Integration with Ibuffer
+:PROPERTIES:
+:CUSTOM_ID: h:ae6c4c6b-179a-4d35-86b5-8b63bf614697
+:END:
+
+This is not perfect because frames can have duplicate buffers, but it
+works:
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'ibuffer
+  (defun beframe--buffer-in-frame (buf frame)
+    "Return non-nil if BUF is in FRAME."
+    (memq buf (beframe--buffer-list (beframe--frame-object frame))))
+
+  (defun beframe--frame-name-list ()
+    "Return list with frame names."
+    (mapcar #'car (make-frame-names-alist)))
+
+  (defun beframe-generate-ibuffer-filter-groups ()
+    "Create a set of ibuffer filter groups based on the vc root dirs of buffers."
+    (mapcar
+     (lambda (frame)
+       (list (format "%s" frame)
+             (list 'predicate 'beframe--buffer-in-frame '(current-buffer) frame)))
+     (beframe--frame-name-list)))
+
+  (setq ibuffer-saved-filter-groups
+        `(("Frames" ,@(beframe-generate-ibuffer-filter-groups))))
+
+  (define-ibuffer-filter frame
+      "Limit current view to buffers in frames."
+    (:description "frame")
+    (memq buf (beframe--buffer-list))))
+#+end_src
+
 * COPYING
 :PROPERTIES:
 :COPYING: t
