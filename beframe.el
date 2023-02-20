@@ -7,7 +7,7 @@
 ;; URL: https://git.sr.ht/~protesilaos/beframe
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
 ;; Version: 0.1.2
-;; Package-Requires: ((emacs "27.1") (compat "29.1.3.2"))
+;; Package-Requires: ((emacs "28.1"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -91,9 +91,6 @@
 ;; Management of Emacs.
 
 ;;; Code:
-
-(require 'compat)
-(require 'project)
 
 (defgroup beframe ()
   "Isolate buffers per frame."
@@ -319,7 +316,7 @@ If FRAME is nil, use the current frame."
   "Apply APP with `other-frame-prefix'.
 Use this as :around advice to commands that must make a new
 frame.  See `beframe-functions-in-frames'."
-  (funcall (compat-function other-frame-prefix))
+  (funcall #'other-frame-prefix)
   (apply app))
 
 (defun beframe--functions-in-frames (&optional disable)
