@@ -287,6 +287,26 @@ The window manager must permit such an operation.  See bug#61319:
 
 ;;; Minor mode setup
 
+(defvar beframe--read-buffer-function nil
+  "Last value of `read-buffer-function'.")
+
+;;;###autoload
+(define-minor-mode beframe-mode
+  "Make all buffer prompts limit candidates per frame."
+  :global t
+  (if beframe-mode
+      (progn
+        (setq beframe--read-buffer-function read-buffer-function
+              read-buffer-function #'beframe-read-buffer)
+        (add-hook 'after-make-frame-functions #'beframe--frame-predicate)
+        (add-hook 'after-make-frame-functions beframe-rename-function)
+        (beframe--functions-in-frames))
+    (setq read-buffer-function beframe--read-buffer-function
+          beframe--read-buffer-function nil)
+    (remove-hook 'after-make-frame-functions #'beframe--frame-predicate)
+    (remove-hook 'after-make-frame-functions beframe-rename-function)
+    (beframe--functions-in-frames :disable)))
+
 (defun beframe-rename-frame (frame)
   "Rename FRAME per `beframe-rename-function'."
   (select-frame frame)
@@ -309,9 +329,6 @@ BUF is a buffer object among `beframe--buffer-list'."
 If FRAME is nil, use the current frame."
   (set-frame-parameter frame 'buffer-predicate #'beframe--frame-parameter-p))
 
-(defvar beframe--read-buffer-function nil
-  "Last value of `read-buffer-function'.")
-
 (defun beframe--with-other-frame (&rest app)
   "Apply APP with `other-frame-prefix'.
 Use this as :around advice to commands that must make a new
@@ -329,23 +346,5 @@ With optional DISABLE remove the advice."
      (beframe-mode
       (advice-add cmd :around #'beframe--with-other-frame)))))
 
-(declare-function project-prompt-project-dir "project")
-
-;;;###autoload
-(define-minor-mode beframe-mode
-  "Make all buffer prompts limit candidates per frame."
-  :global t
-  (if beframe-mode
-      (progn
-        (setq beframe--read-buffer-function read-buffer-function
-              read-buffer-function #'beframe-read-buffer)
-        (add-hook 'after-make-frame-functions #'beframe--frame-predicate)
-        (add-hook 'after-make-frame-functions beframe-rename-function)
-        (beframe--functions-in-frames))
-    (setq read-buffer-function beframe--read-buffer-function
-          beframe--read-buffer-function nil)
-    (remove-hook 'after-make-frame-functions #'beframe--frame-predicate)
-    (remove-hook 'after-make-frame-functions beframe-rename-function)
-    (beframe--functions-in-frames :disable)))
 (provide 'beframe)
 ;;; beframe.el ends here
