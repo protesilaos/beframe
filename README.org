@@ -102,10 +102,11 @@ The ~beframe-mode~ does the following:
  #+vindex: beframe-functions-in-frames
 - When the user option ~beframe-functions-in-frames~ contains a list
   of functions, it makes them run with ~other-frame-prefix~, meaning
-  that they are called in a new frame.  The default value of that
-  user option affects the =project.el= project-switching selection:
-  the new project buffer appears in its own frame and, thus, becomes
-  part of a beframed list of buffers, isolated from all other frames.
+  that they are called in a new frame.  For example, the user can add
+  a list that includes ~project-prompt-project-dir~ from the built-in
+  ~project~ library.  With that the new project buffer appears in its
+  own frame and, thus, becomes part of a beframed list of buffers,
+  isolated from all other frames.
 
 Development note: ~beframe~ is in its early days.  The minor mode may
 be revised to have more features and/or greater flexibility.

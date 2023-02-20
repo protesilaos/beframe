@@ -107,7 +107,7 @@ Otherwise framed buffers are limited to the frame that uses them."
   :package-version '(beframe . "0.1.0")
   :type '(repeat string))
 
-(defcustom beframe-functions-in-frames (list (compat-function project-prompt-project-dir))
+(defcustom beframe-functions-in-frames nil
   "Functions that use new frame when `beframe-mode' is enabled.
 
 When `beframe-mode' is enabled, install advice around each
