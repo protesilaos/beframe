@@ -93,6 +93,7 @@
 ;;; Code:
 
 (require 'compat)
+(require 'project)
 
 (defgroup beframe ()
   "Isolate buffers per frame."
