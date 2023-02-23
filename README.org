@@ -79,6 +79,23 @@ that represent buffers names.  Those buffers are never beframed and
 are available in all frames.  The default value contains the buffers
 =*scratch*=, =*Messages*=, and =*Backtrace*=.
 
+[ The following are part of {{{development-version}}}. ]
+
+#+vindex: beframe-create-frame-scratch-buffer
+The user option ~beframe-create-frame-scratch-buffer~ allows
+~beframe-mode~ to create a frame-specific scratch buffer that runs the
+~initial-major-mode~.  This is done upon the creation of a new frame
+and the scratch buffer is named after the frame it belongs to.  For
+example, if the frame is called =modus-themes=, the corresponding
+scratch buffer is =*scratch for modus-themes*=.  Set this user option
+to ~nil~ to disable the creation of such scratch buffers.
+
+#+vindex: beframe-kill-frame-scratch-buffer
+The user option ~beframe-kill-frame-scratch-buffer~ is the counterpart
+of ~beframe-create-frame-scratch-buffer~.  It kills the frame-specific
+scratch buffer after the frame is deleted.  Set this user option to
+~nil~ to disable the killing of such buffers.
+
 * Features of ~beframe-mode~
 :PROPERTIES:
 :CUSTOM_ID: h:5b751614-8749-4aa8-aaed-f181beaddc57
@@ -107,6 +124,10 @@ The ~beframe-mode~ does the following:
   ~project~ library.  With that the new project buffer appears in its
   own frame and, thus, becomes part of a beframed list of buffers,
   isolated from all other frames.
+
+- Handles the creation and deletion of frame-specific scratch buffers,
+  per the user options ~beframe-create-frame-scratch-buffer~,
+  ~beframe-kill-frame-scratch-buffer~ ([[#h:9979c363-d7b6-4382-b2ce-a93f64043b4b][Overview]]).
 
 Development note: ~beframe~ is in its early days.  The minor mode may
 be revised to have more features and/or greater flexibility.

@@ -49,6 +49,20 @@
 ;; are available in all frames.  The default value contains the buffers
 ;; `*scratch*', `*Messages*', and `*Backtrace*'.
 ;;
+;; The user option `beframe-create-frame-scratch-buffer' allows
+;; `beframe-mode' to create a frame-specific scratch buffer that runs
+;; the `initial-major-mode'.  This is done upon the creation of a new
+;; frame and the scratch buffer is named after the frame it belongs
+;; to.  For example, if the frame is called `modus-themes', the
+;; corresponding scratch buffer is `*scratch for modus-themes*'.  Set
+;; this user option to `nil' to disable the creation of such scratch
+;; buffers.
+;;
+;; The user option `beframe-kill-frame-scratch-buffer' is the
+;; counterpart of `beframe-create-frame-scratch-buffer'.  It kills the
+;; frame-specific scratch buffer after the frame is deleted.  Set this
+;; user option to `nil' to disable the killing of such buffers.
+;;
 ;; The `beframe-mode' does the following:
 ;;
 ;; - Sets the value of `read-buffer-function' to a function that
@@ -69,6 +83,10 @@
 ;;   user option affects the `project.el' project-switching selection:
 ;;   the new project buffer appears in its own frame and, thus, becomes
 ;;   part of a beframed list of buffers, isolated from all other frames.
+;;
+;; - Handles the creation and deletion of frame-specific scratch
+;;   buffers,per the user options `beframe-create-frame-scratch-buffer',
+;;   `beframe-kill-frame-scratch-buffer'.
 ;;
 ;; Development note: `beframe' is in its early days.  The minor mode may
 ;; be revised to have more features and/or greater flexibility.
@@ -106,6 +124,26 @@ Otherwise framed buffers are limited to the frame that uses them."
   :group 'beframe
   :package-version '(beframe . "0.1.0")
   :type '(repeat string))
+
+(defcustom beframe-create-frame-scratch-buffer t
+  "Create a frame-specific scratch buffer for new frames.
+Do it when `beframe-mode' is enabled.
+
+The frame-specific scratch buffer runs `initial-major-mode'.
+
+Also see `beframe-kill-frame-scratch-buffer'."
+  :group 'beframe
+  :package-version '(beframe . "0.2.0")
+  :type 'boolean)
+
+(defcustom beframe-kill-frame-scratch-buffer t
+  "Kill the frame-specific scratch buffer when the frame is deleted.
+Do it when `beframe-mode' is enabled.
+
+Also see `beframe-create-frame-scratch-buffer'."
+  :group 'beframe
+  :package-version '(beframe . "0.2.0")
+  :type 'boolean)
 
 (defcustom beframe-functions-in-frames nil
   "Functions that use new frame when `beframe-mode' is enabled.
@@ -300,12 +338,26 @@ The window manager must permit such an operation.  See bug#61319:
               read-buffer-function #'beframe-read-buffer)
         (add-hook 'after-make-frame-functions #'beframe--frame-predicate)
         (add-hook 'after-make-frame-functions beframe-rename-function)
+        (add-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
           beframe--read-buffer-function nil)
     (remove-hook 'after-make-frame-functions #'beframe--frame-predicate)
     (remove-hook 'after-make-frame-functions beframe-rename-function)
+    (remove-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
     (beframe--functions-in-frames :disable)))
+
+(defun beframe-create-scratch-buffer (name)
+  "Create scratch buffer in `initial-major-mode' for frame with NAME.
+NAME is either a string or a frame object (per `framep')."
+  (let* ((name (if (framep name) (frame-parameter name 'name) name))
+         (buf (get-buffer-create (format "*scratch for %s*" name))))
+    (with-current-buffer buf
+      (funcall initial-major-mode)
+      (add-hook 'delete-frame-functions
+                (lambda (_frame)
+                  (when beframe-kill-frame-scratch-buffer
+                    (kill-buffer buf)))))))
 
 (defun beframe-rename-frame (frame)
   "Rename FRAME per `beframe-rename-function'."
