@@ -389,10 +389,9 @@ its placement and other parameters."
     (remove-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
     (beframe--functions-in-frames :disable)))
 
-(defun beframe-create-scratch-buffer (name)
-  "Create scratch buffer in `initial-major-mode' for frame with NAME.
-NAME is either a string or a frame object (per `framep')."
-  (let* ((name (if (framep name) (frame-parameter name 'name) name))
+(defun beframe-create-scratch-buffer (frame)
+  "Create scratch buffer in `initial-major-mode' for FRAME."
+  (let* ((name (frame-parameter frame 'name))
          (buf (get-buffer-create (format "*scratch for %s*" name))))
     (with-current-buffer buf
       (funcall initial-major-mode)
