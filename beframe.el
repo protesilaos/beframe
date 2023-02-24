@@ -225,7 +225,7 @@ it must satisfy `framep'."
     (when (consp buf)
       (setq b (car buf)))
     (unless (string-prefix-p " " b)
-      (seq-contains-p (beframe--buffer-names frame) b #'string-match-p))))
+      (seq-contains-p (beframe--buffer-names frame) b))))
 
 (defvar beframe-history nil
   "Minibuffer history of frame specific buffers.")
