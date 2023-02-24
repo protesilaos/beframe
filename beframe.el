@@ -396,6 +396,8 @@ NAME is either a string or a frame object (per `framep')."
          (buf (get-buffer-create (format "*scratch for %s*" name))))
     (with-current-buffer buf
       (funcall initial-major-mode)
+      (when (zerop (buffer-size))
+        (insert initial-scratch-message))
       (add-hook 'delete-frame-functions
                 (lambda (_frame)
                   (when beframe-kill-frame-scratch-buffer
