@@ -6,7 +6,7 @@
 ;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
 ;; URL: https://git.sr.ht/~protesilaos/beframe
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
-;; Version: 0.1.4
+;; Version: 0.1.5
 ;; Package-Requires: ((emacs "28.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -203,9 +203,10 @@ With optional FRAME as an object that satisfies `framep', return
 the list of buffers that are used by FRAME.
 
 Include `beframe-global-buffers' in the list."
-  (delete-dups
-   (append (beframe--frame-buffers frame)
-           (beframe--global-buffers))))
+  (delq nil
+        (delete-dups
+         (append (beframe--frame-buffers frame)
+                 (beframe--global-buffers)))))
 
 (defun beframe--buffer-names (&optional frame)
   "Return list of names of `beframe--buffer-list' as strings.
