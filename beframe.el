@@ -6,7 +6,7 @@
 ;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
 ;; URL: https://git.sr.ht/~protesilaos/beframe
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
-;; Version: 0.1.6
+;; Version: 0.1.7
 ;; Package-Requires: ((emacs "28.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -400,7 +400,12 @@ its placement and other parameters."
       (add-hook 'delete-frame-functions
                 (lambda (_frame)
                   (when beframe-kill-frame-scratch-buffer
-                    (kill-buffer buf)))))))
+                    (kill-buffer buf)))))
+    (let* ((frame-bufs (beframe--buffer-list frame))
+           (frame-bufs-with-buf (push buf frame-bufs)))
+      (modify-frame-parameters
+       frame
+       `((buffer-list . ,frame-bufs-with-buf))))))
 
 (defun beframe-rename-frame (frame)
   "Rename FRAME per `beframe-rename-function'."
