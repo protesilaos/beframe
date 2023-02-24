@@ -415,15 +415,15 @@ NAME is either a string or a frame object (per `framep')."
     (t
      default-directory))))
 
-(defun beframe--frame-parameter-p (buf)
+(defun beframe--frame-buffer-p (buf &optional frame)
   "Return non-nil if BUF belongs to the current frame.
-BUF is a buffer object among `beframe--buffer-list'."
-  (memq buf (beframe--buffer-list)))
+Use optional FRAME to test if BUF belongs to it."
+  (memq buf (beframe--buffer-list frame)))
 
 (defun beframe--frame-predicate (&optional frame)
   "Set FRAME `buffer-predicate' parameter.
 If FRAME is nil, use the current frame."
-  (set-frame-parameter frame 'buffer-predicate #'beframe--frame-parameter-p))
+  (set-frame-parameter frame 'buffer-predicate #'beframe--frame-buffer-p))
 
 (defun beframe--with-other-frame (&rest app)
   "Apply APP with `other-frame-prefix'.
