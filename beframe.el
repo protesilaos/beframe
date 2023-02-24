@@ -6,7 +6,7 @@
 ;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
 ;; URL: https://git.sr.ht/~protesilaos/beframe
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
-;; Version: 0.1.5
+;; Version: 0.1.6
 ;; Package-Requires: ((emacs "28.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -330,6 +330,25 @@ The window manager must permit such an operation.  See bug#61319:
   (select-frame-set-input-focus frame)
   (switch-to-buffer buffer))
 
+(defun beframe--list-buffers-noselect (&optional frame)
+  "Produce a buffer list of buffers for optional FRAME.
+When FRAME is nil, use the current one.
+
+This is a simplified variant of `list-buffers-noselect'."
+  (let* ((frame (if (framep frame) frame (selected-frame)))
+         (name (frame-parameter frame 'name))
+         (old-buf (current-buffer))
+         (buf (get-buffer-create (format "*Buffer List for %s*" name)))
+         (buffer-list (beframe--buffer-list frame)))
+    (with-current-buffer buf
+      (Buffer-menu-mode)
+      (setq-local Buffer-menu-files-only nil
+                  Buffer-menu-buffer-list buffer-list
+                  Buffer-menu-filter-predicate nil)
+      (list-buffers--refresh buffer-list old-buf)
+      (tabulated-list-print))
+    buf))
+
 ;;;###autoload
 (defun beframe-buffer-menu (&optional frame)
   "Produce a `buffer-menu' for the current FRAME.
@@ -343,7 +362,7 @@ its placement and other parameters."
    (list
     (when current-prefix-arg
       (beframe--frame-object (beframe--frame-prompt)))))
-  (display-buffer (list-buffers-noselect nil (beframe--buffer-list frame)))
+  (display-buffer (beframe--list-buffers-noselect frame))
   (buffer-menu--display-help))
 
 ;;; Minor mode setup
