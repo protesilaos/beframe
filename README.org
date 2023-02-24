@@ -54,7 +54,7 @@ the GNU ELPA machinery automatically generates an Info manual out of it.
 ~beframe~ enables a frame-oriented Emacs workflow where each frame has
 access to the list of buffers visited therein.  In the interest of
 brevity, we call buffers that belong to frames "beframed".  Beframing
-is achieved in two main ways:
+is achieved in three main ways:
 
 #+findex: beframe-switch-buffer
 1. By calling the command ~beframe-switch-buffer~.  It is like the
@@ -66,6 +66,14 @@ is achieved in two main ways:
    ~read-buffer-function~ to one that filters buffers per frame.  As
    such, commands like ~switch-to-buffer~, ~next-buffer~, and
    ~previous-buffer~ automatically work in a beframed way.
+
+#+findex: beframe-buffer-menu
+3. The command ~beframe-buffer-menu~ produces a dedicated buffer with
+   a list of buffers for the current frame.  This is the counterpart
+   of ~beframe-switch-buffer~.  When called with a prefix argument
+   (=C-u= with default key bindings), it prompts for a frame whose
+   buffers it will display.  [ ~beframe-buffer-menu~ is part of
+   {{{development-version}}}. ]
 
 [[#h:5b751614-8749-4aa8-aaed-f181beaddc57][Features of beframe-mode]].
 
@@ -222,6 +230,11 @@ Everything is in place to set up the package.
 ;; do not need this command if you enable `beframe-mode', as
 ;; `switch-to-buffer' only shows a list of beframed buffers.
 (define-key global-map (kbd "C-x B") #'beframe-switch-buffer)
+
+;; Replace the generic `buffer-menu'.  With a prefix argument, this
+;; commands prompts for a frame.  Call the `buffer-menu' via M-x if
+;; you absolutely need the global list of buffers.
+(define-key global-map (kbd "C-x C-b") #'beframe-buffer-menu)
 #+end_src
 
 ** Integration with Consult

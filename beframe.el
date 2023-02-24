@@ -6,7 +6,7 @@
 ;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
 ;; URL: https://git.sr.ht/~protesilaos/beframe
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
-;; Version: 0.1.3
+;; Version: 0.1.4
 ;; Package-Requires: ((emacs "28.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -29,7 +29,7 @@
 ;; `beframe' enables a frame-oriented Emacs workflow where each frame
 ;; has access to the list of buffers visited therein.  In the interest
 ;; of brevity, we call buffers that belong to frames "beframed".
-;; Beframing is achieved in two main ways:
+;; Beframing is achieved in three main ways:
 ;;
 ;; 1. By calling the command `beframe-switch-buffer'.  It is like the
 ;;    standard `switch-to-buffer' except the list of candidates is
@@ -39,6 +39,12 @@
 ;;    `read-buffer-function' to one that filters buffers per frame.  As
 ;;    such, commands like `switch-to-buffer', `next-buffer', and
 ;;    `previous-buffer' automatically work in a beframed way.
+;;
+;; 3. The command `beframe-buffer-menu' produces a dedicated buffer with
+;;    a list of buffers for the current frame.  This is the counterpart
+;;    of `beframe-switch-buffer'.  When called with a prefix argument
+;;    (`C-u' with default key bindings), it prompts for a frame whose
+;;    buffers it will display.
 ;;
 ;; Producing multiple frames does not generate multiple buffer lists.
 ;; There still is only one global list of buffers.  Beframing them simply
@@ -322,6 +328,22 @@ The window manager must permit such an operation.  See bug#61319:
      (list obj (beframe--buffer-prompt obj))))
   (select-frame-set-input-focus frame)
   (switch-to-buffer buffer))
+
+;;;###autoload
+(defun beframe-buffer-menu (&optional frame)
+  "Produce a `buffer-menu' for the current FRAME.
+With FRAME as a prefix argument, prompt for a frame.  When called
+from Lisp, FRAME satisfies `framep'.
+
+The bespoke buffer menu is displayed in a window using
+`display-buffer'.  Configure `display-buffer-alist' to control
+its placement and other parameters."
+  (interactive
+   (list
+    (when current-prefix-arg
+      (beframe--frame-object (beframe--frame-prompt)))))
+  (display-buffer (list-buffers-noselect nil (beframe--buffer-list frame)))
+  (buffer-menu--display-help))
 
 ;;; Minor mode setup
 
