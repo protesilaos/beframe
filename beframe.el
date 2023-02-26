@@ -408,17 +408,68 @@ its placement and other parameters."
        frame
        `((buffer-list . ,frame-bufs-with-buf))))))
 
-(defun beframe-rename-frame (frame)
-  "Rename FRAME per `beframe-rename-function'."
-  (select-frame frame)
-  (set-frame-name
-   (cond
-    ((and (not (minibufferp)) (buffer-file-name))
-     (format "%s  %s" (buffer-name) default-directory))
-    ((not (minibufferp))
-     (buffer-name))
-    (t
-     default-directory))))
+(defvar beframe--rename-frame-history nil
+  "Minibuffer history for `beframe-rename-frame'.")
+
+(defun beframe--rename-scratch-buffer (frame-name)
+  "Try to rename the scratch buffer associated with FRAME-NAME."
+  (when (member (format "*scratch for %s*" frame-name) (beframe--buffer-list))
+    (rename-buffer (frame-parameter (beframe--frame-object frame-name) 'name))))
+
+(defun beframe--infer-frame-name (frame name)
+  "Infer a suitable name for FRAME with given NAME.
+See `beframe-rename-frame'."
+  (let* ((buffer (car (frame-parameter frame 'buffer-list)))
+         (file-name (when (bufferp buffer)
+                      (buffer-file-name buffer)))
+         (buf-name (buffer-name buffer))
+         (dir (with-current-buffer buffer
+                default-directory)))
+    (cond
+     ((and name (stringp name))
+      name)
+     ((and (not (minibufferp)) file-name)
+      (format "%s  %s" buf-name dir))
+     ((not (minibufferp))
+      buf-name)
+     (t
+      dir))))
+
+;;;###autoload
+(defun beframe-rename-frame (frame &optional name)
+  "Rename FRAME per `beframe-rename-function'.
+
+When called interactively, prompt for FRAME.  Else accept FRAME
+if it is an object that satisfies `framep'.
+
+With optional NAME as a string, use it to name the given FRAME.
+When called interactively, prompt for NAME when a prefix argument
+is given.
+
+With no NAME argument try to infer a name based on the following:
+
+- If the current window has a buffer that visits a file, name the
+  FRAME after the file's name and its `default-directory'.
+
+- If the current window has a non-file-visiting buffer, use the
+  `buffer-name' as the FRAME name.
+
+- Else use the `default-directory'.
+
+Remember that this function doubles as an example for
+`beframe-rename-function': copy it and modify it accordingly."
+  (interactive
+   (let ((select-frame (beframe--frame-prompt)))
+     (list
+      (beframe--frame-object select-frame)
+      (when current-prefix-arg
+        (read-string
+         (format "Rename the frame now called `%s' to: "
+                 select-frame)
+         nil 'beframe--rename-frame-history select-frame)))))
+  (modify-frame-parameters
+   frame
+   (list (cons 'name (beframe--infer-frame-name frame name)))))
 
 (defun beframe--frame-buffer-p (buf &optional frame)
   "Return non-nil if BUF belongs to the current frame.
