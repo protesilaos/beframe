@@ -411,10 +411,12 @@ its placement and other parameters."
 (defvar beframe--rename-frame-history nil
   "Minibuffer history for `beframe-rename-frame'.")
 
-(defun beframe--rename-scratch-buffer (frame-name)
-  "Try to rename the scratch buffer associated with FRAME-NAME."
-  (when (member (format "*scratch for %s*" frame-name) (beframe--buffer-list))
-    (rename-buffer (frame-parameter (beframe--frame-object frame-name) 'name))))
+;; (defun beframe--rename-scratch-buffer (frame name)
+;;   "Rename the scratch buffer associated with FRAME according to NAME."
+;;   (when-let* ((buf (get-buffer (format "*scratch for %s*" frame)))
+;;               ((member (format "*scratch for %s*" frame) (beframe--buffer-list))))
+;;     (with-current-buffer buf
+;;       (rename-buffer (format "*scratch for %s*" name)))))
 
 (defun beframe--infer-frame-name (frame name)
   "Infer a suitable name for FRAME with given NAME.
@@ -467,6 +469,8 @@ Remember that this function doubles as an example for
          (format "Rename the frame now called `%s' to: "
                  select-frame)
          nil 'beframe--rename-frame-history select-frame)))))
+  ;; (when name
+  ;;   (beframe--rename-scratch-buffer frame name))
   (modify-frame-parameters
    frame
    (list (cons 'name (beframe--infer-frame-name frame name)))))
