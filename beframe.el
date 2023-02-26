@@ -403,7 +403,7 @@ its placement and other parameters."
                              (null frame))
                     (kill-buffer buf)))))
     (let* ((frame-bufs (beframe--buffer-list frame))
-           (frame-bufs-with-buf (push buf frame-bufs)))
+           (frame-bufs-with-buf (append frame-bufs (list buf))))
       (modify-frame-parameters
        frame
        `((buffer-list . ,frame-bufs-with-buf))))))
