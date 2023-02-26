@@ -6,7 +6,7 @@
 ;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
 ;; URL: https://git.sr.ht/~protesilaos/beframe
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
-;; Version: 0.1.7
+;; Version: 0.1.8
 ;; Package-Requires: ((emacs "28.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -398,8 +398,9 @@ its placement and other parameters."
       (when (zerop (buffer-size))
         (insert initial-scratch-message))
       (add-hook 'delete-frame-functions
-                (lambda (_frame)
-                  (when beframe-kill-frame-scratch-buffer
+                (lambda (frame)
+                  (when (and beframe-kill-frame-scratch-buffer
+                             (null frame))
                     (kill-buffer buf)))))
     (let* ((frame-bufs (beframe--buffer-list frame))
            (frame-bufs-with-buf (push buf frame-bufs)))
