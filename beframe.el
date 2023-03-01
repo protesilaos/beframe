@@ -362,8 +362,7 @@ its placement and other parameters."
    (list
     (when current-prefix-arg
       (beframe--frame-object (beframe--frame-prompt)))))
-  (display-buffer (beframe--list-buffers-noselect frame))
-  (buffer-menu--display-help))
+  (display-buffer (beframe--list-buffers-noselect frame)))
 
 ;;; Minor mode setup
 
