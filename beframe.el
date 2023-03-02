@@ -6,7 +6,7 @@
 ;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
 ;; URL: https://git.sr.ht/~protesilaos/beframe
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
-;; Version: 0.1.9
+;; Version: 0.1.10
 ;; Package-Requires: ((emacs "28.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -68,6 +68,14 @@
 ;; counterpart of `beframe-create-frame-scratch-buffer'.  It kills the
 ;; frame-specific scratch buffer after the frame is deleted.  Set this
 ;; user option to `nil' to disable the killing of such buffers.
+;;
+;; The command `beframe-assume-frame-buffers' (alias
+;; `beframe-add-frame-buffers') prompts for a frame and then copies
+;; its buffer list into the current frame.
+;;
+;; The command `beframe-unassume-frame-buffers' (alias
+;; `beframe-remove-frame-buffers') prompts for a frame and then
+;; removes its buffer list from the current frame.
 ;;
 ;; The `beframe-mode' does the following:
 ;;
@@ -363,6 +371,44 @@ its placement and other parameters."
     (when current-prefix-arg
       (beframe--frame-object (beframe--frame-prompt)))))
   (display-buffer (beframe--list-buffers-noselect frame)))
+
+;;;###autoload
+(defun beframe-assume-frame-buffers (frame)
+  "Assume FRAME buffer list, copying it into current buffer list.
+When called interactively, prompt for FRAME using completion.
+Else FRAME must satisfy `framep'.
+
+Also see `beframe-unassume-frame-buffers'."
+  (interactive (list (beframe--frame-object (beframe--frame-prompt))))
+  (let* ((other-buffer-list (beframe--buffer-list frame))
+         (buffers (delete-dups (append other-buffer-list (beframe--buffer-list)))))
+    (modify-frame-parameters
+     nil
+     `((buffer-list . ,buffers)))))
+
+(defalias 'beframe-add-frame-buffers 'beframe-assume-frame-buffers
+  "Alias of `beframe-assume-frame-buffers' command.")
+
+;;;###autoload
+(defun beframe-unassume-frame-buffers (frame)
+  "Unassume FRAME buffer list, removing it from current buffer list.
+When called interactively, prompt for FRAME using completion.
+Else FRAME must satisfy `framep'.
+
+Also see `beframe-assume-frame-buffers'."
+  (interactive (list (beframe--frame-object (beframe--frame-prompt))))
+  (let* ((other-buffer-list (beframe--buffer-list frame))
+         (new-buffer-list
+          (seq-filter
+           (lambda (buf)
+             (not (member buf other-buffer-list)))
+           (beframe--buffer-list))))
+    (modify-frame-parameters
+     nil
+     `((buffer-list . ,new-buffer-list)))))
+
+(defalias 'beframe-remove-frame-buffers 'beframe-unassume-frame-buffers
+  "Alias of `beframe-unassume-frame-buffers' command.")
 
 ;;; Minor mode setup
 

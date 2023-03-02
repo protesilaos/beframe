@@ -104,6 +104,18 @@ of ~beframe-create-frame-scratch-buffer~.  It kills the frame-specific
 scratch buffer after the frame is deleted.  Set this user option to
 ~nil~ to disable the killing of such buffers.
 
+#+findex: beframe-assume-frame-buffers
+#+findex: beframe-add-frame-buffers
+The command ~beframe-assume-frame-buffers~ (alias
+~beframe-add-frame-buffers~) prompts for a frame and then copies its
+buffer list into the current frame.
+
+#+findex: beframe-unassume-frame-buffers
+#+findex: beframe-remove-frame-buffers
+The command ~beframe-unassume-frame-buffers~ (alias
+~beframe-remove-frame-buffers~) prompts for a frame and then removes
+its buffer list from the current frame.
+
 * Features of ~beframe-mode~
 :PROPERTIES:
 :CUSTOM_ID: h:5b751614-8749-4aa8-aaed-f181beaddc57
