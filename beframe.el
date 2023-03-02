@@ -378,7 +378,8 @@ its placement and other parameters."
         (setq beframe--read-buffer-function read-buffer-function
               read-buffer-function #'beframe-read-buffer)
         (add-hook 'after-make-frame-functions #'beframe--frame-predicate)
-        (add-hook 'after-make-frame-functions beframe-rename-function)
+        (when beframe-rename-function
+          (add-hook 'after-make-frame-functions beframe-rename-function))
         (add-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
