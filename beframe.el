@@ -410,6 +410,9 @@ Also see `beframe-assume-frame-buffers'."
 (defalias 'beframe-remove-frame-buffers 'beframe-unassume-frame-buffers
   "Alias of `beframe-unassume-frame-buffers' command.")
 
+;; TODO 2023-03-02: Define commands to `completing-read-multiple'
+;; assume/unassume buffers.
+
 ;;; Minor mode setup
 
 (defvar beframe--read-buffer-function nil
