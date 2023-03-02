@@ -394,7 +394,8 @@ its placement and other parameters."
          (buf (get-buffer-create (format "*scratch for %s*" name))))
     (with-current-buffer buf
       (funcall initial-major-mode)
-      (when (zerop (buffer-size))
+      (when (and (zerop (buffer-size))
+                 (stringp initial-scratch-message))
         (insert initial-scratch-message))
       (add-hook 'delete-frame-functions
                 (lambda (frame)
