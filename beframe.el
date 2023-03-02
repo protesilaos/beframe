@@ -429,7 +429,8 @@ Also see `beframe-assume-frame-buffers'."
         (add-hook 'after-make-frame-functions #'beframe--frame-predicate)
         (when beframe-rename-function
           (add-hook 'after-make-frame-functions beframe-rename-function))
-        (add-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
+        (when beframe-create-frame-scratch-buffer
+          (add-hook 'after-make-frame-functions #'beframe-create-scratch-buffer))
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
           beframe--read-buffer-function nil)

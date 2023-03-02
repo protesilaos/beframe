@@ -333,7 +333,8 @@ matters.
 
 + Author/maintainer :: Protesilaos Stavrou.
 
-+ Ideas and/or user feedback :: Karan Ahlawat, Karthik Chikmagalur.
++ Ideas and/or user feedback :: Derek Passen, Karan Ahlawat, Karthik
+  Chikmagalur.
 
 * COPYING
 :PROPERTIES:
