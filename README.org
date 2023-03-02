@@ -310,6 +310,19 @@ works:
     (memq buf (beframe--buffer-list))))
 #+end_src
 
+* Acknowledgements
+:PROPERTIES:
+:CUSTOM_ID: h:809bde28-beeb-473f-99b0-0116da23b03e
+:END:
+#+cindex: Contributors
+
+Beframe is meant to be a collective effort.  Every bit of help
+matters.
+
++ Author/maintainer :: Protesilaos Stavrou.
+
++ Ideas and/or user feedback :: Karan Ahlawat.
+
 * COPYING
 :PROPERTIES:
 :COPYING: t
