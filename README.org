@@ -321,7 +321,7 @@ matters.
 
 + Author/maintainer :: Protesilaos Stavrou.
 
-+ Ideas and/or user feedback :: Karan Ahlawat.
++ Ideas and/or user feedback :: Karan Ahlawat, Karthik Chikmagalur.
 
 * COPYING
 :PROPERTIES:
