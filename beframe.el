@@ -124,6 +124,8 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl-lib))
+
 (defgroup beframe ()
   "Isolate buffers per frame."
   :group 'frames)
@@ -205,24 +207,32 @@ If nil, no renaming is performed."
      (get-buffer name))
    beframe-global-buffers))
 
-(defun beframe--buffer-list (&optional frame)
+(cl-defun beframe--buffer-list (&optional frame &key sort)
   "Return list of buffers that are used by the current frame.
 With optional FRAME as an object that satisfies `framep', return
 the list of buffers that are used by FRAME.
 
-Include `beframe-global-buffers' in the list."
-  (delq nil
-        (delete-dups
-         (append (beframe--frame-buffers frame)
-                 (beframe--global-buffers)))))
+They key SORT may be a function taking the list of buffers as an
+argument, and returning a new list to be used instead.  This can,
+for example, used to prefer hidden buffers to visible ones—see
+`beframe-buffer-sort-visibility'.
 
-(defun beframe--buffer-names (&optional frame)
+Include `beframe-global-buffers' in the list."
+  (funcall (or sort #'identity)
+           (delq nil
+                 (delete-dups
+                  (append (beframe--frame-buffers frame)
+                          (beframe--global-buffers))))))
+
+(cl-defun beframe--buffer-names (&optional frame &key sort)
   "Return list of names of `beframe--buffer-list' as strings.
-With optional FRAME, do it for the given frame name."
+With optional FRAME, do it for the given frame name.  With key
+SORT, apply this sorting function—see `beframe--buffer-list' for
+more information."
   (mapcar
    (lambda (buf)
      (buffer-name buf))
-   (beframe--buffer-list frame)))
+   (beframe--buffer-list frame :sort sort)))
 
 (defun beframe--read-buffer-p (buf &optional frame)
   "Return non-nil if BUF belongs to the current FRAME.
@@ -338,16 +348,18 @@ The window manager must permit such an operation.  See bug#61319:
   (select-frame-set-input-focus frame)
   (switch-to-buffer buffer))
 
-(defun beframe--list-buffers-noselect (&optional frame)
+(cl-defun beframe--list-buffers-noselect (&optional frame &key sort)
   "Produce a buffer list of buffers for optional FRAME.
-When FRAME is nil, use the current one.
+When FRAME is nil, use the current one.  With key SORT, apply
+this sorting function—see `beframe--buffer-list' for more
+information.
 
 This is a simplified variant of `list-buffers-noselect'."
   (let* ((frame (if (framep frame) frame (selected-frame)))
          (name (frame-parameter frame 'name))
          (old-buf (current-buffer))
          (buf (get-buffer-create (format "*Buffer List for %s*" name)))
-         (buffer-list (beframe--buffer-list frame)))
+         (buffer-list (beframe--buffer-list frame :sort sort)))
     (with-current-buffer buf
       (Buffer-menu-mode)
       (setq-local Buffer-menu-files-only nil
@@ -358,10 +370,11 @@ This is a simplified variant of `list-buffers-noselect'."
     buf))
 
 ;;;###autoload
-(defun beframe-buffer-menu (&optional frame)
+(cl-defun beframe-buffer-menu (&optional frame &key sort)
   "Produce a `buffer-menu' for the current FRAME.
 With FRAME as a prefix argument, prompt for a frame.  When called
-from Lisp, FRAME satisfies `framep'.
+from Lisp, FRAME satisfies `framep'.  With key SORT, apply this
+sorting function—see `beframe--buffer-list' for more information.
 
 The bespoke buffer menu is displayed in a window using
 `display-buffer'.  Configure `display-buffer-alist' to control
@@ -370,7 +383,7 @@ its placement and other parameters."
    (list
     (when current-prefix-arg
       (beframe--frame-object (beframe--frame-prompt)))))
-  (display-buffer (beframe--list-buffers-noselect frame)))
+  (display-buffer (beframe--list-buffers-noselect frame :sort sort)))
 
 ;;;###autoload
 (defun beframe-assume-frame-buffers (frame)
@@ -552,6 +565,21 @@ With optional DISABLE remove the advice."
       (advice-remove cmd #'beframe--with-other-frame))
      (beframe-mode
       (advice-add cmd :around #'beframe--with-other-frame)))))
+
+(defun beframe-buffer-sort-visibility (buffers)
+  "Sort the given BUFFERS by visibility.
+Concretely, this means this function will return a sequence that
+first lists hidden, then visible, and then the current buffer."
+  (let* ((current (current-buffer))
+         (bufs (seq-group-by
+                (lambda (buf)
+                  (cond ((eq buf current)                 :current)
+                        ((get-buffer-window buf 'visible) :visible)
+                        (t                                :hidden)))
+                buffers)))
+    (nconc (alist-get :hidden  bufs)
+           (alist-get :visible bufs)
+           (alist-get :current bufs))))
 
 (provide 'beframe)
 ;;; beframe.el ends here
