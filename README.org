@@ -287,6 +287,21 @@ It is possible to add beframed buffers to the list of sources the
   (add-to-list 'consult-buffer-sources 'beframe--consult-source))
 #+end_src
 
+Much like ~consult--buffer-query~ itself, the ~beframe--buffer-names~
+function may also take a keyword argument ~:sort~.  In our case, this is
+a function that can be used to sort—or otherwise modify—the list of
+buffers.  You can use this to, for example, prefer hidden frames over
+visible ones.  To integrate a sorting function with the above setup, one
+could first define
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/beframe-items (&optional frame)
+    (beframe--buffer-names frame :sort #'beframe-buffer-sort-visibility))
+#+END_SRC
+
+and then appropriately modify the ~:items~ field of the
+~beframe--consult-source~ variable: ~:items ,#'my/beframe-items~.
+
 ** Integration with Ibuffer
 :PROPERTIES:
 :CUSTOM_ID: h:ae6c4c6b-179a-4d35-86b5-8b63bf614697
