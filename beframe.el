@@ -212,9 +212,9 @@ If nil, no renaming is performed."
 With optional FRAME as an object that satisfies `framep', return
 the list of buffers that are used by FRAME.
 
-They key SORT may be a function taking the list of buffers as an
+The key SORT may be a function taking the list of buffers as an
 argument, and returning a new list to be used instead.  This can,
-for example, used to prefer hidden buffers to visible ones—see
+for example, be used to prefer hidden buffers to visible ones—see
 `beframe-buffer-sort-visibility'.
 
 Include `beframe-global-buffers' in the list."
