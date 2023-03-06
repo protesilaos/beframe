@@ -207,7 +207,7 @@ If nil, no renaming is performed."
      (get-buffer name))
    beframe-global-buffers))
 
-(cl-defun beframe--buffer-list (&optional frame &key sort)
+(cl-defun beframe-buffer-list (&optional frame &key sort)
   "Return list of buffers that are used by the current frame.
 With optional FRAME as an object that satisfies `framep', return
 the list of buffers that are used by FRAME.
@@ -224,15 +224,25 @@ Include `beframe-global-buffers' in the list."
                   (append (beframe--frame-buffers frame)
                           (beframe--global-buffers))))))
 
-(cl-defun beframe--buffer-names (&optional frame &key sort)
-  "Return list of names of `beframe--buffer-list' as strings.
+(define-obsolete-function-alias
+  'beframe--buffer-list
+  'beframe-buffer-list
+  "0.2.0")
+
+(cl-defun beframe-buffer-names (&optional frame &key sort)
+  "Return list of names of `beframe-buffer-list' as strings.
 With optional FRAME, do it for the given frame name.  With key
-SORT, apply this sorting function—see `beframe--buffer-list' for
+SORT, apply this sorting function—see `beframe-buffer-list' for
 more information."
   (mapcar
    (lambda (buf)
      (buffer-name buf))
-   (beframe--buffer-list frame :sort sort)))
+   (beframe-buffer-list frame :sort sort)))
+
+(define-obsolete-function-alias
+  'beframe--buffer-names
+  'beframe-buffer-names
+  "0.2.0")
 
 (defun beframe--read-buffer-p (buf &optional frame)
   "Return non-nil if BUF belongs to the current FRAME.
@@ -243,7 +253,7 @@ it must satisfy `framep'."
     (when (consp buf)
       (setq b (car buf)))
     (unless (string-prefix-p " " b)
-      (seq-contains-p (beframe--buffer-names frame) b))))
+      (seq-contains-p (beframe-buffer-names frame) b))))
 
 (defvar beframe-history nil
   "Minibuffer history of frame specific buffers.")
@@ -255,7 +265,7 @@ PROMPT, DEF, REQUIRE-MATCH, and PREDICATE are the same as
 `read-buffer'.  The PREDICATE is ignored, however, to apply the
 per-frame filter."
   (completing-read prompt
-                   (beframe--buffer-names)
+                   (beframe-buffer-names)
                    #'beframe--read-buffer-p
                    require-match
                    nil
@@ -263,7 +273,7 @@ per-frame filter."
                    def))
 
 (defun beframe--buffer-prompt (&optional frame)
-  "Prompt for buffer among `beframe--buffer-names'.
+  "Prompt for buffer among `beframe-buffer-names'.
 
 Use the previous buffer as the default value, such that
 subsequent invocations of this command flip between the current
@@ -348,10 +358,10 @@ The window manager must permit such an operation.  See bug#61319:
   (select-frame-set-input-focus frame)
   (switch-to-buffer buffer))
 
-(cl-defun beframe--list-buffers-noselect (&optional frame &key sort)
+(cl-defun beframe-list-buffers-noselect (&optional frame &key sort)
   "Produce a buffer list of buffers for optional FRAME.
 When FRAME is nil, use the current one.  With key SORT, apply
-this sorting function—see `beframe--buffer-list' for more
+this sorting function—see `beframe-buffer-list' for more
 information.
 
 This is a simplified variant of `list-buffers-noselect'."
@@ -359,7 +369,7 @@ This is a simplified variant of `list-buffers-noselect'."
          (name (frame-parameter frame 'name))
          (old-buf (current-buffer))
          (buf (get-buffer-create (format "*Buffer List for %s*" name)))
-         (buffer-list (beframe--buffer-list frame :sort sort)))
+         (buffer-list (beframe-buffer-list frame :sort sort)))
     (with-current-buffer buf
       (Buffer-menu-mode)
       (setq-local Buffer-menu-files-only nil
@@ -369,12 +379,17 @@ This is a simplified variant of `list-buffers-noselect'."
       (tabulated-list-print))
     buf))
 
+(define-obsolete-function-alias
+  'beframe--list-buffers-noselect
+  'beframe-list-buffers-noselect
+  "0.2.0")
+
 ;;;###autoload
 (cl-defun beframe-buffer-menu (&optional frame &key sort)
   "Produce a `buffer-menu' for the current FRAME.
 With FRAME as a prefix argument, prompt for a frame.  When called
 from Lisp, FRAME satisfies `framep'.  With key SORT, apply this
-sorting function—see `beframe--buffer-list' for more information.
+sorting function—see `beframe-buffer-list' for more information.
 
 The bespoke buffer menu is displayed in a window using
 `display-buffer'.  Configure `display-buffer-alist' to control
@@ -383,7 +398,7 @@ its placement and other parameters."
    (list
     (when current-prefix-arg
       (beframe--frame-object (beframe--frame-prompt)))))
-  (display-buffer (beframe--list-buffers-noselect frame :sort sort)))
+  (display-buffer (beframe-list-buffers-noselect frame :sort sort)))
 
 ;;;###autoload
 (defun beframe-assume-frame-buffers (frame)
@@ -393,8 +408,8 @@ Else FRAME must satisfy `framep'.
 
 Also see `beframe-unassume-frame-buffers'."
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
-  (let* ((other-buffer-list (beframe--buffer-list frame))
-         (buffers (delete-dups (append other-buffer-list (beframe--buffer-list)))))
+  (let* ((other-buffer-list (beframe-buffer-list frame))
+         (buffers (delete-dups (append other-buffer-list (beframe-buffer-list)))))
     (modify-frame-parameters
      nil
      `((buffer-list . ,buffers)))))
@@ -410,12 +425,12 @@ Else FRAME must satisfy `framep'.
 
 Also see `beframe-assume-frame-buffers'."
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
-  (let* ((other-buffer-list (beframe--buffer-list frame))
+  (let* ((other-buffer-list (beframe-buffer-list frame))
          (new-buffer-list
           (seq-filter
            (lambda (buf)
              (not (member buf other-buffer-list)))
-           (beframe--buffer-list))))
+           (beframe-buffer-list))))
     (modify-frame-parameters
      nil
      `((buffer-list . ,new-buffer-list)))))
@@ -466,7 +481,7 @@ Also see `beframe-assume-frame-buffers'."
                   (when (and beframe-kill-frame-scratch-buffer
                              (null frame))
                     (kill-buffer buf)))))
-    (let* ((frame-bufs (beframe--buffer-list frame))
+    (let* ((frame-bufs (beframe-buffer-list frame))
            (frame-bufs-with-buf (append frame-bufs (list buf))))
       (modify-frame-parameters
        frame
@@ -478,7 +493,7 @@ Also see `beframe-assume-frame-buffers'."
 ;; (defun beframe--rename-scratch-buffer (frame name)
 ;;   "Rename the scratch buffer associated with FRAME according to NAME."
 ;;   (when-let* ((buf (get-buffer (format "*scratch for %s*" frame)))
-;;               ((member (format "*scratch for %s*" frame) (beframe--buffer-list))))
+;;               ((member (format "*scratch for %s*" frame) (beframe-buffer-list))))
 ;;     (with-current-buffer buf
 ;;       (rename-buffer (format "*scratch for %s*" name)))))
 
@@ -542,7 +557,7 @@ Remember that this function doubles as an example for
 (defun beframe--frame-buffer-p (buf &optional frame)
   "Return non-nil if BUF belongs to the current frame.
 Use optional FRAME to test if BUF belongs to it."
-  (memq buf (beframe--buffer-list frame)))
+  (memq buf (beframe-buffer-list frame)))
 
 (defun beframe--frame-predicate (&optional frame)
   "Set FRAME `buffer-predicate' parameter.

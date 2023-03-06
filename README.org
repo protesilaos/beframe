@@ -274,20 +274,21 @@ It is possible to add beframed buffers to the list of sources the
     '((t :inherit font-lock-string-face))
     "Face for `consult' framed buffers.")
 
-  (defvar beframe--consult-source
+  (defvar beframe-consult-source
     `( :name     "Frame-specific buffers (current frame)"
        :narrow   ?F
        :category buffer
        :face     beframe-buffer
        :history  beframe-history
-       :items    ,#'beframe--buffer-names
+       :items    ,#'beframe-buffer-names
        :action   ,#'switch-to-buffer
        :state    ,#'consult--buffer-state))
 
-  (add-to-list 'consult-buffer-sources 'beframe--consult-source))
+  (add-to-list 'consult-buffer-sources 'beframe-consult-source))
 #+end_src
 
-Much like ~consult--buffer-query~ itself, the ~beframe--buffer-names~
+#+findex: beframe-buffer-names
+Much like ~consult--buffer-query~ itself, the ~beframe-buffer-names~
 function may also take a keyword argument ~:sort~.  In our case, this is
 a function that can be used to sort—or otherwise modify—the list of
 buffers.  You can use this to, for example, prefer hidden frames over
@@ -296,11 +297,11 @@ could first define
 
 #+BEGIN_SRC emacs-lisp
   (defun my/beframe-items (&optional frame)
-    (beframe--buffer-names frame :sort #'beframe-buffer-sort-visibility))
+    (beframe-buffer-names frame :sort #'beframe-buffer-sort-visibility))
 #+END_SRC
 
 and then appropriately modify the ~:items~ field of the
-~beframe--consult-source~ variable: ~:items ,#'my/beframe-items~.
+~beframe-consult-source~ variable: ~:items ,#'my/beframe-items~.
 
 ** Integration with Ibuffer
 :PROPERTIES:
@@ -312,11 +313,11 @@ works:
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'ibuffer
-  (defun beframe--buffer-in-frame (buf frame)
+  (defun beframe-buffer-in-frame (buf frame)
     "Return non-nil if BUF is in FRAME."
-    (memq buf (beframe--buffer-list (beframe--frame-object frame))))
+    (memq buf (beframe-buffer-list (beframe-frame-object frame))))
 
-  (defun beframe--frame-name-list ()
+  (defun beframe-frame-name-list ()
     "Return list with frame names."
     (mapcar #'car (make-frame-names-alist)))
 
@@ -325,8 +326,8 @@ works:
     (mapcar
      (lambda (frame)
        (list (format "%s" frame)
-             (list 'predicate 'beframe--buffer-in-frame '(current-buffer) frame)))
-     (beframe--frame-name-list)))
+             (list 'predicate 'beframe-buffer-in-frame '(current-buffer) frame)))
+     (beframe-frame-name-list)))
 
   (setq ibuffer-saved-filter-groups
         `(("Frames" ,@(beframe-generate-ibuffer-filter-groups))))
@@ -334,7 +335,7 @@ works:
   (define-ibuffer-filter frame
       "Limit current view to buffers in frames."
     (:description "frame")
-    (memq buf (beframe--buffer-list))))
+    (memq buf (beframe-buffer-list))))
 #+end_src
 
 * Acknowledgements
