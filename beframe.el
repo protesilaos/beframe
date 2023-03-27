@@ -441,6 +441,22 @@ Also see `beframe-assume-frame-buffers',
 (defalias 'beframe-remove-buffers 'beframe-unassume-buffers
   "Alias of `beframe-unassume-buffers' command.")
 
+;;;###autoload
+(defun beframe-assume-all-buffers-no-prompts ()
+  "Assume the consolidated buffer list (all frames)."
+  (declare (interactive-only t))
+  (interactive)
+  (beframe--assume (beframe--buffer-list-consolidated)))
+
+;;;###autoload
+(defun beframe-unassume-all-buffers-no-prompts ()
+  "Unassume the consolidated buffer list (all frames).
+Keep only the `beframe-global-buffers'."
+  (declare (interactive-only t))
+  (interactive)
+  (beframe--unassume (beframe--buffer-list-consolidated))
+  (beframe--assume (beframe--global-buffers)))
+
 ;;; Minor mode setup
 
 (defvar beframe--read-buffer-function nil
