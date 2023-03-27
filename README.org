@@ -116,6 +116,25 @@ The command ~beframe-unassume-frame-buffers~ (alias
 ~beframe-remove-frame-buffers~) prompts for a frame and then removes
 its buffer list from the current frame.
 
+#+findex: beframe-assume-buffers
+#+findex: beframe-add-buffers
+The command ~beframe-assume-buffers~ (alias ~beframe-add-buffers~)
+adds buffers from a given frame to the current frame.  In interactive
+use, the command first prompts for a frame and then asks about the
+list of buffers therein.  The to-be-assumed buffer list is compiled
+with ~completing-read-multiple~.  This means that the user can select
+multiple buffers, each separated by the ~crm-separator~ (typically a
+comma).
+
+#+findex: beframe-unassume-buffers
+#+findex: beframe-remove-buffers
+The command ~beframe-unassume-buffers~ (alias
+~beframe-remove-buffers~) removes buffers from the current frame.  In
+interactive use, the to-be-unassumed buffer list is compiled with
+~completing-read-multiple~.  This means that the user can select
+multiple buffers, each separated by the ~crm-separator~ (typically a
+comma).
+
 * Features of ~beframe-mode~
 :PROPERTIES:
 :CUSTOM_ID: h:5b751614-8749-4aa8-aaed-f181beaddc57

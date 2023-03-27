@@ -77,6 +77,21 @@
 ;; `beframe-remove-frame-buffers') prompts for a frame and then
 ;; removes its buffer list from the current frame.
 ;;
+;; The command `beframe-assume-buffers' (alias `beframe-add-buffers')
+;; adds buffers from a given frame to the current frame.  In interactive
+;; use, the command first prompts for a frame and then asks about the
+;; list of buffers therein.  The to-be-assumed buffer list is compiled
+;; with `completing-read-multiple'.  This means that the user can select
+;; multiple buffers, each separated by the `crm-separator' (typically a
+;; comma).
+;;
+;; The command `beframe-unassume-buffers' (alias
+;; `beframe-remove-buffers') removes buffers from the current frame.  In
+;; interactive use, the to-be-unassumed buffer list is compiled with
+;; `completing-read-multiple'.  This means that the user can select
+;; multiple buffers, each separated by the `crm-separator' (typically a
+;; comma).
+;;
 ;; The `beframe-mode' does the following:
 ;;
 ;; - Sets the value of `read-buffer-function' to a function that
@@ -406,7 +421,8 @@ its placement and other parameters."
 When called interactively, prompt for FRAME using completion.
 Else FRAME must satisfy `framep'.
 
-Also see `beframe-unassume-frame-buffers'."
+Also see `beframe-unassume-frame-buffers',
+`beframe-assume-buffers', `beframe-unassume-buffers'."
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
   (let* ((other-buffer-list (beframe-buffer-list frame))
          (buffers (delete-dups (append other-buffer-list (beframe-buffer-list)))))
@@ -423,7 +439,8 @@ Also see `beframe-unassume-frame-buffers'."
 When called interactively, prompt for FRAME using completion.
 Else FRAME must satisfy `framep'.
 
-Also see `beframe-assume-frame-buffers'."
+Also see `beframe-assume-frame-buffers',
+`beframe-assume-buffers', `beframe-unassume-buffers'."
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
   (let* ((other-buffer-list (beframe-buffer-list frame))
          (new-buffer-list
@@ -438,8 +455,74 @@ Also see `beframe-assume-frame-buffers'."
 (defalias 'beframe-remove-frame-buffers 'beframe-unassume-frame-buffers
   "Alias of `beframe-unassume-frame-buffers' command.")
 
-;; TODO 2023-03-02: Define commands to `completing-read-multiple'
-;; assume/unassume buffers.
+(defun beframe--buffers-name-to-objects (buffers)
+  "Convert list of named BUFFERS to their corresponding objects."
+  (mapcar
+   (lambda (buf)
+     (get-buffer buf))
+   buffers))
+
+(defun beframe--buffer-list-prompt-crm (&optional frame)
+  "Select one or more buffers in FRAME separated by `crm-separator'.
+Optional FRAME argument is an object that satisfies `framep'.  If
+FRAME is nil, the current frame is used."
+  (completing-read-multiple
+   "Select buffers: "
+   (beframe-buffer-names frame)
+   nil
+   :require-match))
+
+;;;###autoload
+(defun beframe-assume-buffers (buffers)
+  "Assume BUFFERS from a frame into the current buffer list.
+
+In interactive use, BUFFERS is determined with a prompt that is
+powered by `completing-read-multiple'.  Multiple candidates can
+be selected, each separated by the `crm-separator' (typically a
+comma).
+
+Also see `beframe-assume-frame-buffers',
+`beframe-unassume-buffers', `beframe-unassume-frame-buffers'."
+  (interactive
+   (list
+    (beframe--buffers-name-to-objects
+     (beframe--buffer-list-prompt-crm
+      (beframe--frame-object
+       (beframe--frame-prompt))))))
+  (let ((buffer-list (delete-dups (append buffers (beframe-buffer-list)))))
+    (modify-frame-parameters
+     nil
+     `((buffer-list . ,buffer-list)))))
+
+(defalias 'beframe-add-buffers 'beframe-assume-buffers
+  "Alias of `beframe-assume-buffers' command.")
+
+;;;###autoload
+(defun beframe-unassume-buffers (buffers)
+  "Unassume BUFFERS from the current frame's buffer list.
+
+In interactive use, BUFFERS is determined with a prompt that is
+powered by `completing-read-multiple'.  Multiple candidates can
+be selected, each separated by the `crm-separator' (typically a
+comma).
+
+Also see `beframe-assume-frame-buffers',
+`beframe-assume-buffers', `beframe-unassume-frame-buffers'."
+  (interactive
+   (list
+    (beframe--buffers-name-to-objects
+     (beframe--buffer-list-prompt-crm))))
+  (let ((buffer-list
+         (seq-filter
+          (lambda (buf)
+            (not (member buf buffers)))
+          (beframe-buffer-list))))
+    (modify-frame-parameters
+     nil
+     `((buffer-list . ,buffer-list)))))
+
+(defalias 'beframe-remove-buffers 'beframe-unassume-buffers
+  "Alias of `beframe-unassume-buffers' command.")
 
 ;;; Minor mode setup
 
