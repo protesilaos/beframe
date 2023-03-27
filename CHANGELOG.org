@@ -1,0 +1,126 @@
+#+title: Change log of Beframe
+#+author: Protesilaos Stavrou
+#+email: info@protesilaos.com
+#+options: ':nil toc:nil num:nil author:nil email:nil
+
+This document contains the release notes for each tagged commit on the
+project's main git repository: <https://git.sr.ht/~protesilaos/beframe>.
+
+The newest release is at the top.  For further details, please consult
+the manual: <https://protesilaos.com/emacs/beframe>.
+
+* 0.2.0
+
+There were no release notes for the initial version of Beframe.  Watch
+the video demo I produced on 2023-02-28 to get an overview of what
+this package is all about:
+<https://protesilaos.com/codelog/2023-02-28-emacs-beframe-demo/>.
+
+In short: beframe your buffers, not your outlook.  Oops that is for
+the philosophy blog! 🙃
+
+** A beframed buffer menu
+
+The command ~beframe-buffer-menu~ produces a dedicated buffer with a
+list of buffers for the current frame.  This is the counterpart of
+~beframe-switch-buffer~.  When called with a prefix argument (=C-u=
+with default key bindings), it prompts for a frame whose buffers it
+will display.
+
+** Frame-specific scratch buffer
+
+The user option ~beframe-create-frame-scratch-buffer~ allows
+~beframe-mode~ to create a frame-specific scratch buffer that runs the
+~initial-major-mode~.  This is done upon the creation of a new frame
+and the scratch buffer is named after the frame it belongs to.  For
+example, if the frame is called =modus-themes=, the corresponding
+scratch buffer is =*scratch for modus-themes*=.  Set this user option
+to ~nil~ to disable the creation of such scratch buffers.
+
+The user option ~beframe-kill-frame-scratch-buffer~ is the counterpart
+of ~beframe-create-frame-scratch-buffer~.  It kills the frame-specific
+scratch buffer after the frame is deleted.  Set this user option to
+~nil~ to disable the killing of such buffers.
+
+** Assuming and unassuming buffers
+
+Beframe makes it possible to add or remove buffers from the list of
+buffers associated with the current frame.  This provides for a
+flexible workflow where buffers can be initially beframed yet
+consolidated into new lists on demand.
+
+*** Assuming buffers
+
+To assume buffers is to include them in the buffer list associated
+with the current frame.
+
+- The command ~beframe-assume-frame-buffers~ (alias
+  ~beframe-add-frame-buffers~) prompts for a frame and then copies its
+  buffer list into the current frame.
+
+- The command ~beframe-assume-buffers~ (alias ~beframe-add-buffers~)
+  adds buffers from a given frame to the current frame.  In
+  interactive use, the command first prompts for a frame and then asks
+  about the list of buffers therein.  The to-be-assumed buffer list is
+  compiled with ~completing-read-multiple~.  This means that the user
+  can select multiple buffers, each separated by the ~crm-separator~
+  (typically a comma).
+
+- The command ~beframe-assume-buffers-all-frames~ prompts with
+  minibuffer completion for a list of buffers to assume.  The
+  interface is the same as that of ~beframe-assume-buffers~ except
+  that there is no prompt for a frame: buffers belong to the
+  consolidated buffer list (all frames).
+
+- The command ~beframe-assume-all-buffers-no-prompts~ unconditionally
+  assumes the consolidated buffer list.
+
+*** Unassuming buffers
+
+To unassume buffers is to omit them from the buffer list associated with
+the current frame.
+
+- The command ~beframe-unassume-frame-buffers~ (alias
+  ~beframe-remove-frame-buffers~) prompts for a frame and then removes
+  its buffer list from the current frame.
+
+- The command ~beframe-unassume-buffers~ (alias
+  ~beframe-remove-buffers~) removes buffers from the current frame.
+  In interactive use, the to-be-unassumed buffer list is compiled with
+  ~completing-read-multiple~.  This means that the user can select
+  multiple buffers, each separated by the ~crm-separator~ (typically a
+  comma).
+
+- The command ~beframe-unassume-all-buffers-no-prompts~ unconditionally
+  unassumes the consolidated buffer list, but preserves the list
+  stored in the user option ~beframe-global-buffers~.
+
+** Sort beframed buffers from Lisp
+
+This is courtesy of Tony Zorman:
+<https://lists.sr.ht/~protesilaos/general-issues/%3C87edq4n3qt.fsf%40hyperspace%3E>.
+
+#+begin_quote
+commit dfa4678c208e1e5c41413f2d39416f84c21f28ff
+Author: Tony Zorman <soliditsallgood@mailbox.org>
+Date:   Sat Mar 4 11:48:17 2023 +0100
+
+  Add the ability to sort the buffer list
+
+  Some completion libraries, like consult, give the user the option to
+  sort the list of buffers according to some strategy.  For example,
+  sorting by visibility—in the sense that one is first shown hidden
+  buffers, then visible ones, and only then the current buffer—may be
+  preferrable when deciding to switch buffers via consult-buffer.
+
+  Since beframe.el can be used as a consult source (see the manual),
+  endowing beframe--buffer-list with an arbitrary sort function greatly
+  improves the synergy between the two libraries.
+
+ beframe.el | 56 ++++++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 42 insertions(+), 14 deletions(-)
+#+end_quote
+
+The manual explains how this works in practice:
+<https://protesilaos.com/emacs/beframe#h:1c2d3d64-aa7b-4585-a418-ccedbb548b38>.
+Thanks to Tony Zorman for including the reference to the sorting mechanism!

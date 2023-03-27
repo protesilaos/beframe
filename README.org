@@ -4,9 +4,9 @@
 #+language:              en
 #+options:               ':t toc:nil author:t email:t num:t
 #+startup:               content
-#+macro:                 stable-version 0.1.1
-#+macro:                 release-date 2023-02-14
-#+macro:                 development-version 0.2.0-dev
+#+macro:                 stable-version 0.2.0
+#+macro:                 release-date 2023-03-27
+#+macro:                 development-version 0.3.0-dev
 #+export_file_name:      beframe.texi
 #+texinfo_filename:      beframe.info
 #+texinfo_dir_category:  Emacs misc features
@@ -73,8 +73,7 @@ is achieved in three main ways:
    a list of buffers for the current frame.  This is the counterpart
    of ~beframe-switch-buffer~.  When called with a prefix argument
    (=C-u= with default key bindings), it prompts for a frame whose
-   buffers it will display.  [ ~beframe-buffer-menu~ is part of
-   {{{development-version}}}. ]
+   buffers it will display.
 
 [[#h:5b751614-8749-4aa8-aaed-f181beaddc57][Features of beframe-mode]].
 
@@ -87,8 +86,6 @@ The user option ~beframe-global-buffers~ contains a list of strings
 that represent buffers names.  Those buffers are never beframed and
 are available in all frames.  The default value contains the buffers
 =*scratch*=, =*Messages*=, and =*Backtrace*=.
-
-[ The following are part of {{{development-version}}}. ]
 
 #+vindex: beframe-create-frame-scratch-buffer
 The user option ~beframe-create-frame-scratch-buffer~ allows
@@ -110,8 +107,6 @@ scratch buffer after the frame is deleted.  Set this user option to
 :CUSTOM_ID: h:97b140d0-677d-427d-b9c4-631dc36dbab7
 :END:
 
-[ Part of {{{development-version}}}. ]
-
 Beframe makes it possible to add or remove buffers from the list of
 buffers associated with the current frame.  This provides for a
 flexible workflow where buffers can be initially beframed yet
@@ -121,8 +116,6 @@ consolidated into new lists on demand.
 :PROPERTIES:
 :CUSTOM_ID: h:dc12ca87-9ba7-4d11-89c8-653bf19015a1
 :END:
-
-[ Part of {{{development-version}}}. ]
 
 To assume buffers is to include them in the buffer list associated
 with the current frame.
@@ -158,8 +151,6 @@ with the current frame.
 :PROPERTIES:
 :CUSTOM_ID: h:8fb895ac-7f99-4c92-b15a-18871b30c7b9
 :END:
-
-[ Part of {{{development-version}}}. ]
 
 To unassume buffers is to omit them from the buffer list associated with
 the current frame.
