@@ -219,25 +219,6 @@ The ~beframe-mode~ does the following:
 Development note: ~beframe~ is in its early days.  The minor mode may
 be revised to have more features and/or greater flexibility.
 
-* Integration with the ~consult~ package
-:PROPERTIES:
-:CUSTOM_ID: h:4d154a72-2ae2-43d6-a599-8a739cb2a8c2
-:END:
-
-The ~consult~ package by Daniel Mendler (also known as @minad)
-provides commands that extend the functionality of the generic
-minibuffer.  Among them is ~consult-buffer~.  With that command the
-user can search for buffers, recent files, and bookmarks, among
-others.
-
-~consult-buffer~ displays a global list of buffers and is never
-beframed.  This is done by design.  Instead of forcing it to only show
-beframed buffers, we get the best of both worlds: (i) a convenient way
-to access the global list of buffers and (ii) a new entry to the
-~consult-buffer-sources~ that registers beframed buffers as their own
-group.  Users can narrow directly to this group by typing =F= followed
-by =SPC=.
-
 * Installation
 :PROPERTIES:
 :CUSTOM_ID: h:62cdea75-5d49-4f8e-a11b-83fca49fb92b
