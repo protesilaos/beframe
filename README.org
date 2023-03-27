@@ -114,8 +114,8 @@ scratch buffer after the frame is deleted.  Set this user option to
 
 Beframe makes it possible to add or remove buffers from the list of
 buffers associated with the current frame.  This provides for a
-flexible workflow where buffers can be beframed but consolidated on
-demand into new lists.
+flexible workflow where buffers can be initially beframed yet
+consolidated into new lists on demand.
 
 ** Assuming buffers
 :PROPERTIES:
@@ -124,7 +124,7 @@ demand into new lists.
 
 [ Part of {{{development-version}}}. ]
 
-To assume buffers is to include them from the buffer list associated
+To assume buffers is to include them in the buffer list associated
 with the current frame.
 
   #+findex: beframe-assume-frame-buffers
@@ -161,8 +161,8 @@ with the current frame.
 
 [ Part of {{{development-version}}}. ]
 
-To unassume buffers is to omit them from the buffer list associated
-with the current frame.
+To unassume buffers is to omit them from the buffer list associated with
+the current frame.
 
   #+findex: beframe-unassume-frame-buffers
   #+findex: beframe-remove-frame-buffers
