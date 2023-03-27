@@ -392,10 +392,17 @@ Also see `beframe-assume-frame-buffers',
 (defun beframe--buffer-list-prompt-crm (&optional frame)
   "Select one or more buffers in FRAME separated by `crm-separator'.
 Optional FRAME argument is an object that satisfies `framep'.  If
-FRAME is nil, the current frame is used."
+FRAME is nil, the current frame is used.  If FRAME is non-nil but
+not a frame object, treat it as a flag for the consolidated
+buffer list (buffers from all frames)."
   (completing-read-multiple
    "Select buffers: "
-   (beframe-buffer-names frame)
+   (cond
+    ((framep frame)
+     (beframe-buffer-names frame))
+    (frame
+     (beframe--buffer-names-consolidated))
+    (t (beframe-buffer-names)))
    nil
    :require-match))
 
@@ -420,6 +427,16 @@ Also see `beframe-assume-frame-buffers',
 
 (defalias 'beframe-add-buffers 'beframe-assume-buffers
   "Alias of `beframe-assume-buffers' command.")
+
+;;;###autoload
+(defun beframe-assume-buffers-all-frames ()
+  "Like `beframe-assume-buffers' but for the consolidated buffer list (all frames)."
+  (declare (interactive-only t))
+  (interactive)
+  (beframe--assume
+   (beframe--buffers-name-to-objects
+    (beframe--buffer-list-prompt-crm
+     :all-frames))))
 
 ;;;###autoload
 (defun beframe-unassume-buffers (buffers)
