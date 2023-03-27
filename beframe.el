@@ -135,6 +135,16 @@ Include `beframe-global-buffers' in the list."
                   (append (beframe--frame-buffers frame)
                           (beframe--global-buffers))))))
 
+(defun beframe--buffer-list-consolidated ()
+  "Return list of buffers from all frames.
+This is the same as the output of the `buffer-list' function
+minus all the internal buffers."
+  (seq-filter
+   (lambda (buf)
+     (and (bufferp buf)
+          (not (string-prefix-p " " (buffer-name buf)))))
+   (buffer-list)))
+
 (define-obsolete-function-alias
   'beframe--buffer-list
   'beframe-buffer-list
@@ -149,6 +159,13 @@ more information."
    (lambda (buf)
      (buffer-name buf))
    (beframe-buffer-list frame :sort sort)))
+
+(defun beframe--buffer-names-consolidated ()
+  "Return list of names of all buffers as strings."
+  (mapcar
+   (lambda (buf)
+     (buffer-name buf))
+   (beframe--buffer-list-consolidated)))
 
 (define-obsolete-function-alias
   'beframe--buffer-names
