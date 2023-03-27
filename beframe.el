@@ -415,6 +415,32 @@ its placement and other parameters."
       (beframe--frame-object (beframe--frame-prompt)))))
   (display-buffer (beframe-list-buffers-noselect frame :sort sort)))
 
+(defun beframe--assume (buffers)
+  "Unassume BUFFERS from current frame.
+BUFFERS is a list of buffer objects.  If BUFFERS satisfies
+`framep', then the list of buffers is that of the corresponding
+frame object (per `beframe-buffer-list')."
+  (let ((buffer-list
+         (delete-dups
+          (append
+           (if (framep buffers)
+               (beframe-buffer-list buffers)
+             buffers)
+           (beframe-buffer-list)))))
+    (modify-frame-parameters nil `((buffer-list . ,buffer-list)))))
+
+(defun beframe--unassume (buffers)
+  "Unassume BUFFERS from current frame.
+BUFFERS is a list of buffer objects.  If BUFFERS satisfies
+`framep', then the list of buffers is that of the corresponding
+frame object (per `beframe-buffer-list')."
+  (let ((buffer-list
+         (seq-filter
+          (lambda (buf)
+            (not (member buf (if (framep buffers) (beframe-buffer-list buffers) buffers))))
+          (beframe-buffer-list))))
+    (modify-frame-parameters nil `((buffer-list . ,buffer-list)))))
+
 ;;;###autoload
 (defun beframe-assume-frame-buffers (frame)
   "Assume FRAME buffer list, copying it into current buffer list.
@@ -424,11 +450,7 @@ Else FRAME must satisfy `framep'.
 Also see `beframe-unassume-frame-buffers',
 `beframe-assume-buffers', `beframe-unassume-buffers'."
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
-  (let* ((other-buffer-list (beframe-buffer-list frame))
-         (buffers (delete-dups (append other-buffer-list (beframe-buffer-list)))))
-    (modify-frame-parameters
-     nil
-     `((buffer-list . ,buffers)))))
+  (beframe--assume frame))
 
 (defalias 'beframe-add-frame-buffers 'beframe-assume-frame-buffers
   "Alias of `beframe-assume-frame-buffers' command.")
@@ -442,15 +464,7 @@ Else FRAME must satisfy `framep'.
 Also see `beframe-assume-frame-buffers',
 `beframe-assume-buffers', `beframe-unassume-buffers'."
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
-  (let* ((other-buffer-list (beframe-buffer-list frame))
-         (new-buffer-list
-          (seq-filter
-           (lambda (buf)
-             (not (member buf other-buffer-list)))
-           (beframe-buffer-list))))
-    (modify-frame-parameters
-     nil
-     `((buffer-list . ,new-buffer-list)))))
+  (beframe--unassume frame))
 
 (defalias 'beframe-remove-frame-buffers 'beframe-unassume-frame-buffers
   "Alias of `beframe-unassume-frame-buffers' command.")
@@ -489,10 +503,7 @@ Also see `beframe-assume-frame-buffers',
      (beframe--buffer-list-prompt-crm
       (beframe--frame-object
        (beframe--frame-prompt))))))
-  (let ((buffer-list (delete-dups (append buffers (beframe-buffer-list)))))
-    (modify-frame-parameters
-     nil
-     `((buffer-list . ,buffer-list)))))
+  (beframe--assume buffers))
 
 (defalias 'beframe-add-buffers 'beframe-assume-buffers
   "Alias of `beframe-assume-buffers' command.")
@@ -512,14 +523,7 @@ Also see `beframe-assume-frame-buffers',
    (list
     (beframe--buffers-name-to-objects
      (beframe--buffer-list-prompt-crm))))
-  (let ((buffer-list
-         (seq-filter
-          (lambda (buf)
-            (not (member buf buffers)))
-          (beframe-buffer-list))))
-    (modify-frame-parameters
-     nil
-     `((buffer-list . ,buffer-list)))))
+  (beframe--unassume buffers))
 
 (defalias 'beframe-remove-buffers 'beframe-unassume-buffers
   "Alias of `beframe-unassume-buffers' command.")
