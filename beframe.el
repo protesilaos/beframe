@@ -488,9 +488,8 @@ Keep only the `beframe-global-buffers'."
         (setq beframe--read-buffer-function read-buffer-function
               read-buffer-function #'beframe-read-buffer)
         (add-hook 'after-make-frame-functions #'beframe--frame-predicate)
-        (when beframe-create-frame-scratch-buffer
-          (add-hook 'after-make-frame-functions #'beframe-create-scratch-buffer))
         (add-hook 'after-make-frame-functions beframe-rename-function)
+        (add-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
           beframe--read-buffer-function nil)
@@ -501,23 +500,24 @@ Keep only the `beframe-global-buffers'."
 
 (defun beframe-create-scratch-buffer (frame)
   "Create scratch buffer in `initial-major-mode' for FRAME."
-  (let* ((name (frame-parameter frame 'name))
-         (buf (get-buffer-create (format "*scratch for %s*" name))))
-    (with-current-buffer buf
-      (funcall initial-major-mode)
-      (when (and (zerop (buffer-size))
-                 (stringp initial-scratch-message))
-        (insert initial-scratch-message))
-      (add-hook 'delete-frame-functions
-                (lambda (frame)
-                  (when (and beframe-kill-frame-scratch-buffer
-                             (null frame))
-                    (kill-buffer buf)))))
-    (let* ((frame-bufs (beframe-buffer-list frame))
-           (frame-bufs-with-buf (append frame-bufs (list buf))))
-      (modify-frame-parameters
-       frame
-       `((buffer-list . ,frame-bufs-with-buf))))))
+  (when beframe-create-frame-scratch-buffer
+    (let* ((name (frame-parameter frame 'name))
+           (buf (get-buffer-create (format "*scratch for %s*" name))))
+      (with-current-buffer buf
+        (funcall initial-major-mode)
+        (when (and (zerop (buffer-size))
+                   (stringp initial-scratch-message))
+          (insert initial-scratch-message))
+        (add-hook 'delete-frame-functions
+                  (lambda (frame)
+                    (when (and beframe-kill-frame-scratch-buffer
+                               (null frame))
+                      (kill-buffer buf)))))
+      (let* ((frame-bufs (beframe-buffer-list frame))
+             (frame-bufs-with-buf (append frame-bufs (list buf))))
+        (modify-frame-parameters
+         frame
+         `((buffer-list . ,frame-bufs-with-buf)))))))
 
 (defvar beframe--rename-frame-history nil
   "Minibuffer history for `beframe-rename-frame'.")
