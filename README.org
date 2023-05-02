@@ -362,7 +362,7 @@ works:
     (mapcar #'car (make-frame-names-alist)))
 
   (defun beframe-generate-ibuffer-filter-groups ()
-    "Create a set of ibuffer filter groups based on the vc root dirs of buffers."
+    "Create a set of ibuffer filter groups based on the Frame of buffers."
     (mapcar
      (lambda (frame)
        (list (format "%s" frame)
