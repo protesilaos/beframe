@@ -614,16 +614,19 @@ With optional DISABLE remove the advice."
       (advice-add cmd :around #'beframe--with-other-frame)))))
 
 (defun beframe-buffer-sort-visibility (buffers)
-  "Sort the given BUFFERS by visibility.
-Concretely, this means this function will return a sequence that
-first lists hidden, then visible, and then the current buffer."
-  (let* ((current (current-buffer))
-         (bufs (seq-group-by
-                (lambda (buf)
-                  (cond ((eq buf current)                 :current)
-                        ((get-buffer-window buf 'visible) :visible)
-                        (t                                :hidden)))
-                buffers)))
+  "Group the given BUFFERS by visibility and sort them accordingly.
+Return a sequence that first lists hidden, then visible, and then
+the current buffer.
+
+This function can be used as the :sort key of
+`beframe-buffer-list' or `beframe-buffer-names'."
+  (let ((bufs (seq-group-by
+               (lambda (buf)
+                 (cond
+                  ((eq buf (current-buffer)) :current)
+                  ((get-buffer-window buf 'visible) :visible)
+                  (t :hidden)))
+               buffers)))
     (nconc (alist-get :hidden  bufs)
            (alist-get :visible bufs)
            (alist-get :current bufs))))
