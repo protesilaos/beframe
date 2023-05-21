@@ -210,8 +210,8 @@ The ~beframe-mode~ does the following:
   per the user options ~beframe-create-frame-scratch-buffer~,
   ~beframe-kill-frame-scratch-buffer~ ([[#h:9979c363-d7b6-4382-b2ce-a93f64043b4b][Overview]]).
 
-Development note: ~beframe~ is in its early days.  The minor mode may
-be revised to have more features and/or greater flexibility.
+Those granted, it is not necessary to enable the ~beframe-mode~ to use
+Beframe's commands.  Those are available on demand ([[*The Beframe keymap][The Beframe keymap]]).
 
 * The Beframe keymap
 :PROPERTIES:
