@@ -119,30 +119,30 @@ consolidated into new lists on demand.
 :CUSTOM_ID: h:dc12ca87-9ba7-4d11-89c8-653bf19015a1
 :END:
 
+[ Command that use ~completing-read-multiple~ are renamed as part of
+  {{{development-version}}}. ]
+
 To assume buffers is to include them in the buffer list associated
 with the current frame.
 
   #+findex: beframe-assume-frame-buffers
-  #+findex: beframe-add-frame-buffers
-- The command ~beframe-assume-frame-buffers~ (alias
-  ~beframe-add-frame-buffers~) prompts for a frame and then copies its
-  buffer list into the current frame.
+- The command ~beframe-assume-frame-buffers~ prompts for a frame and
+  then copies its buffer list into the current frame.
 
-  #+findex: beframe-assume-buffers
-  #+findex: beframe-add-buffers
-- The command ~beframe-assume-buffers~ (alias ~beframe-add-buffers~)
-  adds buffers from a given frame to the current frame.  In
-  interactive use, the command first prompts for a frame and then asks
-  about the list of buffers therein.  The to-be-assumed buffer list is
-  compiled with ~completing-read-multiple~.  This means that the user
-  can select multiple buffers, each separated by the ~crm-separator~
-  (typically a comma).
+  #+findex: beframe-assume-frame-buffers-selectively
+- The command ~beframe-assume-frame-buffers-selectively~ adds buffers
+  from a given frame to the current frame.  In interactive use, the
+  command first prompts for a frame and then asks about the list of
+  buffers therein.  The to-be-assumed buffer list is compiled with
+  ~completing-read-multiple~.  This means that the user can select
+  multiple buffers, each separated by the ~crm-separator~ (typically a
+  comma).
 
-  #+findex: beframe-assume-buffers-all-frames
-- The command ~beframe-assume-buffers-all-frames~ prompts with
-  minibuffer completion for a list of buffers to assume.  The
-  interface is the same as that of ~beframe-assume-buffers~ except
-  that there is no prompt for a frame: buffers belong to the
+  #+findex: beframe-assume-buffers-selectively-all-frames
+- The command ~beframe-assume-buffers-selectively-all-frames~ prompts
+  with minibuffer completion for a list of buffers to assume.  The
+  interface is the same as that of ~beframe-assume-frame-buffers-selectively~
+  except that there is no prompt for a frame: buffers belong to the
   consolidated buffer list (all frames).
 
   #+findex: beframe-assume-all-buffers-no-prompts
@@ -154,20 +154,20 @@ with the current frame.
 :CUSTOM_ID: h:8fb895ac-7f99-4c92-b15a-18871b30c7b9
 :END:
 
+[ Command that use ~completing-read-multiple~ are renamed as part of
+  {{{development-version}}}. ]
+
 To unassume buffers is to omit them from the buffer list associated with
 the current frame.
 
   #+findex: beframe-unassume-frame-buffers
-  #+findex: beframe-remove-frame-buffers
-- The command ~beframe-unassume-frame-buffers~ (alias
-  ~beframe-remove-frame-buffers~) prompts for a frame and then removes
-  its buffer list from the current frame.
+- The command ~beframe-unassume-frame-buffers~ prompts for a frame and
+  then removes its buffer list from the current frame.
 
-  #+findex: beframe-unassume-buffers
-  #+findex: beframe-remove-buffers
-- The command ~beframe-unassume-buffers~ (alias
-  ~beframe-remove-buffers~) removes buffers from the current frame.
-  In interactive use, the to-be-unassumed buffer list is compiled with
+  #+findex: beframe-unassume-frame-buffers-selectively
+- The command ~beframe-unassume-frame-buffers-selectively~ removes
+  buffers from the current frame.  In interactive use, the
+  to-be-unassumed buffer list is compiled with
   ~completing-read-multiple~.  This means that the user can select
   multiple buffers, each separated by the ~crm-separator~ (typically a
   comma).

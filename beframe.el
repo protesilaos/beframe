@@ -361,12 +361,15 @@ When called interactively, prompt for FRAME using completion.
 Else FRAME must satisfy `framep'.
 
 Also see `beframe-unassume-frame-buffers',
-`beframe-assume-buffers', `beframe-unassume-buffers'."
+`beframe-assume-frame-buffers-selectively',
+`beframe-unassume-frame-buffers-selectively'."
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
   (beframe--assume frame))
 
-(defalias 'beframe-add-frame-buffers 'beframe-assume-frame-buffers
-  "Alias of `beframe-assume-frame-buffers' command.")
+(make-obsolete
+ 'beframe-add-frame-buffers
+ 'beframe-assume-frame-buffers
+ "0.3.0")
 
 ;;;###autoload
 (defun beframe-unassume-frame-buffers (frame)
@@ -375,12 +378,15 @@ When called interactively, prompt for FRAME using completion.
 Else FRAME must satisfy `framep'.
 
 Also see `beframe-assume-frame-buffers',
-`beframe-assume-buffers', `beframe-unassume-buffers'."
+`beframe-assume-frame-buffers-selectively',
+`beframe-unassume-frame-buffers-selectively'."
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
   (beframe--unassume frame))
 
-(defalias 'beframe-remove-frame-buffers 'beframe-unassume-frame-buffers
-  "Alias of `beframe-unassume-frame-buffers' command.")
+(make-obsolete
+ 'beframe-remove-frame-buffers
+ 'beframe-unassume-frame-buffers
+ "0.3.0")
 
 (defun beframe--buffers-name-to-objects (buffers)
   "Convert list of named BUFFERS to their corresponding objects."
@@ -406,17 +412,22 @@ buffer list (buffers from all frames)."
    nil
    :require-match))
 
-;;;###autoload
-(defun beframe-assume-buffers (buffers)
-  "Assume BUFFERS from a frame into the current buffer list.
+(define-obsolete-function-alias
+  'beframe-assume-buffers
+  'beframe-assume-frame-buffers-selectively
+  "0.3.0")
 
-In interactive use, BUFFERS is determined with a prompt that is
-powered by `completing-read-multiple'.  Multiple candidates can
-be selected, each separated by the `crm-separator' (typically a
-comma).
+;;;###autoload
+(defun beframe-assume-frame-buffers-selectively (buffers)
+  "Assume BUFFERS from a selected frame into the current buffer list.
+
+In interactive use, select a frame and then use
+`completing-read-multiple' to pick the list of BUFFERS.  Multiple
+candidates can be selected, each separated by the
+`crm-separator' (typically a comma).
 
 Also see `beframe-assume-frame-buffers',
-`beframe-unassume-buffers', `beframe-unassume-frame-buffers'."
+`beframe-unassume-frame-buffers-selectively', `beframe-unassume-frame-buffers'."
   (interactive
    (list
     (beframe--buffers-name-to-objects
@@ -425,12 +436,19 @@ Also see `beframe-assume-frame-buffers',
        (beframe--frame-prompt))))))
   (beframe--assume buffers))
 
-(defalias 'beframe-add-buffers 'beframe-assume-buffers
-  "Alias of `beframe-assume-buffers' command.")
+(make-obsolete
+ 'beframe-add-buffers
+ 'beframe-assume-frame-buffers-selectively
+ "0.3.0")
+
+(define-obsolete-function-alias
+  'beframe-assume-buffers-all-frames
+  'beframe-assume-buffers-selectively-all-frames
+  "0.3.0")
 
 ;;;###autoload
-(defun beframe-assume-buffers-all-frames ()
-  "Like `beframe-assume-buffers' but for the consolidated buffer list (all frames)."
+(defun beframe-assume-buffers-selectively-all-frames ()
+  "Like `beframe-assume-frame-buffers-selectively' but for all frames."
   (declare (interactive-only t))
   (interactive)
   (beframe--assume
@@ -438,25 +456,33 @@ Also see `beframe-assume-frame-buffers',
     (beframe--buffer-list-prompt-crm
      :all-frames))))
 
+(define-obsolete-function-alias
+  'beframe-unassume-buffers
+  'beframe-unassume-frame-buffers-selectively
+  "0.3.0")
+
 ;;;###autoload
-(defun beframe-unassume-buffers (buffers)
+(defun beframe-unassume-frame-buffers-selectively (buffers)
   "Unassume BUFFERS from the current frame's buffer list.
 
-In interactive use, BUFFERS is determined with a prompt that is
-powered by `completing-read-multiple'.  Multiple candidates can
-be selected, each separated by the `crm-separator' (typically a
-comma).
+In interactive use, select a frame and then use
+`completing-read-multiple' to pick the list of BUFFERS.  Multiple
+candidates can be selected, each separated by the
+`crm-separator' (typically a comma).
 
 Also see `beframe-assume-frame-buffers',
-`beframe-assume-buffers', `beframe-unassume-frame-buffers'."
+`beframe-assume-frame-buffers-selectively',
+`beframe-unassume-frame-buffers'."
   (interactive
    (list
     (beframe--buffers-name-to-objects
      (beframe--buffer-list-prompt-crm))))
   (beframe--unassume buffers))
 
-(defalias 'beframe-remove-buffers 'beframe-unassume-buffers
-  "Alias of `beframe-unassume-buffers' command.")
+(make-obsolete
+ 'beframe-remove-buffers
+ 'beframe-unassume-frame-buffers-selectively
+ "0.3.0")
 
 ;;;###autoload
 (defun beframe-assume-all-buffers-no-prompts ()
@@ -483,11 +509,11 @@ Keep only the `beframe-global-buffers'."
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "b") #'beframe-switch-buffer)
     (define-key map (kbd "m") #'beframe-buffer-menu)
-    (define-key map (kbd "a f") #'beframe-assume-buffers)
+    (define-key map (kbd "a f") #'beframe-assume-frame-buffers-selectively)
     (define-key map (kbd "a F") #'beframe-assume-frame-buffers)
-    (define-key map (kbd "a a") #'beframe-assume-buffers-all-frames)
+    (define-key map (kbd "a a") #'beframe-assume-buffers-selectively-all-frames)
     (define-key map (kbd "a A") #'beframe-assume-all-buffers-no-prompts)
-    (define-key map (kbd "u f") #'beframe-unassume-buffers)
+    (define-key map (kbd "u f") #'beframe-unassume-frame-buffers-selectively)
     (define-key map (kbd "a F") #'beframe-unassume-frame-buffers)
     (define-key map (kbd "u U") #'beframe-unassume-all-buffers-no-prompts)
     map)
