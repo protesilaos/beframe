@@ -112,6 +112,8 @@ buffers associated with the current frame.  This provides for a
 flexible workflow where buffers can be initially beframed yet
 consolidated into new lists on demand.
 
+[[#h:737253ad-f671-46df-bdb9-6be20a982470][The Beframe keymap]]
+
 ** Assuming buffers
 :PROPERTIES:
 :CUSTOM_ID: h:dc12ca87-9ba7-4d11-89c8-653bf19015a1
@@ -211,6 +213,28 @@ The ~beframe-mode~ does the following:
 Development note: ~beframe~ is in its early days.  The minor mode may
 be revised to have more features and/or greater flexibility.
 
+* The Beframe keymap
+:PROPERTIES:
+:CUSTOM_ID: h:737253ad-f671-46df-bdb9-6be20a982470
+:END:
+
+[ Part of {{{development-version}}}. ]
+
+#+vindex: beframe-prefix-map
+The ~beframe-prefix-map~ defines key bindings for the Beframe commands
+documented herein.  We call it a prefix keymap because it is not
+available from anywhere unless the user attaches it to a key sequence.
+For example:
+
+#+begin_src emacs-lisp
+(define-key global-map (kbd "C-c b") beframe-prefix-map)
+#+end_src
+
+With the above code, =C-c b= becomes the prefix key that invokes
+Beframe commands.  Type =C-c b C-h= to show the available key
+bindings (by default =C-h= as a suffix to an incomplete key sequence
+produces a Help buffer that links to all the available bindings).
+
 * Installation
 :PROPERTIES:
 :CUSTOM_ID: h:62cdea75-5d49-4f8e-a11b-83fca49fb92b
@@ -278,15 +302,8 @@ Everything is in place to set up the package.
 
 (beframe-mode 1)
 
-;; This is just an example.  We do not define any key bindings.  You
-;; do not need this command if you enable `beframe-mode', as
-;; `switch-to-buffer' only shows a list of beframed buffers.
-(define-key global-map (kbd "C-x B") #'beframe-switch-buffer)
-
-;; Replace the generic `buffer-menu'.  With a prefix argument, this
-;; commands prompts for a frame.  Call the `buffer-menu' via M-x if
-;; you absolutely need the global list of buffers.
-(define-key global-map (kbd "C-x C-b") #'beframe-buffer-menu)
+;; Bind Beframe commands to a prefix key, such as C-c b:
+(define-key global-map (kbd "C-c b") beframe-prefix-map)
 #+end_src
 
 ** Integration with Consult

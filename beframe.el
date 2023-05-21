@@ -479,9 +479,27 @@ Keep only the `beframe-global-buffers'."
 (defvar beframe--read-buffer-function nil
   "Last value of `read-buffer-function'.")
 
+(defvar beframe-prefix-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "b") #'beframe-switch-buffer)
+    (define-key map (kbd "m") #'beframe-buffer-menu)
+    (define-key map (kbd "a f") #'beframe-assume-buffers)
+    (define-key map (kbd "a F") #'beframe-assume-frame-buffers)
+    (define-key map (kbd "a a") #'beframe-assume-buffers-all-frames)
+    (define-key map (kbd "a A") #'beframe-assume-all-buffers-no-prompts)
+    (define-key map (kbd "u f") #'beframe-unassume-buffers)
+    (define-key map (kbd "a F") #'beframe-unassume-frame-buffers)
+    (define-key map (kbd "u U") #'beframe-unassume-all-buffers-no-prompts)
+    map)
+  "Keymap with Beframe commands.
+Meant to be assigned to a prefix key, like this:
+
+    (define-key global-map (kbd \"C-c b\") beframe-prefix-map)")
+
 ;;;###autoload
 (define-minor-mode beframe-mode
-  "Make all buffer prompts limit candidates per frame."
+  "Make all buffer prompts limit candidates per frame.
+Also see the `beframe-prefix-map'."
   :global t
   (if beframe-mode
       (progn
