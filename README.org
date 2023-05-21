@@ -4,9 +4,9 @@
 #+language:              en
 #+options:               ':t toc:nil author:t email:t num:t
 #+startup:               content
-#+macro:                 stable-version 0.2.0
-#+macro:                 release-date 2023-03-27
-#+macro:                 development-version 0.3.0-dev
+#+macro:                 stable-version 0.3.0
+#+macro:                 release-date 2023-05-21
+#+macro:                 development-version 0.4.0-dev
 #+export_file_name:      beframe.texi
 #+texinfo_filename:      beframe.info
 #+texinfo_dir_category:  Emacs misc features
@@ -119,9 +119,6 @@ consolidated into new lists on demand.
 :CUSTOM_ID: h:dc12ca87-9ba7-4d11-89c8-653bf19015a1
 :END:
 
-[ Command that use ~completing-read-multiple~ are renamed as part of
-  {{{development-version}}}. ]
-
 To assume buffers is to include them in the buffer list associated
 with the current frame.
 
@@ -153,9 +150,6 @@ with the current frame.
 :PROPERTIES:
 :CUSTOM_ID: h:8fb895ac-7f99-4c92-b15a-18871b30c7b9
 :END:
-
-[ Command that use ~completing-read-multiple~ are renamed as part of
-  {{{development-version}}}. ]
 
 To unassume buffers is to omit them from the buffer list associated with
 the current frame.
@@ -217,8 +211,6 @@ Beframe's commands.  Those are available on demand ([[*The Beframe keymap][The B
 :PROPERTIES:
 :CUSTOM_ID: h:737253ad-f671-46df-bdb9-6be20a982470
 :END:
-
-[ Part of {{{development-version}}}. ]
 
 #+vindex: beframe-prefix-map
 The ~beframe-prefix-map~ defines key bindings for the Beframe commands

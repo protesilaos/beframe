@@ -9,7 +9,86 @@ project's main git repository: <https://git.sr.ht/~protesilaos/beframe>.
 The newest release is at the top.  For further details, please consult
 the manual: <https://protesilaos.com/emacs/beframe>.
 
+* 0.3.0
+:PROPERTIES:
+:CUSTOM_ID: h:59120517-f6e0-4bb8-a495-c5eb40654d6a
+:END:
+
+** Use more descriptive names for assume/unassume commands
+:PROPERTIES:
+:CUSTOM_ID: h:a3b24770-40a2-4c97-8403-62bbf79720fa
+:END:
+
+Beframe limits the buffer list to buffers that are visited in the
+current frame.  I provide commands to assume (add) or unassume
+(remove) buffers from other frames, making for a powerful and flexible
+workflow:
+
+- In bulk :: Assume/unassume the (i) entire buffer list of a frame, or
+  the (ii) consolidated buffer list of all frames.
+
+- Selectively :: Use minibuffer completion to compile a list of
+  buffers to assume/unassume (iii) from the given frame, or (iv)
+  buffers from the consolidated buffer list.
+
+The commands that operate selectively are renamed to better describe
+what they do.  We thus have:
+
+| Deprecated name                   | New name                                           |
+|-----------------------------------+----------------------------------------------------|
+| beframe-assume-buffers            | beframe-assume-frame-buffers-selectively           |
+| beframe-assume-buffers-all-frames | beframe-assume-buffers-selectively-all-frames      |
+| beframe-unassume-buffers          | beframe-unassume-current-frame-buffers-selectively |
+
+To avoid potential confusion, the following command aliases are
+discontinued:
+
+- ~beframe-add-buffers~
+- ~beframe-remove-buffers~
+- ~beframe-add-frame-buffers~
+- ~beframe-remove-frame-buffers~
+
+** Provide the ~beframe-prefix-map~
+:PROPERTIES:
+:CUSTOM_ID: h:a34d0635-4022-41b0-bb41-3b6286c954cc
+:END:
+
+This is a keymap that binds the Beframe commands to recommended keys.
+As with all Emacs key bindings, those are configurable.
+
+I call it a "prefix" keymap because it is not bound anywhere and
+cannot be used by default.  The user must explicitly bind it to a key,
+which will be treated as a prefix key.  For example:
+
+#+begin_src emacs-lisp
+(define-key global-map (kbd "C-c b") beframe-prefix-map)
+#+end_src
+
+With the above code, =C-c b= becomes the prefix key that invokes
+Beframe commands.  Type =C-c b C-h= to show the available key
+bindings (by default =C-h= as a suffix to an incomplete key sequence
+produces a Help buffer that links to all the available bindings).
+
+The ~beframe-prefix-map~ and ~beframe-mode~ are used independent of
+each other.
+
+** Miscellaneous
+:PROPERTIES:
+:CUSTOM_ID: h:b5dcf56b-3668-4f3e-9743-771ce9b1eeb0
+:END:
+
+- Simplify how ~beframe-rename-function~ is added by the
+  ~beframe-mode~.
+- Refine the application of ~beframe-create-frame-scratch-buffer~ by
+  the ~beframe-mode~.
+- Tweak the ~beframe-buffer-sort-visibility~ function to be consistent
+  with the style of =beframe.el=.
+- Rewrite parts of the manual to reference the aforementioned.
+
 * 0.2.0
+:PROPERTIES:
+:CUSTOM_ID: h:ba53a28d-7e85-4c9b-9770-22abb9263473
+:END:
 
 There were no release notes for the initial version of Beframe.  Watch
 the video demo I produced on 2023-02-28 to get an overview of what
@@ -20,6 +99,9 @@ In short: beframe your buffers, not your outlook.  Oops that is for
 the philosophy blog! 🙃
 
 ** A beframed buffer menu
+:PROPERTIES:
+:CUSTOM_ID: h:345543c7-f61c-4656-964e-53f338ec7850
+:END:
 
 The command ~beframe-buffer-menu~ produces a dedicated buffer with a
 list of buffers for the current frame.  This is the counterpart of
@@ -28,6 +110,9 @@ with default key bindings), it prompts for a frame whose buffers it
 will display.
 
 ** Frame-specific scratch buffer
+:PROPERTIES:
+:CUSTOM_ID: h:69df2c63-c509-4063-bf24-b6aa39c6cfca
+:END:
 
 The user option ~beframe-create-frame-scratch-buffer~ allows
 ~beframe-mode~ to create a frame-specific scratch buffer that runs the
@@ -43,6 +128,9 @@ scratch buffer after the frame is deleted.  Set this user option to
 ~nil~ to disable the killing of such buffers.
 
 ** Assuming and unassuming buffers
+:PROPERTIES:
+:CUSTOM_ID: h:b0546404-2e70-44e4-84c9-e7fbf0786d04
+:END:
 
 Beframe makes it possible to add or remove buffers from the list of
 buffers associated with the current frame.  This provides for a
@@ -50,6 +138,9 @@ flexible workflow where buffers can be initially beframed yet
 consolidated into new lists on demand.
 
 *** Assuming buffers
+:PROPERTIES:
+:CUSTOM_ID: h:4ec70ff0-531c-4a9c-9509-0ee49d26da71
+:END:
 
 To assume buffers is to include them in the buffer list associated
 with the current frame.
@@ -76,6 +167,9 @@ with the current frame.
   assumes the consolidated buffer list.
 
 *** Unassuming buffers
+:PROPERTIES:
+:CUSTOM_ID: h:b98f5c92-23d6-464a-9001-9531e513dd73
+:END:
 
 To unassume buffers is to omit them from the buffer list associated with
 the current frame.
@@ -96,6 +190,9 @@ the current frame.
   stored in the user option ~beframe-global-buffers~.
 
 ** Sort beframed buffers from Lisp
+:PROPERTIES:
+:CUSTOM_ID: h:a72b304d-4dc4-48c2-8d29-7ccac1984422
+:END:
 
 This is courtesy of Tony Zorman:
 <https://lists.sr.ht/~protesilaos/general-issues/%3C87edq4n3qt.fsf%40hyperspace%3E>.
