@@ -427,7 +427,8 @@ candidates can be selected, each separated by the
 `crm-separator' (typically a comma).
 
 Also see `beframe-assume-frame-buffers',
-`beframe-unassume-current-frame-buffers-selectively', `beframe-unassume-frame-buffers'."
+`beframe-unassume-current-frame-buffers-selectively',
+`beframe-unassume-frame-buffers'."
   (interactive
    (list
     (beframe--buffers-name-to-objects
