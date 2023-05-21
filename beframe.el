@@ -259,7 +259,9 @@ Either bind this command to a key as an alternative to
 `beframe-mode' which makes all buffer prompts limit the
 candidates to those that belong to the selected frame.
 
-Also see `beframe-switch-buffer-in-frame'."
+Also see the other Beframe commands:
+
+\\{beframe-prefix-map}"
   (interactive (list (beframe--buffer-prompt)))
   (switch-to-buffer buffer))
 
@@ -321,7 +323,11 @@ sorting function—see `beframe-buffer-list' for more information.
 
 The bespoke buffer menu is displayed in a window using
 `display-buffer'.  Configure `display-buffer-alist' to control
-its placement and other parameters."
+its placement and other parameters.
+
+Also see the other Beframe commands:
+
+\\{beframe-prefix-map}"
   (interactive
    (list
     (when current-prefix-arg
@@ -360,9 +366,9 @@ frame object (per `beframe-buffer-list')."
 When called interactively, prompt for FRAME using completion.
 Else FRAME must satisfy `framep'.
 
-Also see `beframe-unassume-frame-buffers',
-`beframe-assume-frame-buffers-selectively',
-`beframe-unassume-current-frame-buffers-selectively'."
+Also see the other Beframe commands:
+
+\\{beframe-prefix-map}"
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
   (beframe--assume frame))
 
@@ -377,9 +383,9 @@ Also see `beframe-unassume-frame-buffers',
 When called interactively, prompt for FRAME using completion.
 Else FRAME must satisfy `framep'.
 
-Also see `beframe-assume-frame-buffers',
-`beframe-assume-frame-buffers-selectively',
-`beframe-unassume-current-frame-buffers-selectively'."
+Also see the other Beframe commands:
+
+\\{beframe-prefix-map}"
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
   (beframe--unassume frame))
 
@@ -426,9 +432,9 @@ In interactive use, select a frame and then use
 candidates can be selected, each separated by the
 `crm-separator' (typically a comma).
 
-Also see `beframe-assume-frame-buffers',
-`beframe-unassume-current-frame-buffers-selectively',
-`beframe-unassume-frame-buffers'."
+Also see the other Beframe commands:
+
+\\{beframe-prefix-map}"
   (interactive
    (list
     (beframe--buffers-name-to-objects
@@ -470,9 +476,9 @@ In interactive use, call `completing-read-multiple' to pick the
 list of BUFFERS.  Multiple candidates can be selected, each
 separated by the `crm-separator' (typically a comma).
 
-Also see `beframe-assume-frame-buffers',
-`beframe-assume-frame-buffers-selectively',
-`beframe-unassume-frame-buffers'."
+Also see the other Beframe commands:
+
+\\{beframe-prefix-map}"
   (interactive
    (list
     (beframe--buffers-name-to-objects
@@ -494,7 +500,11 @@ Also see `beframe-assume-frame-buffers',
 ;;;###autoload
 (defun beframe-unassume-all-buffers-no-prompts ()
   "Unassume the consolidated buffer list (all frames).
-Keep only the `beframe-global-buffers'."
+Keep only the `beframe-global-buffers'.
+
+Also see the other Beframe commands:
+
+\\{beframe-prefix-map}"
   (declare (interactive-only t))
   (interactive)
   (beframe--unassume (beframe--buffer-list-consolidated))
