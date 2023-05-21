@@ -164,8 +164,8 @@ the current frame.
 - The command ~beframe-unassume-frame-buffers~ prompts for a frame and
   then removes its buffer list from the current frame.
 
-  #+findex: beframe-unassume-frame-buffers-selectively
-- The command ~beframe-unassume-frame-buffers-selectively~ removes
+  #+findex: beframe-unassume-current-frame-buffers-selectively
+- The command ~beframe-unassume-current-frame-buffers-selectively~ removes
   buffers from the current frame.  In interactive use, the
   to-be-unassumed buffer list is compiled with
   ~completing-read-multiple~.  This means that the user can select

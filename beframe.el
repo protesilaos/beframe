@@ -362,7 +362,7 @@ Else FRAME must satisfy `framep'.
 
 Also see `beframe-unassume-frame-buffers',
 `beframe-assume-frame-buffers-selectively',
-`beframe-unassume-frame-buffers-selectively'."
+`beframe-unassume-current-frame-buffers-selectively'."
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
   (beframe--assume frame))
 
@@ -379,7 +379,7 @@ Else FRAME must satisfy `framep'.
 
 Also see `beframe-assume-frame-buffers',
 `beframe-assume-frame-buffers-selectively',
-`beframe-unassume-frame-buffers-selectively'."
+`beframe-unassume-current-frame-buffers-selectively'."
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
   (beframe--unassume frame))
 
@@ -427,7 +427,7 @@ candidates can be selected, each separated by the
 `crm-separator' (typically a comma).
 
 Also see `beframe-assume-frame-buffers',
-`beframe-unassume-frame-buffers-selectively', `beframe-unassume-frame-buffers'."
+`beframe-unassume-current-frame-buffers-selectively', `beframe-unassume-frame-buffers'."
   (interactive
    (list
     (beframe--buffers-name-to-objects
@@ -458,17 +458,16 @@ Also see `beframe-assume-frame-buffers',
 
 (define-obsolete-function-alias
   'beframe-unassume-buffers
-  'beframe-unassume-frame-buffers-selectively
+  'beframe-unassume-current-frame-buffers-selectively
   "0.3.0")
 
 ;;;###autoload
-(defun beframe-unassume-frame-buffers-selectively (buffers)
+(defun beframe-unassume-current-frame-buffers-selectively (buffers)
   "Unassume BUFFERS from the current frame's buffer list.
 
-In interactive use, select a frame and then use
-`completing-read-multiple' to pick the list of BUFFERS.  Multiple
-candidates can be selected, each separated by the
-`crm-separator' (typically a comma).
+In interactive use, call `completing-read-multiple' to pick the
+list of BUFFERS.  Multiple candidates can be selected, each
+separated by the `crm-separator' (typically a comma).
 
 Also see `beframe-assume-frame-buffers',
 `beframe-assume-frame-buffers-selectively',
@@ -481,7 +480,7 @@ Also see `beframe-assume-frame-buffers',
 
 (make-obsolete
  'beframe-remove-buffers
- 'beframe-unassume-frame-buffers-selectively
+ 'beframe-unassume-current-frame-buffers-selectively
  "0.3.0")
 
 ;;;###autoload
@@ -513,7 +512,7 @@ Keep only the `beframe-global-buffers'."
     (define-key map (kbd "a F") #'beframe-assume-frame-buffers)
     (define-key map (kbd "a a") #'beframe-assume-buffers-selectively-all-frames)
     (define-key map (kbd "a A") #'beframe-assume-all-buffers-no-prompts)
-    (define-key map (kbd "u f") #'beframe-unassume-frame-buffers-selectively)
+    (define-key map (kbd "u f") #'beframe-unassume-current-frame-buffers-selectively)
     (define-key map (kbd "a F") #'beframe-unassume-frame-buffers)
     (define-key map (kbd "u U") #'beframe-unassume-all-buffers-no-prompts)
     map)
