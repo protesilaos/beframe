@@ -235,6 +235,9 @@ Beframe commands.  Type =C-c b C-h= to show the available key
 bindings (by default =C-h= as a suffix to an incomplete key sequence
 produces a Help buffer that links to all the available bindings).
 
+The ~beframe-prefix-map~ and ~beframe-mode~ are used independent of
+each other ([[#h:5b751614-8749-4aa8-aaed-f181beaddc57][Features of beframe-mode]]).
+
 * Installation
 :PROPERTIES:
 :CUSTOM_ID: h:62cdea75-5d49-4f8e-a11b-83fca49fb92b
