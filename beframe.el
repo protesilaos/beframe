@@ -77,7 +77,12 @@ Also see `beframe-create-frame-scratch-buffer'."
 
 When `beframe-mode' is enabled, install advice around each
 function so that every invocation of it is called with
-`other-frame-prefix'."
+`other-frame-prefix'.
+
+Setting the value with `setq' requires a restart of
+`beframe-mode' for changes to take effect.  For changes to apply
+automatically, use `customize-set-variable' or `setopt' (Emacs
+29)."
   :group 'beframe
   :package-version '(beframe . "0.1.0")
   :initialize #'custom-initialize-default
