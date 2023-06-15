@@ -98,7 +98,12 @@ automatically, use `customize-set-variable' or `setopt' (Emacs
 The function accepts one argument, the current frame, as is
 called by the `after-make-frame-functions' hook.
 
-If nil, no renaming is performed."
+If nil, no renaming is performed.
+
+Setting the value with `setq' requires a restart of
+`beframe-mode' for changes to take effect.  For changes to apply
+automatically, use `customize-set-variable' or `setopt' (Emacs
+29)."
   :group 'beframe
   :package-version '(beframe . "0.2.0")
   :initialize #'custom-initialize-default
