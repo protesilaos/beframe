@@ -551,14 +551,14 @@ Also see the `beframe-prefix-map'."
       (progn
         (setq beframe--read-buffer-function read-buffer-function
               read-buffer-function #'beframe-read-buffer)
-        (add-hook 'after-make-frame-functions #'beframe--frame-predicate)
         (add-hook 'after-make-frame-functions beframe-rename-function)
+        (add-hook 'after-make-frame-functions #'beframe-frame-predicate)
         (add-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
           beframe--read-buffer-function nil)
-    (remove-hook 'after-make-frame-functions #'beframe--frame-predicate)
     (remove-hook 'after-make-frame-functions beframe-rename-function)
+    (remove-hook 'after-make-frame-functions #'beframe-frame-predicate)
     (remove-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
     (beframe--functions-in-frames :disable)))
 
@@ -655,7 +655,12 @@ Remember that this function doubles as an example for
 Use optional FRAME to test if BUF belongs to it."
   (memq buf (beframe-buffer-list frame)))
 
-(defun beframe--frame-predicate (&optional frame)
+(define-obsolete-function-alias
+  'beframe--frame-predicate
+  'beframe-frame-predicate
+  "0.4.0")
+
+(defun beframe-frame-predicate (&optional frame)
   "Set FRAME `buffer-predicate' parameter.
 If FRAME is nil, use the current frame."
   (set-frame-parameter frame 'buffer-predicate #'beframe--frame-buffer-p))
