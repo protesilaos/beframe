@@ -551,14 +551,14 @@ Also see the `beframe-prefix-map'."
       (progn
         (setq beframe--read-buffer-function read-buffer-function
               read-buffer-function #'beframe-read-buffer)
-        (add-hook 'after-make-frame-functions beframe-rename-function)
         (add-hook 'after-make-frame-functions #'beframe-frame-predicate)
+        (add-hook 'after-make-frame-functions #'beframe-maybe-rename-frame)
         (add-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
           beframe--read-buffer-function nil)
-    (remove-hook 'after-make-frame-functions beframe-rename-function)
     (remove-hook 'after-make-frame-functions #'beframe-frame-predicate)
+    (remove-hook 'after-make-frame-functions #'beframe-maybe-rename-frame)
     (remove-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
     (beframe--functions-in-frames :disable)))
 
@@ -649,6 +649,13 @@ Remember that this function doubles as an example for
   (modify-frame-parameters
    frame
    (list (cons 'name (beframe--infer-frame-name frame name)))))
+
+(defun beframe-maybe-rename-frame (frame &optional name)
+  "Helper function to determine if `beframe-rename-function' is called.
+FRAME and optional NAME arguments are passed to the
+`beframe-rename-function'."
+  (when beframe-rename-function
+    (funcall beframe-rename-function frame name)))
 
 (defun beframe--frame-buffer-p (buf &optional frame)
   "Return non-nil if BUF belongs to the current frame.
