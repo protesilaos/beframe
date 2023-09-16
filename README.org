@@ -326,13 +326,18 @@ It is possible to add beframed buffers to the list of sources the
     '((t :inherit font-lock-string-face))
     "Face for `consult' framed buffers.")
 
+  (defun my-beframe-buffer-names-sorted (&optional frame)
+    "Return the list of buffers from `beframe-buffer-names' sorted by visibility.
+With optional argument FRAME, return the list of buffers of FRAME."
+    (beframe-buffer-names frame :sort #'beframe-buffer-sort-visibility))
+
   (defvar beframe-consult-source
     `( :name     "Frame-specific buffers (current frame)"
        :narrow   ?F
        :category buffer
        :face     beframe-buffer
        :history  beframe-history
-       :items    ,#'beframe-buffer-names
+       :items    ,#'my-beframe-buffer-names-sorted
        :action   ,#'switch-to-buffer
        :state    ,#'consult--buffer-state))
 
@@ -340,20 +345,11 @@ It is possible to add beframed buffers to the list of sources the
 #+end_src
 
 #+findex: beframe-buffer-names
-Much like ~consult--buffer-query~ itself, the ~beframe-buffer-names~
-function may also take a keyword argument ~:sort~.  In our case, this is
-a function that can be used to sort—or otherwise modify—the list of
-buffers.  You can use this to, for example, prefer hidden frames over
-visible ones.  To integrate a sorting function with the above setup, one
-could first define
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/beframe-items (&optional frame)
-    (beframe-buffer-names frame :sort #'beframe-buffer-sort-visibility))
-#+END_SRC
-
-and then appropriately modify the ~:items~ field of the
-~beframe-consult-source~ variable: ~:items ,#'my/beframe-items~.
+As you can see from the snippet above, much like ~consult--buffer-query~
+itself, the ~beframe-buffer-names~ function may take a keyword argument
+~:sort~.  In our case, it is set to ~beframe-buffer-sort-visibility~,
+which groups buffers by visibility, the first element of the list
+being the most recently selected buffer other than the current one.
 
 ** Integration with Ibuffer
 :PROPERTIES:
