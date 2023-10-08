@@ -345,7 +345,7 @@ Also see the other Beframe commands:
   (display-buffer (beframe-list-buffers-noselect frame :sort sort)))
 
 (defun beframe--assume (buffers)
-  "Unassume BUFFERS from current frame.
+  "Assume BUFFERS into current frame.
 BUFFERS is a list of buffer objects.  If BUFFERS satisfies
 `framep', then the list of buffers is that of the corresponding
 frame object (per `beframe-buffer-list')."
