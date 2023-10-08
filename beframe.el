@@ -247,10 +247,18 @@ frame name."
            frame))))
      frames)))
 
-(defun beframe--frame-prompt ()
-  "Prompt to select a frame among the list of frames."
-  (let ((frames (beframe--buffers-with-current)))
-    (completing-read "Select Frame: " frames nil t nil 'frame-name-history (caar frames))))
+(defun beframe--multiple-frames-p ()
+  "Return non-nil if `frame-list' is longer than 1."
+  (> (length (frame-list)) 1))
+
+(defun beframe--frame-prompt (&optional force)
+  "Prompt to select a frame among the list of frames.
+Return user-error if `beframe--multiple-frames-p' is nil.  Skip
+this check if FORCE is non-nil."
+  (if (or force (beframe--multiple-frames-p))
+      (let ((frames (beframe--buffers-with-current)))
+        (completing-read "Select Frame: " frames nil t nil 'frame-name-history (caar frames)))
+    (user-error "Only a single frame is available; aborting")))
 
 (defun beframe--frame-object (frame)
   "Retun frame object of named FRAME.
@@ -636,7 +644,7 @@ With no NAME argument try to infer a name based on the following:
 Remember that this function doubles as an example for
 `beframe-rename-function': copy it and modify it accordingly."
   (interactive
-   (let ((select-frame (beframe--frame-prompt)))
+   (let ((select-frame (beframe--frame-prompt :force-even-if-one)))
      (list
       (beframe--frame-object select-frame)
       (when current-prefix-arg
