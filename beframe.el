@@ -562,12 +562,14 @@ Also see the `beframe-prefix-map'."
         (add-hook 'after-make-frame-functions #'beframe-frame-predicate)
         (add-hook 'after-make-frame-functions #'beframe-maybe-rename-frame)
         (add-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
+        (add-hook 'after-make-frame-functions #'beframe-do-not-assume-last-selected-buffer)
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
           beframe--read-buffer-function nil)
     (remove-hook 'after-make-frame-functions #'beframe-frame-predicate)
     (remove-hook 'after-make-frame-functions #'beframe-maybe-rename-frame)
     (remove-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
+    (remove-hook 'after-make-frame-functions #'beframe-do-not-assume-last-selected-buffer)
     (beframe--functions-in-frames :disable)))
 
 (defun beframe-create-scratch-buffer (frame)
@@ -679,6 +681,10 @@ Use optional FRAME to test if BUF belongs to it."
   "Set FRAME `buffer-predicate' parameter.
 If FRAME is nil, use the current frame."
   (set-frame-parameter frame 'buffer-predicate #'beframe--frame-buffer-p))
+
+(defun beframe-do-not-assume-last-selected-buffer (&rest _)
+  "Unassume the buffer of the most recently used window from the new frame."
+  (beframe--unassume (list (window-buffer (get-mru-window)))))
 
 (defun beframe--with-other-frame (&rest app)
   "Apply APP with `other-frame-prefix'.
