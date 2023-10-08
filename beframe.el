@@ -563,6 +563,7 @@ Also see the `beframe-prefix-map'."
         (add-hook 'after-make-frame-functions #'beframe-maybe-rename-frame)
         (add-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
         (add-hook 'after-make-frame-functions #'beframe-do-not-assume-last-selected-buffer)
+        (add-hook 'context-menu-functions #'beframe-context-menu)
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
           beframe--read-buffer-function nil)
@@ -570,6 +571,7 @@ Also see the `beframe-prefix-map'."
     (remove-hook 'after-make-frame-functions #'beframe-maybe-rename-frame)
     (remove-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
     (remove-hook 'after-make-frame-functions #'beframe-do-not-assume-last-selected-buffer)
+    (remove-hook 'context-menu-functions #'beframe-context-menu)
     (beframe--functions-in-frames :disable)))
 
 (defun beframe-create-scratch-buffer (frame)
@@ -720,6 +722,64 @@ This function can be used as the :sort key of
     (nconc (alist-get :hidden  bufs)
            (alist-get :visible bufs)
            (alist-get :current bufs))))
+
+;;;; Menu bar and context menu
+
+(defvar beframe--menu-contents
+  '("Beframe"
+    ["Switch to beframed buffer" beframe-switch-buffer
+     :help "Switch to a buffer that belongs to the current frame"
+     :enable (beframe--multiple-frames-p)]
+    ["Display beframed buffer menu" beframe-buffer-menu
+     :help "Display a buffer menu consisting of buffers that belong to the current frame"
+     :enable (beframe--multiple-frames-p)]
+    "---"
+    ["Assume all of a frame's buffers" beframe-assume-frame-buffers
+     :help "Absorb all the buffers of a frame into the current frame buffer list"
+     :enable (beframe--multiple-frames-p)]
+    ["Assume some of a frame's buffers" beframe-assume-frame-buffers-selectively
+     :help "Absorb some buffers of a frame into the current frame buffer list"
+     :enable (beframe--multiple-frames-p)]
+    ["Assume some buffers from all frames" beframe-assume-buffers-selectively-all-frames
+     :help "Absorb some buffers from the global buffer list into the current frame buffer list"
+     :enable (beframe--multiple-frames-p)]
+    ["Assume all buffers outright" beframe-assume-all-buffers-no-prompts
+     :help "Absorb all buffers from the global buffer list into the current frame buffer list"
+     :enable (beframe--multiple-frames-p)]
+    "---"
+    ["Unassume all of a frame's buffers" beframe-unassume-frame-buffers
+     :help "Omit all the buffers of a frame from the current frame buffer list"
+     :enable (beframe--multiple-frames-p)]
+    ["Unassume some of frame's buffers" beframe-unassume-current-frame-buffers-selectively
+     :help "Omit some buffers from the current frame buffer list"
+     :enable (beframe--multiple-frames-p)]
+    ["Unassume all buffers outright" beframe-assume-all-buffers-no-prompts
+     :help "Omit virtually all buffers from the current frame buffer list"
+     :enable (beframe--multiple-frames-p)]
+    "---"
+    ["Toggle Beframe mode" beframe-mode
+     :help "Make all buffer prompts limit candidates per frame (also see `beframe-functions-in-frames')"
+     :style toggle
+     :selected (bound-and-true-p beframe-mode)])
+  "Contents of the Beframe menu.")
+
+(easy-menu-define beframe-global-menu nil
+  "Menu with all Beframe commands, each available in the right context."
+  beframe--menu-contents)
+
+;; Add Beframe menu at the end of global-map after Tools
+(easy-menu-add-item global-map '(menu-bar) beframe-global-menu)
+
+(defun beframe-context-menu (menu _click)
+  "Populate MENU with Beframe commands at CLICK."
+  (define-key menu [beframe-separator] menu-bar-separator)
+  (let ((easy-menu (make-sparse-keymap "Beframe")))
+    (easy-menu-define nil easy-menu nil
+      beframe--menu-contents)
+    (dolist (item (reverse (lookup-key easy-menu [menu-bar])))
+      (when (consp item)
+        (define-key menu (vector (car item)) (cdr item)))))
+  menu)
 
 (provide 'beframe)
 ;;; beframe.el ends here
