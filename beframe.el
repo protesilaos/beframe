@@ -726,7 +726,7 @@ This function can be used as the :sort key of
 ;;;; Menu bar and context menu
 
 (defvar beframe--menu-contents
-  '("Beframe"
+  '("BEFRAME buffers"
     ["Switch to beframed buffer" beframe-switch-buffer
      :help "Switch to a buffer that belongs to the current frame"
      :enable (beframe--multiple-frames-p)]
@@ -768,7 +768,7 @@ This function can be used as the :sort key of
   beframe--menu-contents)
 
 ;; Add Beframe menu at the end of global-map after Tools
-(easy-menu-add-item global-map '(menu-bar) beframe-global-menu)
+(easy-menu-add-item global-map '(menu-bar "Buffers") beframe-global-menu)
 
 (defun beframe-context-menu (menu _click)
   "Populate MENU with Beframe commands at CLICK."
