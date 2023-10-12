@@ -731,8 +731,7 @@ This function can be used as the :sort key of
      :help "Switch to a buffer that belongs to the current frame"
      :enable (beframe--multiple-frames-p)]
     ["Display beframed buffer menu" beframe-buffer-menu
-     :help "Display a buffer menu consisting of buffers that belong to the current frame"
-     :enable (beframe--multiple-frames-p)]
+     :help "Display a buffer menu consisting of buffers that belong to the current frame"]
     "---"
     ["Assume all of a frame's buffers" beframe-assume-frame-buffers
      :help "Absorb all the buffers of a frame into the current frame buffer list"
