@@ -605,20 +605,31 @@ Also see the `beframe-prefix-map'."
 ;;     (with-current-buffer buf
 ;;       (rename-buffer (format "*scratch for %s*" name)))))
 
-(defun beframe--infer-frame-name (frame name)
+(defun beframe-get-fork-symbol ()
+  "Return the powerline fork symbol, if available, else the VC string."
+  (if-let ((character #xE0A0)
+           ((char-displayable-p character)))
+      (char-to-string character)
+    "VC"))
+
+(defvar project--list) ; from project.el
+
+(defun beframe-infer-frame-name (frame name)
   "Infer a suitable name for FRAME with given NAME.
 See `beframe-rename-frame'."
   (let* ((buffer (car (frame-parameter frame 'buffer-list)))
-         (file-name (when (bufferp buffer)
-                      (buffer-file-name buffer)))
+         (file-name (when (bufferp buffer) (buffer-file-name buffer)))
          (buf-name (buffer-name buffer))
-         (dir (with-current-buffer buffer
-                default-directory)))
+         (dir (with-current-buffer buffer (or (vc-root-dir) default-directory)))
+         (projectp (and (bound-and-true-p project--list) (member (list dir) project--list)))
+         (project-symbol (beframe-get-fork-symbol)))
     (cond
      ((and name (stringp name))
       name)
+     ((and projectp buf-name)
+      (format "%s %s" project-symbol (file-name-nondirectory (directory-file-name dir))))
      ((and (not (minibufferp)) file-name)
-      (format "%s  %s" buf-name dir))
+      (format "%s %s" buf-name dir))
      ((not (minibufferp))
       buf-name)
      (t
@@ -646,7 +657,9 @@ With no NAME argument try to infer a name based on the following:
 - Else use the `default-directory'.
 
 Remember that this function doubles as an example for
-`beframe-rename-function': copy it and modify it accordingly."
+`beframe-rename-function': copy it and modify it accordingly
+while also reviewing `beframe-infer-frame-name' and
+`beframe-get-fork-symbol'."
   (interactive
    (let ((select-frame (beframe--frame-prompt :force-even-if-one)))
      (list
@@ -660,7 +673,7 @@ Remember that this function doubles as an example for
   ;;   (beframe--rename-scratch-buffer frame name))
   (modify-frame-parameters
    frame
-   (list (cons 'name (beframe--infer-frame-name frame name)))))
+   (list (cons 'name (beframe-infer-frame-name frame name)))))
 
 (defun beframe-maybe-rename-frame (frame &optional name)
   "Helper function to determine if `beframe-rename-function' is called.
