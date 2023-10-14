@@ -172,10 +172,7 @@ minus all the internal buffers."
 With optional FRAME, do it for the given frame name.  With key
 SORT, apply this sorting function—see `beframe-buffer-list' for
 more information."
-  (mapcar
-   (lambda (buf)
-     (buffer-name buf))
-   (beframe-buffer-list frame :sort sort)))
+  (mapcar #'buffer-name (beframe-buffer-list frame :sort sort)))
 
 (defun beframe--buffer-names-consolidated ()
   "Return list of names of all buffers as strings."
