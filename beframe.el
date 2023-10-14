@@ -42,15 +42,24 @@
   :group 'frames)
 
 (defcustom beframe-global-buffers '("*scratch*" "*Messages*" "*Backtrace*")
-  "List of buffer names to include in all frames.
-These buffers are shown in the buffer selection prompts even if
-they have not been used by---and thus associated with---the
-current frame.
+  "List of buffer names (as strings) to include in all frames.
+These buffers are always shown in the `beframe-buffer-menu' or
+buffer selection prompts when `beframe-mode' is enabled.  They do
+not need to be open inside the current frame and thus become
+associated with it (the way other buffers are normally beframed).
 
-Otherwise framed buffers are limited to the frame that uses them."
+When the value is nil, no buffer get this special treatment: they
+all follow the beframing scheme of remaining associated with the
+frame that opened them.
+
+Also see commands such as `beframe-assume-frame-buffers' and
+`beframe-unassume-frame-buffers'.  The full list:
+
+\\{beframe-prefix-map}"
   :group 'beframe
   :package-version '(beframe . "0.1.0")
-  :type '(repeat string))
+  :type '(choice (repeat :tag "List of buffer names as strings" string)
+                 (const :tag "No global buffers" nil)))
 
 (defcustom beframe-create-frame-scratch-buffer t
   "Create a frame-specific scratch buffer for new frames.
@@ -123,10 +132,8 @@ automatically, use `customize-set-variable' or `setopt' (Emacs
 
 (defun beframe--global-buffers ()
   "Return list of `beframe-global-buffers' buffer objects."
-  (mapcar
-   (lambda (name)
-     (get-buffer name))
-   beframe-global-buffers))
+  (when beframe-global-buffers
+    (mapcar #'get-buffer beframe-global-buffers)))
 
 (cl-defun beframe-buffer-list (&optional frame &key sort)
   "Return list of buffers that are used by the current frame.
@@ -165,17 +172,11 @@ minus all the internal buffers."
 With optional FRAME, do it for the given frame name.  With key
 SORT, apply this sorting function—see `beframe-buffer-list' for
 more information."
-  (mapcar
-   (lambda (buf)
-     (buffer-name buf))
-   (beframe-buffer-list frame :sort sort)))
+  (mapcar #'buffer-name (beframe-buffer-list frame :sort sort)))
 
 (defun beframe--buffer-names-consolidated ()
   "Return list of names of all buffers as strings."
-  (mapcar
-   (lambda (buf)
-     (buffer-name buf))
-   (beframe--buffer-list-consolidated)))
+  (mapcar #'buffer-name (beframe--buffer-list-consolidated)))
 
 (define-obsolete-function-alias
   'beframe--buffer-names
@@ -414,10 +415,7 @@ Also see the other Beframe commands:
 
 (defun beframe--buffers-name-to-objects (buffers)
   "Convert list of named BUFFERS to their corresponding objects."
-  (mapcar
-   (lambda (buf)
-     (get-buffer buf))
-   buffers))
+  (mapcar #'get-buffer buffers))
 
 (defun beframe--buffer-list-prompt-crm (&optional frame)
   "Select one or more buffers in FRAME separated by `crm-separator'.

@@ -85,7 +85,9 @@ filters the list.
 The user option ~beframe-global-buffers~ contains a list of strings
 that represent buffers names.  Those buffers are never beframed and
 are available in all frames.  The default value contains the buffers
-=*scratch*=, =*Messages*=, and =*Backtrace*=.
+=*scratch*=, =*Messages*=, and =*Backtrace*=.  If the value is nil, no
+buffer enjoys such special treatment: they all follow the beframing
+scheme of remaining associated with the frame that opened them.
 
 #+vindex: beframe-create-frame-scratch-buffer
 The user option ~beframe-create-frame-scratch-buffer~ allows
