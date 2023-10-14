@@ -42,15 +42,24 @@
   :group 'frames)
 
 (defcustom beframe-global-buffers '("*scratch*" "*Messages*" "*Backtrace*")
-  "List of buffer names to include in all frames.
-These buffers are shown in the buffer selection prompts even if
-they have not been used by---and thus associated with---the
-current frame.
+  "List of buffer names (as strings) to include in all frames.
+These buffers are always shown in the `beframe-buffer-menu' or
+buffer selection prompts when `beframe-mode' is enabled.  They do
+not need to be open inside the current frame and thus become
+associated with it (the way other buffers are normally beframed).
 
-Otherwise framed buffers are limited to the frame that uses them."
+When the value is nil, no buffer get this special treatment: they
+all follow the beframing scheme of remaining associated with the
+frame that opened them.
+
+Also see commands such as `beframe-assume-frame-buffers' and
+`beframe-unassume-frame-buffers'.  The full list:
+
+\\{beframe-prefix-map}"
   :group 'beframe
   :package-version '(beframe . "0.1.0")
-  :type '(repeat string))
+  :type '(choice (repeat :tag "List of buffer names as strings" string)
+                 (const :tag "No global buffers" nil)))
 
 (defcustom beframe-create-frame-scratch-buffer t
   "Create a frame-specific scratch buffer for new frames.
@@ -123,10 +132,8 @@ automatically, use `customize-set-variable' or `setopt' (Emacs
 
 (defun beframe--global-buffers ()
   "Return list of `beframe-global-buffers' buffer objects."
-  (mapcar
-   (lambda (name)
-     (get-buffer name))
-   beframe-global-buffers))
+  (when beframe-global-buffers
+    (mapcar #'get-buffer beframe-global-buffers)))
 
 (cl-defun beframe-buffer-list (&optional frame &key sort)
   "Return list of buffers that are used by the current frame.
