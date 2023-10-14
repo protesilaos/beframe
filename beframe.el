@@ -176,10 +176,7 @@ more information."
 
 (defun beframe--buffer-names-consolidated ()
   "Return list of names of all buffers as strings."
-  (mapcar
-   (lambda (buf)
-     (buffer-name buf))
-   (beframe--buffer-list-consolidated)))
+  (mapcar #'buffer-name (beframe--buffer-list-consolidated)))
 
 (define-obsolete-function-alias
   'beframe--buffer-names
