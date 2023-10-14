@@ -415,10 +415,7 @@ Also see the other Beframe commands:
 
 (defun beframe--buffers-name-to-objects (buffers)
   "Convert list of named BUFFERS to their corresponding objects."
-  (mapcar
-   (lambda (buf)
-     (get-buffer buf))
-   buffers))
+  (mapcar #'get-buffer buffers))
 
 (defun beframe--buffer-list-prompt-crm (&optional frame)
   "Select one or more buffers in FRAME separated by `crm-separator'.
