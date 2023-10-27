@@ -557,18 +557,12 @@ Also see the `beframe-prefix-map'."
       (progn
         (setq beframe--read-buffer-function read-buffer-function
               read-buffer-function #'beframe-read-buffer)
-        (add-hook 'after-make-frame-functions #'beframe-frame-predicate)
-        (add-hook 'after-make-frame-functions #'beframe-maybe-rename-frame)
-        (add-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
-        (add-hook 'after-make-frame-functions #'beframe-do-not-assume-last-selected-buffer)
+        (add-hook 'after-make-frame-functions #'beframe-setup-frame)
         (add-hook 'context-menu-functions #'beframe-context-menu)
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
           beframe--read-buffer-function nil)
-    (remove-hook 'after-make-frame-functions #'beframe-frame-predicate)
-    (remove-hook 'after-make-frame-functions #'beframe-maybe-rename-frame)
-    (remove-hook 'after-make-frame-functions #'beframe-create-scratch-buffer)
-    (remove-hook 'after-make-frame-functions #'beframe-do-not-assume-last-selected-buffer)
+    (remove-hook 'after-make-frame-functions #'beframe-setup-frame)
     (remove-hook 'context-menu-functions #'beframe-context-menu)
     (beframe--functions-in-frames :disable)))
 
@@ -672,6 +666,18 @@ FRAME and optional NAME arguments are passed to the
 `beframe-rename-function'."
   (when beframe-rename-function
     (funcall beframe-rename-function frame name)))
+
+(defun beframe-setup-frame (frame)
+  "Rename FRAME and create scratch buffer for it, if appropriate.
+Call the functions `beframe-frame-predicate',
+`beframe-do-not-assume-last-selected-buffer',
+`beframe-maybe-rename-frame', `beframe-create-scratch-buffer' in
+this order."
+  (dolist (fn '(beframe-frame-predicate
+                beframe-do-not-assume-last-selected-buffer
+                beframe-maybe-rename-frame
+                beframe-create-scratch-buffer))
+    (funcall fn frame)))
 
 (defun beframe--frame-buffer-p (buf &optional frame)
   "Return non-nil if BUF belongs to the current frame.
