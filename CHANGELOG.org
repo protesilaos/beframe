@@ -9,7 +9,7 @@ project's main git repository: <https://git.sr.ht/~protesilaos/beframe>.
 The newest release is at the top.  For further details, please consult
 the manual: <https://protesilaos.com/emacs/beframe>.
 
-* 0.3.0
+* 0.3.0 on 2023-05-21
 :PROPERTIES:
 :CUSTOM_ID: h:59120517-f6e0-4bb8-a495-c5eb40654d6a
 :END:
@@ -85,7 +85,7 @@ each other.
   with the style of =beframe.el=.
 - Rewrite parts of the manual to reference the aforementioned.
 
-* 0.2.0
+* 0.2.0 on 2023-03-27
 :PROPERTIES:
 :CUSTOM_ID: h:ba53a28d-7e85-4c9b-9770-22abb9263473
 :END:
