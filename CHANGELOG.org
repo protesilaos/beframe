@@ -9,6 +9,82 @@ project's main git repository: <https://git.sr.ht/~protesilaos/beframe>.
 The newest release is at the top.  For further details, please consult
 the manual: <https://protesilaos.com/emacs/beframe>.
 
+* 1.0.0 on 2023-11-17
+:PROPERTIES:
+:CUSTOM_ID: h:9a00ab34-a07f-4bb3-9397-6b1383fcebca
+:END:
+
+~beframe~ is in a stable state. This release formalises a set of
+stability enhancements and quality-of-life improvements.
+
+** The menu bar helps you discover Beframe commands
+:PROPERTIES:
+:CUSTOM_ID: h:e1aec53d-ed00-4eed-8763-78f7ad9c307d
+:END:
+
+A submenu with Beframe commands is available to users of
+~menu-bar-mode~. It is available at =Buffers > BEFRAME buffers=. Check
+the original announcement, which includes screenshots:
+<https://protesilaos.com/codelog/2023-10-08-emacs-beframe-menu/>.
+
+[ As an aside, never tell a new user to add ~(menu-bar-mode -1)~ to
+  their Emacs init file. It is not helpful. ]
+
+** The sample integration with ~consult~ can flip between recent buffers
+:PROPERTIES:
+:CUSTOM_ID: h:377b869e-a552-41e7-8e52-343a434a77af
+:END:
+
+In the manual of ~beframe~ there is a section about augmenting the
+~consult-buffer~ command with a new source of beframed buffers
+(buffers specific to the current frame). Edgar Vincent made a change
+that sorts buffers by last viewed, meaning that the previous buffer is
+at the top of the list. The change is within the ~15 line limit and
+thus Edgar does not need to assign copyright to the Free Software
+Foundation. Discussed on the mailing list:
+<https://lists.sr.ht/~protesilaos/general-issues/%3C878r97fxmc.fsf%40protesilaos.com%3E>.
+
+Refer to the manual for the code to integrate ~beframe~ with ~consult~:
+<https://protesilaos.com/emacs/beframe#h:1c2d3d64-aa7b-4585-a418-ccedbb548b38>.
+
+NOTE that you do not need ~consult~ to use ~beframe~: (i) the
+~beframe-mode~ makes the regular ~switch-to-buffer~ work in a beframed
+way and/or (ii) use the ~beframe-buffer-menu~ to get a list of the
+beframed buffers (call the latter command with a prefix key (=C-u= by
+default) to select a frame whose buffers you want to list).
+
+** The ~beframe-rename-function~ can take a ~nil~ value
+:PROPERTIES:
+:CUSTOM_ID: h:d64e0861-15a7-40ad-8ece-aba232840fb8
+:END:
+
+This was always the intent, though the code did not honour it. Thanks
+to Karthik Chikmagalur for reporting the bug on the mailing list:
+<https://lists.sr.ht/~protesilaos/general-issues/%3C87a5w8yi1n.fsf%40gmail.com%3E>.
+
+** General refinements
+:PROPERTIES:
+:CUSTOM_ID: h:494d4a62-567e-4886-af96-fa9e93e48083
+:END:
+
+- Commands that prompt for a frame (e.g. ~beframe-assume-frame-buffers~)
+  no longer try to perform their work if a single Emacs frame is
+  available. Instead, they return a ~user-error~.
+
+- The buffer that was current when a new frame was created is no
+  longer part of the new frame's buffer list. This means that the new
+  frame starts clean, including only the buffer specified in the user
+  option ~beframe-global-buffers~.
+
+- The code that renames a new frame based is better at inferring the
+  correct name. It now finds the =project.el= name, if available. The
+  manual explains how to use Beframe with projects:
+  <https://protesilaos.com/emacs/beframe#h:5b751614-8749-4aa8-aaed-f181beaddc57>
+  (to me, this is a killer feature).
+
+- Simplified how frames are set up. This guarantees that our functions
+  are called in the desired order.
+
 * 0.3.0 on 2023-05-21
 :PROPERTIES:
 :CUSTOM_ID: h:59120517-f6e0-4bb8-a495-c5eb40654d6a
