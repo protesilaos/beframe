@@ -41,11 +41,11 @@
   "Isolate buffers per frame."
   :group 'frames)
 
-(defcustom beframe-global-buffers '("*scratch*" "*Messages*" "*Backtrace*")
-  "List of buffer names (as strings) to include in all frames.
-These buffers are always shown in the `beframe-buffer-menu' or
+(defcustom beframe-global-buffers '("\\*scratch\\*" "\\*Messages\\*" "\\*Backtrace\\*")
+  "List of regular expressions to match buffer names.
+The matching buffers are always shown in the `beframe-buffer-menu' or
 buffer selection prompts when `beframe-mode' is enabled.  They do
-not need to be open inside the current frame and thus become
+not need to be open inside the current frame and to thus become
 associated with it (the way other buffers are normally beframed).
 
 When the value is nil, no buffer get this special treatment: they
@@ -53,12 +53,13 @@ all follow the beframing scheme of remaining associated with the
 frame that opened them.
 
 Also see commands such as `beframe-assume-frame-buffers' and
-`beframe-unassume-frame-buffers'.  The full list:
+`beframe-unassume-frame-buffers' to add/remove buffers from a
+frame's buffer list ad-hoc.  The full list of commands:
 
 \\{beframe-prefix-map}"
   :group 'beframe
-  :package-version '(beframe . "0.1.0")
-  :type '(choice (repeat :tag "List of buffer names as strings" string)
+  :package-version '(beframe . "1.1.0")
+  :type '(choice (repeat :tag "List of regular expressions to match buffer names" string)
                  (const :tag "No global buffers" nil)))
 
 (defcustom beframe-create-frame-scratch-buffer t
@@ -130,10 +131,26 @@ automatically, use `customize-set-variable' or `setopt' (Emacs
           (not (string-prefix-p " " (buffer-name buf)))))
    (frame-parameter frame 'buffer-list)))
 
+(defun beframe--public-buffers ()
+  "Return list of buffers from all frames.
+This is the same as the output of the `buffer-list' function
+minus all the internal buffers."
+  (seq-filter
+   (lambda (buf)
+     (and (bufferp buf)
+          (not (string-prefix-p " " (buffer-name buf)))))
+   (buffer-list)))
+
 (defun beframe--global-buffers ()
   "Return list of `beframe-global-buffers' buffer objects."
-  (when beframe-global-buffers
-    (mapcar #'get-buffer beframe-global-buffers)))
+  (mapcan
+   (lambda (regexp)
+     (seq-filter
+      (lambda (buffer)
+        (when (string-match-p regexp (buffer-name buffer))
+          buffer))
+      (beframe--public-buffers)))
+   beframe-global-buffers))
 
 (cl-defun beframe-buffer-list (&optional frame &key sort)
   "Return list of buffers that are used by the current frame.
@@ -152,16 +169,6 @@ Include `beframe-global-buffers' in the list."
                   (append (beframe--frame-buffers frame)
                           (beframe--global-buffers))))))
 
-(defun beframe--buffer-list-consolidated ()
-  "Return list of buffers from all frames.
-This is the same as the output of the `buffer-list' function
-minus all the internal buffers."
-  (seq-filter
-   (lambda (buf)
-     (and (bufferp buf)
-          (not (string-prefix-p " " (buffer-name buf)))))
-   (buffer-list)))
-
 (define-obsolete-function-alias
   'beframe--buffer-list
   'beframe-buffer-list
@@ -176,7 +183,7 @@ more information."
 
 (defun beframe--buffer-names-consolidated ()
   "Return list of names of all buffers as strings."
-  (mapcar #'buffer-name (beframe--buffer-list-consolidated)))
+  (mapcar #'buffer-name (beframe--public-buffers)))
 
 (define-obsolete-function-alias
   'beframe--buffer-names
@@ -511,7 +518,7 @@ Also see the other Beframe commands:
   "Assume the consolidated buffer list (all frames)."
   (declare (interactive-only t))
   (interactive)
-  (beframe--assume (beframe--buffer-list-consolidated)))
+  (beframe--assume (beframe--public-buffers)))
 
 ;;;###autoload
 (defun beframe-unassume-all-buffers-no-prompts ()
@@ -523,7 +530,7 @@ Also see the other Beframe commands:
 \\{beframe-prefix-map}"
   (declare (interactive-only t))
   (interactive)
-  (beframe--unassume (beframe--buffer-list-consolidated))
+  (beframe--unassume (beframe--public-buffers))
   (beframe--assume (beframe--global-buffers)))
 
 ;;; Minor mode setup

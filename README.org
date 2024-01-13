@@ -82,12 +82,17 @@ There still is only one global list of buffers.  Beframing them simply
 filters the list.
 
 #+vindex: beframe-global-buffers
-The user option ~beframe-global-buffers~ contains a list of strings
-that represent buffers names.  Those buffers are never beframed and
-are available in all frames.  The default value contains the buffers
-=*scratch*=, =*Messages*=, and =*Backtrace*=.  If the value is nil, no
-buffer enjoys such special treatment: they all follow the beframing
-scheme of remaining associated with the frame that opened them.
+The user option ~beframe-global-buffers~ contains a list of regular
+expressions that are matched against buffers names. The matching
+buffers are never beframed and are available in all frames. The
+default value contains the buffers =*scratch*=, =*Messages*=, and
+=*Backtrace*= (more preciselly, it matches the regular expressions
+=\\*scratch\\*=, =\\*Messages\\*= =\\*Backtrace\\*=). If the value is
+~nil~, no buffer enjoys such special treatment: they all follow the
+beframing scheme of remaining associated with the frame that opened
+them. [ The ~beframe-global-buffers~ is revised as part of
+{{{development-version}}} to take a list of regular expressions
+instead of literal strings. ]
 
 #+vindex: beframe-create-frame-scratch-buffer
 The user option ~beframe-create-frame-scratch-buffer~ allows
