@@ -3,9 +3,8 @@
 ;; Copyright (C) 2023-2024  Free Software Foundation, Inc.
 
 ;; Author: Protesilaos Stavrou <info@protesilaos.com>
-;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
-;; URL: https://git.sr.ht/~protesilaos/beframe
-;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
+;; Maintainer: Protesilaos Stavrou <info@protesilaos.com>
+;; URL: https://github.com/protesilaos/beframe
 ;; Version: 1.0.0
 ;; Package-Requires: ((emacs "28.1"))
 
