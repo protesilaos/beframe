@@ -120,7 +120,7 @@ automatically, use `customize-set-variable' or `setopt' (Emacs
          (beframe--functions-in-frames :disable)
          (set-default symbol value)
          (beframe--functions-in-frames))
-  :type '(repeat symbol))
+  :type 'symbol)
 
 (defun beframe--frame-buffers (&optional frame)
   "Produce list of buffers for either specified or current FRAME."
