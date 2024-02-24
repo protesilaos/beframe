@@ -218,6 +218,13 @@ Beframe's commands.  Those are available on demand ([[*The Beframe keymap][The B
 :CUSTOM_ID: h:737253ad-f671-46df-bdb9-6be20a982470
 :END:
 
+[ The definition of ~beframe-prefix-map~ as a /command/ is part of
+  {{{development-version}}}. In previous versions, the following code
+  block was binding the variable of the key map to the key. This meant
+  that updating the key map required a revaluation of the key binding.
+  Whereas now updates to the key map apply immediately, due to the
+  indirection we achieve by binding the symbol of the command. ]
+
 #+vindex: beframe-prefix-map
 The ~beframe-prefix-map~ defines key bindings for the Beframe commands
 documented herein.  We call it a prefix keymap because it is not
@@ -225,7 +232,7 @@ available from anywhere unless the user attaches it to a key sequence.
 For example:
 
 #+begin_src emacs-lisp
-(define-key global-map (kbd "C-c b") beframe-prefix-map)
+(define-key global-map (kbd "C-c b") #'beframe-prefix-map)
 #+end_src
 
 With the above code, =C-c b= becomes the prefix key that invokes
@@ -304,7 +311,7 @@ Everything is in place to set up the package.
 (beframe-mode 1)
 
 ;; Bind Beframe commands to a prefix key, such as C-c b:
-(define-key global-map (kbd "C-c b") beframe-prefix-map)
+(define-key global-map (kbd "C-c b") #'beframe-prefix-map)
 #+end_src
 
 ** Integration with Consult

@@ -537,27 +537,28 @@ Also see the other Beframe commands:
 (defvar beframe--read-buffer-function nil
   "Last value of `read-buffer-function'.")
 
-(defvar beframe-prefix-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "b") #'beframe-switch-buffer)
-    (define-key map (kbd "m") #'beframe-buffer-menu)
-    (define-key map (kbd "a f") #'beframe-assume-frame-buffers-selectively)
-    (define-key map (kbd "a F") #'beframe-assume-frame-buffers)
-    (define-key map (kbd "a a") #'beframe-assume-buffers-selectively-all-frames)
-    (define-key map (kbd "a A") #'beframe-assume-all-buffers-no-prompts)
-    (define-key map (kbd "u f") #'beframe-unassume-current-frame-buffers-selectively)
-    (define-key map (kbd "a F") #'beframe-unassume-frame-buffers)
-    (define-key map (kbd "u U") #'beframe-unassume-all-buffers-no-prompts)
-    map)
+(defvar beframe-prefix-map (make-sparse-keymap)
   "Keymap with Beframe commands.
 Meant to be assigned to a prefix key, like this:
 
-    (define-key global-map (kbd \"C-c b\") beframe-prefix-map)")
+    (define-key global-map (kbd \"C-c b\") \=#'beframe-prefix-map)")
+
+(define-prefix-command 'beframe-prefix-map)
+
+(define-key beframe-prefix-map (kbd "b") #'beframe-switch-buffer)
+(define-key beframe-prefix-map (kbd "m") #'beframe-buffer-menu)
+(define-key beframe-prefix-map (kbd "a f") #'beframe-assume-frame-buffers-selectively)
+(define-key beframe-prefix-map (kbd "a F") #'beframe-assume-frame-buffers)
+(define-key beframe-prefix-map (kbd "a a") #'beframe-assume-buffers-selectively-all-frames)
+(define-key beframe-prefix-map (kbd "a A") #'beframe-assume-all-buffers-no-prompts)
+(define-key beframe-prefix-map (kbd "u f") #'beframe-unassume-current-frame-buffers-selectively)
+(define-key beframe-prefix-map (kbd "a F") #'beframe-unassume-frame-buffers)
+(define-key beframe-prefix-map (kbd "u U") #'beframe-unassume-all-buffers-no-prompts)
 
 ;;;###autoload
 (define-minor-mode beframe-mode
   "Make all buffer prompts limit candidates per frame.
-Also see the `beframe-prefix-map'."
+Also see the variable `beframe-prefix-map'."
   :global t
   (if beframe-mode
       (progn
