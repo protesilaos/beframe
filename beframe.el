@@ -40,26 +40,31 @@
   "Isolate buffers per frame."
   :group 'frames)
 
-(defcustom beframe-global-buffers '("\\*scratch\\*" "\\*Messages\\*" "\\*Backtrace\\*")
-  "List of regular expressions to match buffer names.
-The matching buffers are always shown in the `beframe-buffer-menu' or
-buffer selection prompts when `beframe-mode' is enabled.  They do
-not need to be open inside the current frame and to thus become
-associated with it (the way other buffers are normally beframed).
+(defcustom beframe-global-buffers
+  '("\\*scratch\\*" "\\*Messages\\*" "\\*Backtrace\\*")
+  "List of regular expressions or major-mode symbols to match global buffers.
+
+Global buffers are those which are not associated only with the frame
+that displayed them: they are available to all frames through
+`beframe-buffer-menu' or standard buffer selection prompts when
+`beframe-mode' is enabled.
 
 When the value is nil, no buffer get this special treatment: they
 all follow the beframing scheme of remaining associated with the
 frame that opened them.
 
 Also see commands such as `beframe-assume-frame-buffers' and
-`beframe-unassume-frame-buffers' to add/remove buffers from a
-frame's buffer list ad-hoc.  The full list of commands:
+`beframe-unassume-frame-buffers' (and their variants) to add/remove
+buffers from a frame's buffer list ad-hoc.  The full list of commands:
 
 \\{beframe-prefix-map}"
   :group 'beframe
   :package-version '(beframe . "1.1.0")
-  :type '(choice (repeat :tag "List of regular expressions to match buffer names" string)
-                 (const :tag "No global buffers" nil)))
+  :type '(choice
+          (repeat (choice
+                   (string :tag "Regular expression to match buffer names")
+                   (symbol :tag "Symbol to match a buffer's major mode" :value "")))
+          (const :tag "No global buffers" nil)))
 
 (defcustom beframe-create-frame-scratch-buffer t
   "Create a frame-specific scratch buffer for new frames.
@@ -143,10 +148,14 @@ minus all the internal buffers."
 (defun beframe--global-buffers ()
   "Return list of `beframe-global-buffers' buffer objects."
   (mapcan
-   (lambda (regexp)
+   (lambda (regexp-or-symbol)
      (seq-filter
       (lambda (buffer)
-        (when (string-match-p regexp (buffer-name buffer))
+        (when (or (and (stringp regexp-or-symbol)
+                       (string-match-p regexp-or-symbol (buffer-name buffer)))
+                  (and (symbolp regexp-or-symbol)
+                       (with-current-buffer buffer
+                         (derived-mode-p regexp-or-symbol))))
           buffer))
       (beframe--public-buffers)))
    beframe-global-buffers))
