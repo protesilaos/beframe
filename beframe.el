@@ -618,13 +618,14 @@ Also see the variable `beframe-prefix-map'."
 (defun beframe-infer-frame-name (frame name)
   "Infer a suitable name for FRAME with given NAME.
 See `beframe-rename-frame'."
-  (let* ((buffer (car (frame-parameter frame 'buffer-list)))
-         (file-name (when (bufferp buffer) (buffer-file-name buffer)))
-         (buf-name (buffer-name buffer))
-         (dir (with-current-buffer buffer (or (vc-root-dir) default-directory)))
-         (projectp (and (bound-and-true-p project--list)
-                        (listp project--list)
-                        (member (list dir) project--list))))
+  (when-let (((frame-list))
+             (buffer (car (frame-parameter frame 'buffer-list)))
+             (file-name (when (bufferp buffer) (buffer-file-name buffer)))
+             (buf-name (buffer-name buffer))
+             (dir (with-current-buffer buffer (or (vc-root-dir) default-directory)))
+             (projectp (and (bound-and-true-p project--list)
+                            (listp project--list)
+                            (member (list dir) project--list))))
     (cond
      ((and name (stringp name))
       name)
