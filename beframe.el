@@ -5,7 +5,7 @@
 ;; Author: Protesilaos Stavrou <info@protesilaos.com>
 ;; Maintainer: Protesilaos Stavrou <info@protesilaos.com>
 ;; URL: https://github.com/protesilaos/beframe
-;; Version: 1.1.0
+;; Version: 1.1.1
 ;; Package-Requires: ((emacs "28.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -552,6 +552,7 @@ Meant to be assigned to a prefix key, like this:
 
     (define-key global-map (kbd \"C-c b\") \=#'beframe-prefix-map)")
 
+;;;###autoload (autoload 'beframe-prefix-map "beframe")
 (define-prefix-command 'beframe-prefix-map)
 
 (define-key beframe-prefix-map (kbd "b") #'beframe-switch-buffer)
