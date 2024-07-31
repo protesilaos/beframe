@@ -404,7 +404,7 @@ matters.
 + Contributions to code or the manual :: Edgar Vincent, Tony Zorman.
 
 + Ideas and/or user feedback :: Derek Passen, Karan Ahlawat, Karthik
-  Chikmagalur, Valentino.
+  Chikmagalur, Valentino, duli.
 
 * COPYING
 :PROPERTIES:
