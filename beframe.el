@@ -626,7 +626,9 @@ See `beframe-rename-frame'."
            (dir (with-current-buffer buffer (or (vc-root-dir) default-directory)))
            (projectp (and (bound-and-true-p project--list)
                           (listp project--list)
-                          (member (list dir) project--list))))
+                          (or
+                           (member (list dir) project--list)
+                           (member (list (abbreviate-file-name dir)) project--list)))))
       (cond
        ((and name (stringp name))
         name)
