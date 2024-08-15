@@ -141,19 +141,18 @@ automatically, use `customize-set-variable' or `setopt' (Emacs
 
 The following values of ARG can be used:
 
-- nil or \\='public\\=' to consider the return value of the `buffer-list'
+- \\='public\\=' to consider the return value of the `buffer-list'
   function.
 
 - \\='global\\=' to consider the user-custom option in `beframe-global-buffers'
 
-ARG can be the symbol \\='public or nil for `buffer-list' return value."
+- nil or a frame object satisfying `frame-live-p' to consider the
+  \\='buffer-list\\=' parameter of either `selected-frame' or the given object."
   (pcase arg
-    ((or 'public (pred null))
-     (beframe--remove-internal-buffers (buffer-list)))
+    ('public (beframe--remove-internal-buffers (buffer-list)))
     ('global (beframe--global-buffers))
-    ((or (and 'frame (let frame nil))
-         (and (pred frame-live-p) (let frame arg)))
-     (beframe--remove-internal-buffers (frame-parameter frame 'buffer-list)))
+    ((or (pred null) (pred frame-live-p))
+     (beframe--remove-internal-buffers (frame-parameter arg 'buffer-list)))
     (_ (user-error "Wrong argument in `beframe--get-buffers' pcase"))))
 
 (cl-defun beframe-buffer-list (&optional frame &key sort)
