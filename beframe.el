@@ -155,6 +155,20 @@ The following values of ARG can be used:
      (beframe--remove-internal-buffers (frame-parameter arg 'buffer-list)))
     (_ (user-error "Wrong argument in `beframe--get-buffers' pcase"))))
 
+
+(defun beframe--global-buffers ()
+  "Return list of `beframe-global-buffers' buffer objects."
+  (pcase-let* ((pub-buffs (beframe--get-buffers 'public))
+               (`(,str-re ,modes-lst)
+                (cl-loop for E in beframe-global-buffers
+                         if (stringp E) collect E into str
+                         else if (symbolp E) collect E into sym
+                         finally return (list (string-join str "\\|") sym))))
+    (cl-loop for b in pub-buffs
+             if (string-match-p str-re (buffer-name b)) collect b
+             else if (with-current-buffer b (derived-mode-p modes-lst))
+             collect b)))
+
 (cl-defun beframe-buffer-list (&optional frame &key sort)
   "Return list of buffers that are used by the current frame.
 With optional FRAME as an object that satisfies `framep', return
