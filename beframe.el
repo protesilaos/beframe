@@ -160,6 +160,13 @@ minus all the internal buffers."
       (beframe--public-buffers)))
    beframe-global-buffers))
 
+(defun beframe--remove-internal-buffers (buffers)
+  "Removes internal buffers from BUFFERS list."
+  (cl-flet ((beframe--filter-internal-p (buffer)
+              (string-prefix-p " " (buffer-name buffer))))
+    (seq-remove #'beframe--filter-internal-p buffers)))
+
+
 (cl-defun beframe-buffer-list (&optional frame &key sort)
   "Return list of buffers that are used by the current frame.
 With optional FRAME as an object that satisfies `framep', return
