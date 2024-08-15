@@ -401,7 +401,8 @@ matters.
 
 + Author/maintainer :: Protesilaos Stavrou.
 
-+ Contributions to code or the manual :: Edgar Vincent, Tony Zorman.
++ Contributions to code or the manual :: Bruno Boal, Edgar Vincent,
+  Tony Zorman.
 
 + Ideas and/or user feedback :: Derek Passen, Karan Ahlawat, Karthik
   Chikmagalur, Valentino, duli.
