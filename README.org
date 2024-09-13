@@ -275,7 +275,7 @@ mkdir manual-packages
 cd manual-packages
 
 # Clone this repo, naming it "beframe"
-git clone https://git.sr.ht/~protesilaos/beframe beframe
+git clone https://github.com/protesilaos/beframe beframe
 #+end_src
 
 Finally, in your =init.el= (or equivalent) evaluate this:
