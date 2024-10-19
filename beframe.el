@@ -559,7 +559,7 @@ Also see the other Beframe commands:
   "Keymap with Beframe commands.
 Meant to be assigned to a prefix key, like this:
 
-    (define-key global-map (kbd \"C-c b\") \=#'beframe-prefix-map)")
+    (define-key global-map (kbd \"C-c b\") \='beframe-prefix-map)")
 
 ;;;###autoload (autoload 'beframe-prefix-map "beframe")
 (define-prefix-command 'beframe-prefix-map)
