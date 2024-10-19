@@ -150,6 +150,22 @@ with the current frame.
 - The command ~beframe-assume-all-buffers-no-prompts~ unconditionally
   assumes the consolidated buffer list.
 
+  [ The following two are part of {{{development-version}}}. ]
+
+  #+findex: beframe-assume-buffers-matching-regexp-all-frames
+- The command ~beframe-assume-buffers-matching-regexp-all-frames~
+  prompts for a regular expression to match against buffer names. The
+  matching buffers are assumed by the current frame. With an optional
+  prefix argument for =MATCH-MODE-NAMES=, the regular expression is
+  matched against the buffer name or major mode.
+
+  #+findex: beframe-unassume-buffers-matching-regexp-all-frames
+- The ~beframe-unassume-buffers-matching-regexp-all-frames~ prompts
+  for a regular expression to match against buffer names. The matching
+  buffers are unassumed by the current frame. With an optional prefix
+  argument for =MATCH-MODE-NAMES=, the regular expression is matched
+  against the buffer name or major mode.
+
 ** Unassuming buffers
 :PROPERTIES:
 :CUSTOM_ID: h:8fb895ac-7f99-4c92-b15a-18871b30c7b9

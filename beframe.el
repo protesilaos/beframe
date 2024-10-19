@@ -503,6 +503,59 @@ Also see the other Beframe commands:
     (beframe--buffer-list-prompt-crm
      :all-frames))))
 
+(defun beframe--get-buffers-matching-regexp (regexp &optional match-mode-names)
+  "Return buffers whose name matches REGEXP.
+With optional MATCH-MODE-NAMES also return buffers whose major mode
+matches REGEXP."
+  (seq-filter
+   (lambda (buffer)
+     (if match-mode-names
+         (or (string-match-p regexp (buffer-name buffer))
+             (with-current-buffer buffer
+               (string-match-p regexp (symbol-name major-mode))))
+       (string-match-p regexp (buffer-name buffer))))
+   (buffer-list)))
+
+(defvar beframe-buffers-matching-regexp-history nil
+  "Minibuffer history of `beframe-buffers-matching-regexp-prompt'.")
+
+(defun beframe-buffers-matching-regexp-prompt (prompt-text)
+  "Prompt for regular with PROMPT-TEXT."
+  (let ((default (car beframe-buffers-matching-regexp-history)))
+    (read-regexp
+     (format-prompt prompt-text default)
+     default 'beframe-buffers-matching-regexp-history)))
+
+;;;###autoload
+(defun beframe-assume-buffers-matching-regexp-all-frames (regexp &optional match-mode-names)
+  "Assume all buffers whose name matches REGEXP.
+With optional MATCH-MODE-NAMES return buffers whose name or major mode
+matches REGEXP.
+
+Also see the other Beframe commands:
+
+\\{beframe-prefix-map}"
+  (interactive
+   (list
+    (beframe-buffers-matching-regexp-prompt "Buffer names matching REGEXP")
+    current-prefix-arg))
+  (beframe--assume (beframe--get-buffers-matching-regexp regexp match-mode-names)))
+
+;;;###autoload
+(defun beframe-unassume-buffers-matching-regexp-all-frames (regexp &optional match-mode-names)
+  "Unassume all buffers whose name matches REGEXP.
+With optional MATCH-MODE-NAMES return buffers whose name or major mode
+matches REGEXP.
+
+Also see the other Beframe commands:
+
+\\{beframe-prefix-map}"
+  (interactive
+   (list
+    (beframe-buffers-matching-regexp-prompt "Buffer names matching REGEXP")
+    current-prefix-arg))
+  (beframe--unassume (beframe--get-buffers-matching-regexp regexp match-mode-names)))
+
 (define-obsolete-function-alias
   'beframe-unassume-buffers
   'beframe-unassume-current-frame-buffers-selectively
@@ -573,6 +626,8 @@ Meant to be assigned to a prefix key, like this:
 (define-key beframe-prefix-map (kbd "u f") #'beframe-unassume-current-frame-buffers-selectively)
 (define-key beframe-prefix-map (kbd "a F") #'beframe-unassume-frame-buffers)
 (define-key beframe-prefix-map (kbd "u U") #'beframe-unassume-all-buffers-no-prompts)
+(define-key beframe-prefix-map (kbd "a s") #'beframe-assume-buffers-matching-regexp-all-frames)
+(define-key beframe-prefix-map (kbd "u s") #'beframe-unassume-buffers-matching-regexp-all-frames)
 
 ;;;###autoload
 (define-minor-mode beframe-mode
