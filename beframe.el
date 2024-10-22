@@ -428,17 +428,16 @@ BUFFERS is a list of buffer objects.  If BUFFERS satisfies
 `framep', then the list of buffers is that of the corresponding
 frame object (per `beframe-buffer-list')."
   (if-let ((frame-buffers (beframe--get-buffers))
-           (final-list (delete-dups
-                        (append
-                         (if (framep buffers)
-                             (beframe--get-buffers buffers)
-                           buffers)
-                         frame-buffers))))
+           (final-list (append
+                        (if (framep buffers)
+                            (beframe--get-buffers buffers)
+                          buffers)
+                        frame-buffers)))
       (if-let ((assumed-buffers (seq-difference ; NOTE: the longer list must come first
                                  (mapcar #'buffer-name final-list)
                                  (mapcar #'buffer-name frame-buffers))))
           (progn
-            (modify-frame-parameters nil `((buffer-list . ,final-list)))
+            (modify-frame-parameters nil `((buffer-list . ,(delete-dups final-list))))
             (message "Assumed into frame: %s" assumed-buffers))
         (message "Did not assume any buffers"))
     (error "Could not determine how to assume `%s'" buffers)))
