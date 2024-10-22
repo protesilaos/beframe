@@ -134,32 +134,53 @@ automatically, use `customize-set-variable' or `setopt' (Emacs
      (string-prefix-p " " (buffer-name buffer)))
    buffers))
 
-(defun beframe--get-buffers-matching-regexp (regexp &optional match-mode-names)
+(defun beframe--get-buffers-matching-regexp (regexp &optional match-mode-names no-internal-buffers)
   "Return buffers whose name matches REGEXP.
 With optional MATCH-MODE-NAMES also return buffers whose major mode
-matches REGEXP."
-  (seq-filter
-   (lambda (buffer)
-     (if match-mode-names
-         (or (string-match-p regexp (buffer-name buffer))
-             (with-current-buffer buffer
-               (string-match-p regexp (symbol-name major-mode))))
-       (string-match-p regexp (buffer-name buffer))))
-   (buffer-list)))
+matches REGEXP.
+
+With optional NO-INTERNAL-BUFFERS, get the `buffer-list' filtered
+through `beframe--remove-internal-buffers'."
+  (let ((buffers (if no-internal-buffers
+                     (beframe--remove-internal-buffers (buffer-list))
+                   (buffer-list))))
+    (seq-filter
+     (lambda (buffer)
+       (if match-mode-names
+           (or (string-match-p regexp (buffer-name buffer))
+               (with-current-buffer buffer
+                 (string-match-p regexp (symbol-name major-mode))))
+         (string-match-p regexp (buffer-name buffer))))
+     buffers)))
 
 (defun beframe--get-buffers (&optional arg)
   "Return list of buffers from different sources depending on ARG.
 
 The following values of ARG can be used:
 
-- \\='public\\=' to consider the return value of the `buffer-list'
-  function.
+- A list of one to three elements that are passed to the function
+  `beframe--get-buffers-matching-regexp' (refer to its doc string from
+  the arguments).
 
-- \\='global\\=' to consider the user-custom option in `beframe-global-buffers'
+- A string, which is passed to `beframe--get-buffers-matching-regexp' as
+  the sole argument.
 
-- nil or a frame object satisfying `frame-live-p' to consider the
-  \\='buffer-list\\=' parameter of either `selected-frame' or the given object."
+- The symbol \\='public\\=' to filter the `buffer-list' through
+  `beframe--remove-internal-buffers'.
+
+- The symbol \\='global\\=' to get the return value of the function
+  `beframe--global-buffers', which reads the user option
+  `beframe-global-buffers'.
+
+- nil or a frame object satisfying `frame-live-p' to get the
+  \\='buffer-list\\=' parameter of either the `selected-frame' or the
+  given frame object, filtered through `beframe--remove-internal-buffers'."
   (pcase arg
+    ((or `(,regexp ,match-major-modes ,no-internal-buffers)
+         `(,regexp ,match-major-modes)
+         `(,regexp)
+         (and (pred stringp) `,regexp))
+     (beframe--get-buffers-matching-regexp regexp match-major-modes no-internal-buffers))
     ('public (beframe--remove-internal-buffers (buffer-list)))
     ('global (beframe--global-buffers))
     ((or (pred null) (pred frame-live-p))
@@ -537,7 +558,7 @@ Also see the other Beframe commands:
    (list
     (beframe-buffers-matching-regexp-prompt "Buffer names matching REGEXP")
     current-prefix-arg))
-  (beframe--assume (beframe--get-buffers-matching-regexp regexp match-mode-names)))
+  (beframe--assume (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
 
 ;;;###autoload
 (defun beframe-unassume-buffers-matching-regexp-all-frames (regexp &optional match-mode-names)
@@ -552,7 +573,7 @@ Also see the other Beframe commands:
    (list
     (beframe-buffers-matching-regexp-prompt "Buffer names matching REGEXP")
     current-prefix-arg))
-  (beframe--unassume (beframe--get-buffers-matching-regexp regexp match-mode-names)))
+  (beframe--unassume (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
 
 (define-obsolete-function-alias
   'beframe-unassume-buffers
