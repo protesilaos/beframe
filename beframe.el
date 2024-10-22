@@ -561,7 +561,9 @@ Also see the other Beframe commands:
        (if arg
            "Buffer names matching REGEXP in the name or major mode"
          "Buffer names matching REGEXP in the name")))))
-  (beframe--assume (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
+  (if-let ((buffers (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
+      (beframe--assume buffers)
+    (user-error "No buffers match `%s'" regexp)))
 
 ;;;###autoload
 (defun beframe-unassume-buffers-matching-regexp-all-frames (regexp &optional match-mode-names)
@@ -579,7 +581,9 @@ Also see the other Beframe commands:
        (if arg
            "Buffer names matching REGEXP in the name or major mode"
          "Buffer names matching REGEXP in the name")))))
-  (beframe--unassume (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
+  (if-let ((buffers (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
+      (beframe--unassume buffers)
+    (user-error "No buffers match `%s'" regexp)))
 
 (define-obsolete-function-alias
   'beframe-unassume-buffers
