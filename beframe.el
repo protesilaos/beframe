@@ -427,26 +427,43 @@ Also see the other Beframe commands:
 BUFFERS is a list of buffer objects.  If BUFFERS satisfies
 `framep', then the list of buffers is that of the corresponding
 frame object (per `beframe-buffer-list')."
-  (let ((buffer-list
-         (delete-dups
-          (append
-           (if (framep buffers)
-               (beframe-buffer-list buffers)
-             buffers)
-           (beframe-buffer-list)))))
-    (modify-frame-parameters nil `((buffer-list . ,buffer-list)))))
+  (if-let ((frame-buffers (beframe--get-buffers))
+           (final-list (delete-dups
+                        (append
+                         (if (framep buffers)
+                             (beframe--get-buffers buffers)
+                           buffers)
+                         frame-buffers))))
+      (progn
+        (modify-frame-parameters nil `((buffer-list . ,final-list)))
+        (if-let ((assumed-buffers (seq-difference ; NOTE: the longer list must come first
+                                   (mapcar #'buffer-name final-list)
+                                   (mapcar #'buffer-name frame-buffers))))
+            (message "Assumed into frame: %s" assumed-buffers)
+          (message "Did not assume any buffers")))
+    (error "Could not determine how to assume `%s'" buffers)))
 
 (defun beframe--unassume (buffers)
   "Unassume BUFFERS from current frame.
 BUFFERS is a list of buffer objects.  If BUFFERS satisfies
 `framep', then the list of buffers is that of the corresponding
 frame object (per `beframe-buffer-list')."
-  (let ((buffer-list
-         (seq-filter
-          (lambda (buf)
-            (not (member buf (if (framep buffers) (beframe-buffer-list buffers) buffers))))
-          (beframe-buffer-list))))
-    (modify-frame-parameters nil `((buffer-list . ,buffer-list)))))
+  (if-let ((frame-buffers (beframe--get-buffers))
+           (new-buffers (if (framep buffers)
+                            (beframe--get-buffers buffers)
+                          buffers))
+           (final-list (seq-filter
+                        (lambda (buf)
+                          (not (member buf new-buffers)))
+                        frame-buffers)))
+      (progn
+        (modify-frame-parameters nil `((buffer-list . ,final-list)))
+        (if-let ((assumed-buffers (seq-difference ; NOTE: the longer list must come first
+                                   (mapcar #'buffer-name frame-buffers)
+                                   (mapcar #'buffer-name final-list))))
+            (message "Unassumed from frame: %s" assumed-buffers)
+          (message "Did not unassume any buffers")))
+    (error "Could not determine how to unassume `%s'" buffers)))
 
 ;;;###autoload
 (defun beframe-assume-frame-buffers (frame)
