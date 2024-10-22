@@ -127,6 +127,19 @@ automatically, use `customize-set-variable' or `setopt' (Emacs
          (beframe--functions-in-frames))
   :type 'symbol)
 
+(defcustom beframe-kill-buffers-no-confirm nil
+  "When non-nil, do not prompt for confirmation when killing buffers.
+This concerns the command `beframe-kill-buffers-matching-regexp'.
+
+If nil (the default), `beframe-kill-buffers-matching-regexp' asks for
+confirmation once and then proceeds to kill all the buffers it has found.
+
+Emacs may still prompt to confirm each action if the buffer is unsaved,
+has a running process, and the like."
+  :group 'beframe
+  :package-version '(beframe . "1.2.0")
+  :type 'boolean)
+
 (defun beframe--remove-internal-buffers (buffers)
   "Remove internal buffers from BUFFERS."
   (seq-remove
@@ -632,6 +645,33 @@ Also see the other Beframe commands:
   (beframe--unassume (beframe--get-buffers 'public))
   (beframe--assume (beframe--global-buffers)))
 
+;;;###autoload
+(defun beframe-kill-buffers-matching-regexp (regexp &optional match-mode-names)
+  "Delete all buffers whose name matches REGEXP.
+With optional MATCH-MODE-NAMES delete buffers whose name or major mode
+matches REGEXP.
+
+Note that this operation applies to all frames, because buffers are
+shared by the Emacs session even though Beframe only exposes those that
+pertain to a given frame.
+
+Also see the other Beframe commands:
+
+\\{beframe-prefix-map}"
+  (interactive
+   (let ((arg current-prefix-arg))
+     (list
+      (beframe-buffers-matching-regexp-prompt
+       (if arg
+           "Delete buffers matching REGEXP in the name or major mode"
+         "Delete buffers matching REGEXP in the name"))
+      arg)))
+  (if-let ((buffers (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
+      (when (or beframe-kill-buffers-no-confirm
+                (y-or-n-p (format "Kill %d buffers matching `%s'?" (length buffers) regexp)))
+        (mapc #'kill-buffer buffers))
+    (user-error "No buffers match `%s'" regexp)))
+
 ;;; Minor mode setup
 
 (defvar beframe--read-buffer-function nil
@@ -648,6 +688,7 @@ Meant to be assigned to a prefix key, like this:
 
 (define-key beframe-prefix-map (kbd "b") #'beframe-switch-buffer)
 (define-key beframe-prefix-map (kbd "m") #'beframe-buffer-menu)
+(define-key beframe-prefix-map (kbd "k") #'beframe-kill-buffers-matching-regexp)
 (define-key beframe-prefix-map (kbd "a f") #'beframe-assume-frame-buffers-selectively)
 (define-key beframe-prefix-map (kbd "a F") #'beframe-assume-frame-buffers)
 (define-key beframe-prefix-map (kbd "a a") #'beframe-assume-buffers-selectively-all-frames)

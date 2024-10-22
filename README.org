@@ -150,7 +150,7 @@ with the current frame.
 - The command ~beframe-assume-all-buffers-no-prompts~ unconditionally
   assumes the consolidated buffer list.
 
-  [ The following two are part of {{{development-version}}}. ]
+  [ The following are part of {{{development-version}}}. ]
 
   #+findex: beframe-assume-buffers-matching-regexp-all-frames
 - The command ~beframe-assume-buffers-matching-regexp-all-frames~
@@ -165,6 +165,19 @@ with the current frame.
   buffers are unassumed by the current frame. With an optional prefix
   argument for =MATCH-MODE-NAMES=, the regular expression is matched
   against the buffer name or major mode.
+
+  #+vindex: beframe-kill-buffers-no-confirm
+  #+findex: beframe-kill-buffers-matching-regexp
+- The ~beframe-kill-buffers-matching-regexp~ command prompts for a
+  regular expression to match against buffer names. If there are
+  matches, it asks for confirmation and then proceeds to kill them. If
+  the user option ~beframe-kill-buffers-no-confirm~ is non-nil, it
+  skips that confirmation step to carry out its action outright. Note
+  that Emacs may still prompt for confirmation if the given buffer is
+  unsaved, has a running process, and the like. Also note that this
+  operation applies to all frames because buffers are shared by the
+  Emacs session even though Beframe only exposes those that pertain to
+  a particular frame.
 
 ** Unassuming buffers
 :PROPERTIES:
