@@ -256,13 +256,14 @@ frame name."
     (mapcar
      (lambda (frame)
        (let ((name (car frame))
-             (obj (cdr frame)))
+             (obj (cdr frame))
+             (selected-frame (selected-frame)))
          (cond
-          ((and (eq (selected-frame) obj)
+          ((and (eq selected-frame obj)
                 (string-prefix-p " " name))
            (setcar frame "Current frame")
            frame)
-          ((eq (selected-frame) obj)
+          ((eq selected-frame obj)
            (setcar frame (format "%s (Current frame)" name))
            frame)
           (t
