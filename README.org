@@ -159,13 +159,6 @@ with the current frame.
   prefix argument for =MATCH-MODE-NAMES=, the regular expression is
   matched against the buffer name or major mode.
 
-  #+findex: beframe-unassume-buffers-matching-regexp-all-frames
-- The ~beframe-unassume-buffers-matching-regexp-all-frames~ prompts
-  for a regular expression to match against buffer names. The matching
-  buffers are unassumed by the current frame. With an optional prefix
-  argument for =MATCH-MODE-NAMES=, the regular expression is matched
-  against the buffer name or major mode.
-
   #+vindex: beframe-kill-buffers-no-confirm
   #+findex: beframe-kill-buffers-matching-regexp
 - The ~beframe-kill-buffers-matching-regexp~ command prompts for a
@@ -203,6 +196,15 @@ the current frame.
 - The command ~beframe-unassume-all-buffers-no-prompts~ unconditionally
   unassumes the consolidated buffer list, but preserves the list
   stored in the user option ~beframe-global-buffers~.
+
+  [ The following is part of {{{development-version}}}. ]
+
+  #+findex: beframe-unassume-buffers-matching-regexp-all-frames
+- The ~beframe-unassume-buffers-matching-regexp-all-frames~ prompts
+  for a regular expression to match against buffer names. The matching
+  buffers are unassumed by the current frame. With an optional prefix
+  argument for =MATCH-MODE-NAMES=, the regular expression is matched
+  against the buffer name or major mode.
 
 * Features of ~beframe-mode~
 :PROPERTIES:
