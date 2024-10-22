@@ -555,9 +555,12 @@ Also see the other Beframe commands:
 
 \\{beframe-prefix-map}"
   (interactive
-   (list
-    (beframe-buffers-matching-regexp-prompt "Buffer names matching REGEXP")
-    current-prefix-arg))
+   (let ((arg current-prefix-arg))
+     (list
+      (beframe-buffers-matching-regexp-prompt
+       (if arg
+           "Buffer names matching REGEXP in the name or major mode"
+         "Buffer names matching REGEXP in the name")))))
   (beframe--assume (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
 
 ;;;###autoload
@@ -570,9 +573,12 @@ Also see the other Beframe commands:
 
 \\{beframe-prefix-map}"
   (interactive
-   (list
-    (beframe-buffers-matching-regexp-prompt "Buffer names matching REGEXP")
-    current-prefix-arg))
+   (let ((arg current-prefix-arg))
+     (list
+      (beframe-buffers-matching-regexp-prompt
+       (if arg
+           "Buffer names matching REGEXP in the name or major mode"
+         "Buffer names matching REGEXP in the name")))))
   (beframe--unassume (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
 
 (define-obsolete-function-alias
