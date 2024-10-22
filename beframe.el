@@ -128,7 +128,7 @@ automatically, use `customize-set-variable' or `setopt' (Emacs
   :type 'symbol)
 
 (defun beframe--remove-internal-buffers (buffers)
-  "Removes internal buffers from BUFFERS list."
+  "Remove internal buffers from BUFFERS."
   (cl-flet ((beframe--filter-internal-p (buffer)
               (string-prefix-p " " (buffer-name buffer))))
     (seq-remove #'beframe--filter-internal-p buffers)))
