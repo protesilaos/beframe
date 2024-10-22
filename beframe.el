@@ -134,6 +134,19 @@ automatically, use `customize-set-variable' or `setopt' (Emacs
      (string-prefix-p " " (buffer-name buffer)))
    buffers))
 
+(defun beframe--get-buffers-matching-regexp (regexp &optional match-mode-names)
+  "Return buffers whose name matches REGEXP.
+With optional MATCH-MODE-NAMES also return buffers whose major mode
+matches REGEXP."
+  (seq-filter
+   (lambda (buffer)
+     (if match-mode-names
+         (or (string-match-p regexp (buffer-name buffer))
+             (with-current-buffer buffer
+               (string-match-p regexp (symbol-name major-mode))))
+       (string-match-p regexp (buffer-name buffer))))
+   (buffer-list)))
+
 (defun beframe--get-buffers (&optional arg)
   "Return list of buffers from different sources depending on ARG.
 
@@ -152,7 +165,6 @@ The following values of ARG can be used:
     ((or (pred null) (pred frame-live-p))
      (beframe--remove-internal-buffers (frame-parameter arg 'buffer-list)))
     (_ (user-error "Wrong argument in `beframe--get-buffers' pcase"))))
-
 
 (defun beframe--global-buffers ()
   "Return list of `beframe-global-buffers' buffer objects."
@@ -501,19 +513,6 @@ Also see the other Beframe commands:
    (beframe--buffers-name-to-objects
     (beframe--buffer-list-prompt-crm
      :all-frames))))
-
-(defun beframe--get-buffers-matching-regexp (regexp &optional match-mode-names)
-  "Return buffers whose name matches REGEXP.
-With optional MATCH-MODE-NAMES also return buffers whose major mode
-matches REGEXP."
-  (seq-filter
-   (lambda (buffer)
-     (if match-mode-names
-         (or (string-match-p regexp (buffer-name buffer))
-             (with-current-buffer buffer
-               (string-match-p regexp (symbol-name major-mode))))
-       (string-match-p regexp (buffer-name buffer))))
-   (buffer-list)))
 
 (defvar beframe-buffers-matching-regexp-history nil
   "Minibuffer history of `beframe-buffers-matching-regexp-prompt'.")
