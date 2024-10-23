@@ -433,10 +433,14 @@ Also see the other Beframe commands:
 (defun beframe--modify-buffer-list (operation buffers)
   "Perform OPERATION to modify the current frame buffer list.
 
-OPERATION is a keyword to :assume or :unassume.  BUFFERS is a list of
-buffer objects to be added or removed from the current frame buffer
-list.  If BUFFERS satisfies `framep', then the list of buffers is that
-of the corresponding frame object."
+OPERATION is a keyword to :assume or :unassume.  To assume is to include
+buffers into the buffer list.  To unassume is to remove them from the
+buffer list.
+
+BUFFERS is a list of buffer objects to be added or removed from the
+current frame buffer list.  If BUFFERS satisfies `framep', then the list
+of buffers is that of the corresponding frame object (per
+`beframe--get-buffers')."
   (pcase-let* ((frame-buffers (beframe--get-buffers))
                (new-buffers (if (framep buffers)
                                 (beframe--get-buffers buffers)
@@ -461,7 +465,7 @@ of the corresponding frame object."
                    (propertize action 'face 'error)
                    (propertize (format "%s" (length difference)) 'face 'warning)
                    (propertize (format "%s" difference) 'face 'success)))
-      (message "Did not modify the frame's buffer list"))))
+      (message "No change to the frame's buffer list"))))
 
 ;;;###autoload
 (defun beframe-assume-frame-buffers (frame)
