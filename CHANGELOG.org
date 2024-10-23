@@ -9,6 +9,104 @@ project's main git repository: <https://github.com/protesilaos/beframe>.
 The newest release is at the top.  For further details, please consult
 the manual: <https://protesilaos.com/emacs/beframe>.
 
+* Version 1.2.0 on 2024-10-23
+:PROPERTIES:
+:CUSTOM_ID: h:c6250209-9bb9-4243-bec0-e925adeffaeb
+:END:
+
+Beframe is in a stable state. This version includes three new commands
+as well as quality-of-life improvements.
+
+** Assume or unassume buffers using a regular expression
+:PROPERTIES:
+:CUSTOM_ID: h:a9d20070-6d73-4033-9a9a-430b36e9b466
+:END:
+
+There two more commands to assume/unassume buffers from/to the current
+frame:
+
+- ~beframe-assume-buffers-matching-regexp~
+- ~beframe-unassume-buffers-matching-regexp~
+
+They both work by matching a regular expression against the global
+list of buffer names. When called with a prefix argument, the regular
+expression is matched against the buffer name or the name of the
+buffer's major mode.
+
+This is a convenient way to, for example, collect all email or IRC
+buffers in a single frame and work with them as you will.
+
+** Delete buffers matching a regular expression
+:PROPERTIES:
+:CUSTOM_ID: h:a1ad4562-3dfa-4483-b19a-08c0a9ef3e99
+:END:
+
+Following the same principle as above, we have the command
+~beframe-kill-buffers-matching-regexp~. The regular expression is
+matched against the buffer name or the name of the major mode when
+called with a prefix argument.
+
+Since this is a destructive operation, the command prompts for
+confirmation to operate on the buffers it has found. Users who do not
+like this check can set the new user option ~beframe-kill-buffers-no-confirm~
+to a non-nil value.
+
+Note that Emacs may still prompt for further confirmation if the given
+buffer is unsaved, has a running process, and the like. Also note that
+this operation applies to all frames because buffers are shared by the
+Emacs session even though Beframe only exposes those that pertain to a
+particular frame (when ~beframe-mode~ is enabled).
+
+** Commands that assume/unassume buffers report on their status
+:PROPERTIES:
+:CUSTOM_ID: h:24b217b5-bf57-4b11-bbb4-014ac2ba4f2d
+:END:
+
+All relevant commands will now log a message about what they did. If,
+for example, ~beframe-assume-buffers-matching-regexp~ assumes two new
+buffers into the current frame, the message will be something like:
+
+: Assumed into current frame 2 buffers: (name-of-buffer-one name-of-buffer-two)
+
+Similarly:
+
+: Unassumed from current frame 2 buffers: (name-of-buffer-one name-of-buffer-two)
+
+If the command does not change the frame's buffer list, it will report
+as much:
+
+: Did not modify the frame's buffer list
+
+** Several internal refinements
+:PROPERTIES:
+:CUSTOM_ID: h:1c5ed1dd-d7ec-43ad-a734-18162efc528a
+:END:
+
+- The way we derive the "global buffers" (buffers that are available
+  in all frames, per the user option ~beframe-global-buffers~) is more
+  efficient. Thanks to Bruno Boal for the contribution in pull request
+  7: <https://github.com/protesilaos/beframe/pull/7>. Bruno has
+  assigned copyright to the Free Software Foundation.
+
+- We now have a single function to get a list of buffers, given
+  certain parameters. Part of this work is by Bruno Boal, from the
+  aforementioned pull request. The rest is from me, which includes the
+  addition of the functionality about matching buffers with a regular
+  expression (as seen in the new commands described herein).
+
+- Inferring the name of a project among those known to =project.el= no
+  longer fails when the path is abbreviated (like =~/path/to/repo=).
+  Thanks to Fritz Grabo for the contribution and for Bruno Boal for
+  double-checking it. This was done in pull request 6:
+  <https://github.com/protesilaos/beframe/pull/6>. The change is
+  small, meaning that Fritz does not need to assign copyright to the
+  Free Software Foundation.
+
+- The subroutines to assume/unassume buffers are consolidated into one
+  function. It not only provides a single point of entry, but also
+  takes care to carry out its operation only when it will yield a
+  change to the current frame's buffer list.
+
 * 1.1.0 on 2024-05-06
 :PROPERTIES:
 :CUSTOM_ID: h:6cdbd605-8a3c-4e71-849e-e17b75805b2f

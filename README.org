@@ -4,9 +4,9 @@
 #+language: en
 #+options: ':t toc:nil author:t email:t num:t
 #+startup: content
-#+macro: stable-version 1.1.0
-#+macro: release-date 2024-05-06
-#+macro: development-version 1.2.0-dev
+#+macro: stable-version 1.2.0
+#+macro: release-date 2024-10-23
+#+macro: development-version 1.3.0-dev
 #+export_file_name: beframe.texi
 #+texinfo_filename: beframe.info
 #+texinfo_dir_category: Emacs misc features
@@ -150,8 +150,6 @@ with the current frame.
 - The command ~beframe-assume-all-buffers-no-prompts~ unconditionally
   assumes the consolidated buffer list.
 
-  [ The following are part of {{{development-version}}}. ]
-
   #+findex: beframe-assume-buffers-matching-regexp-all-frames
 - The command ~beframe-assume-buffers-matching-regexp-all-frames~
   prompts for a regular expression to match against buffer names. The
@@ -166,11 +164,11 @@ with the current frame.
   matches, it asks for confirmation and then proceeds to kill them. If
   the user option ~beframe-kill-buffers-no-confirm~ is non-nil, it
   skips that confirmation step to carry out its action outright. Note
-  that Emacs may still prompt for confirmation if the given buffer is
-  unsaved, has a running process, and the like. Also note that this
-  operation applies to all frames because buffers are shared by the
-  Emacs session even though Beframe only exposes those that pertain to
-  a particular frame.
+  that Emacs may still prompt for further confirmation if the given
+  buffer is unsaved, has a running process, and the like. Also note
+  that this operation applies to all frames because buffers are shared
+  by the Emacs session even though Beframe only exposes those that
+  pertain to a particular frame ([[#h:5b751614-8749-4aa8-aaed-f181beaddc57][Features of ~beframe-mode~]]).
 
 ** Unassuming buffers
 :PROPERTIES:
@@ -196,8 +194,6 @@ the current frame.
 - The command ~beframe-unassume-all-buffers-no-prompts~ unconditionally
   unassumes the consolidated buffer list, but preserves the list
   stored in the user option ~beframe-global-buffers~.
-
-  [ The following is part of {{{development-version}}}. ]
 
   #+findex: beframe-unassume-buffers-matching-regexp-all-frames
 - The ~beframe-unassume-buffers-matching-regexp-all-frames~ prompts
