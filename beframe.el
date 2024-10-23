@@ -579,7 +579,7 @@ Also see the other Beframe commands:
      default 'beframe-buffers-matching-regexp-history)))
 
 ;;;###autoload
-(defun beframe-assume-buffers-matching-regexp-all-frames (regexp &optional match-mode-names)
+(defun beframe-assume-buffers-matching-regexp (regexp &optional match-mode-names)
   "Assume all buffers whose name matches REGEXP.
 With optional MATCH-MODE-NAMES return buffers whose name or major mode
 matches REGEXP.
@@ -598,8 +598,11 @@ Also see the other Beframe commands:
       (beframe--modify-buffer-list :assume buffers)
     (user-error "No buffers match `%s'" regexp)))
 
+(defalias 'beframe-assume-buffers-matching-regexp 'beframe-assume-buffers-matching-regexp-all-frames
+  "Alias for `beframe-assume-buffers-matching-regexp'.")
+
 ;;;###autoload
-(defun beframe-unassume-buffers-matching-regexp-all-frames (regexp &optional match-mode-names)
+(defun beframe-unassume-buffers-matching-regexp (regexp &optional match-mode-names)
   "Unassume all buffers whose name matches REGEXP.
 With optional MATCH-MODE-NAMES return buffers whose name or major mode
 matches REGEXP.
@@ -617,6 +620,10 @@ Also see the other Beframe commands:
   (if-let ((buffers (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
       (beframe--modify-buffer-list :unassume buffers)
     (user-error "No buffers match `%s'" regexp)))
+
+
+(defalias 'beframe-unassume-buffers-matching-regexp 'beframe-unassume-buffers-matching-regexp-all-frames
+  "Alias for `beframe-unassume-buffers-matching-regexp'.")
 
 (define-obsolete-function-alias
   'beframe-unassume-buffers
@@ -716,8 +723,8 @@ Meant to be assigned to a prefix key, like this:
 (define-key beframe-prefix-map (kbd "u f") #'beframe-unassume-current-frame-buffers-selectively)
 (define-key beframe-prefix-map (kbd "a F") #'beframe-unassume-frame-buffers)
 (define-key beframe-prefix-map (kbd "u U") #'beframe-unassume-all-buffers-no-prompts)
-(define-key beframe-prefix-map (kbd "a s") #'beframe-assume-buffers-matching-regexp-all-frames)
-(define-key beframe-prefix-map (kbd "u s") #'beframe-unassume-buffers-matching-regexp-all-frames)
+(define-key beframe-prefix-map (kbd "a s") #'beframe-assume-buffers-matching-regexp)
+(define-key beframe-prefix-map (kbd "u s") #'beframe-unassume-buffers-matching-regexp)
 
 ;;;###autoload
 (define-minor-mode beframe-mode
