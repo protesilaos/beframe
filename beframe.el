@@ -447,13 +447,13 @@ of buffers is that of the corresponding frame object (per
                               buffers))
                (`(,consolidated-buffers . ,action)
                 (pcase operation
-                  (:assume (cons (append new-buffers frame-buffers) "Assume into"))
+                  (:assume (cons (append new-buffers frame-buffers) "Assumed into"))
                   (:unassume (cons
                               (seq-filter
                                (lambda (buf)
                                  (not (member buf new-buffers)))
                                frame-buffers)
-                              "Unassume from"))
+                              "Unassumed from"))
                   (_ (error "`%s' is an unknown operation to modify frame buffers" operation)))))
     (if-let ((lists (beframe--get-longest-list-first frame-buffers consolidated-buffers))
              (difference (seq-difference
