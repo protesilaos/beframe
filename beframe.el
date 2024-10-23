@@ -5,7 +5,7 @@
 ;; Author: Protesilaos Stavrou <info@protesilaos.com>
 ;; Maintainer: Protesilaos Stavrou <info@protesilaos.com>
 ;; URL: https://github.com/protesilaos/beframe
-;; Version: 1.2.0
+;; Version: 1.2.1
 ;; Package-Requires: ((emacs "28.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -447,13 +447,13 @@ of buffers is that of the corresponding frame object (per
                               buffers))
                (`(,consolidated-buffers . ,action)
                 (pcase operation
-                  (:assume (cons (append new-buffers frame-buffers) "Assumed into"))
+                  (:assume (cons (append new-buffers frame-buffers) "Assumed"))
                   (:unassume (cons
                               (seq-filter
                                (lambda (buf)
                                  (not (member buf new-buffers)))
                                frame-buffers)
-                              "Unassumed from"))
+                              "Unassumed"))
                   (_ (error "`%s' is an unknown operation to modify frame buffers" operation)))))
     (if-let ((lists (beframe--get-longest-list-first frame-buffers consolidated-buffers))
              (difference (seq-difference
@@ -461,7 +461,7 @@ of buffers is that of the corresponding frame object (per
                           (mapcar #'buffer-name (cdr lists)))))
         (progn
           (modify-frame-parameters nil `((buffer-list . ,consolidated-buffers)))
-          (message "%s current frame %s buffers: %s"
+          (message "%s %s buffers: %s"
                    (propertize action 'face 'error)
                    (propertize (format "%s" (length difference)) 'face 'warning)
                    (propertize (format "%s" difference) 'face 'success)))
