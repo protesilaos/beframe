@@ -458,10 +458,10 @@ operation."
                                frame-buffers)
                               "Unassumed"))
                   (_ (error "`%s' is an unknown operation to modify frame buffers" operation)))))
-    (if-let ((lists (beframe--get-longest-list-first frame-buffers consolidated-buffers))
-             (difference (seq-difference
-                          (mapcar #'buffer-name (car lists))
-                          (mapcar #'buffer-name (cdr lists)))))
+    (if-let* ((lists (beframe--get-longest-list-first frame-buffers consolidated-buffers))
+              (difference (seq-difference
+                           (mapcar #'buffer-name (car lists))
+                           (mapcar #'buffer-name (cdr lists)))))
         (progn
           (modify-frame-parameters nil `((buffer-list . ,consolidated-buffers)))
           (unless no-message
@@ -599,7 +599,7 @@ Also see the other Beframe commands:
        (if arg
            "Buffer names matching REGEXP in the name or major mode"
          "Buffer names matching REGEXP in the name")))))
-  (if-let ((buffers (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
+  (if-let* ((buffers (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
       (beframe--modify-buffer-list :assume buffers)
     (user-error "No buffers match `%s'" regexp)))
 
@@ -622,7 +622,7 @@ Also see the other Beframe commands:
        (if arg
            "Buffer names matching REGEXP in the name or major mode"
          "Buffer names matching REGEXP in the name")))))
-  (if-let ((buffers (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
+  (if-let* ((buffers (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
       (beframe--modify-buffer-list :unassume buffers)
     (user-error "No buffers match `%s'" regexp)))
 
@@ -698,7 +698,7 @@ Also see the other Beframe commands:
            "Delete buffers matching REGEXP in the name or major mode"
          "Delete buffers matching REGEXP in the name"))
       arg)))
-  (if-let ((buffers (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
+  (if-let* ((buffers (beframe--get-buffers (list regexp match-mode-names :no-internal-buffers))))
       (when (or beframe-kill-buffers-no-confirm
                 (y-or-n-p (format "Kill %d buffers matching `%s'?" (length buffers) regexp)))
         (mapc #'kill-buffer buffers))
