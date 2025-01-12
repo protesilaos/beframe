@@ -765,7 +765,7 @@ Also see the variable `beframe-prefix-map'."
                                (null frame))
                       (kill-buffer buf)))))
       (let* ((frame-bufs (beframe-buffer-list frame))
-             (frame-bufs-with-buf (append frame-bufs (list buf))))
+             (frame-bufs-with-buf (append (list buf) frame-bufs)))
         (modify-frame-parameters
          frame
          `((buffer-list . ,frame-bufs-with-buf)))))))
