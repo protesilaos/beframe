@@ -271,7 +271,7 @@ it must satisfy `framep'."
 PROMPT, DEF, REQUIRE-MATCH, and PREDICATE are the same as
 `read-buffer'.  The PREDICATE is ignored, however, to apply the
 per-frame filter."
-  (completing-read prompt
+  (completing-read (format "[Beframed] %s" prompt)
                    (beframe-buffer-names)
                    #'beframe--read-buffer-p
                    require-match
