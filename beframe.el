@@ -386,7 +386,7 @@ This is a simplified variant of `list-buffers-noselect'."
   (let* ((frame (if (framep frame) frame (selected-frame)))
          (name (frame-parameter frame 'name))
          (old-buf (current-buffer))
-         (buf (get-buffer-create (format "*Buffer List for %s*" name)))
+         (buf (get-buffer-create (format-message "*Buffer List for `%s' frame*" name)))
          (buffer-list (beframe-buffer-list frame :sort sort)))
     (with-current-buffer buf
       (Buffer-menu-mode)
