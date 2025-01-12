@@ -782,6 +782,27 @@ Also see the variable `beframe-prefix-map'."
 
 (defvar project--list) ; from project.el
 
+(defun beframe--get-frame-name (name)
+  "Return the frame with name NAME, or nil if none exists."
+  (car (filtered-frame-list
+        (lambda (frame)
+          (string= (frame-parameter frame 'name) name)))))
+
+(defun beframe--generate-unique-frame-name (name)
+  "Generate a unique frame name starting with NAME.
+If NAME is unique, return it as-is. Otherwise, append <2>, <3>, etc.
+until a unique name is found.
+
+This is the same logic as implemented by `generate-new-buffer-name'."
+  (if (null (beframe--get-frame-name name))
+      name  ; Return name as-is if no frame has this name
+    (let ((n 2)
+          (candidate-name name))
+      (while (beframe--get-frame-name candidate-name)
+        (setq candidate-name (format "%s<%d>" name n)
+              n (1+ n)))
+      candidate-name)))
+
 (defun beframe-infer-frame-name (frame name)
   "Infer a suitable name for FRAME with given NAME.
 See `beframe-rename-frame'."
@@ -799,7 +820,7 @@ See `beframe-rename-frame'."
        ((and name (stringp name))
         name)
        ((and projectp buf-name)
-        (format "%s" (file-name-nondirectory (directory-file-name dir))))
+        (beframe--generate-unique-frame-name (file-name-nondirectory (directory-file-name dir))))
        ((and (not (minibufferp)) file-name)
         (format "%s %s" buf-name dir))
        ((not (minibufferp))
