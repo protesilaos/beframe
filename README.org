@@ -429,7 +429,7 @@ matters.
 + Author/maintainer :: Protesilaos Stavrou.
 
 + Contributions to code or the manual :: Bruno Boal, Edgar Vincent,
-  Fritz Grabo, Tony Zorman.
+  Fritz Grabo, Tony Zorman, Vedang Manerikar.
 
 + Ideas and/or user feedback :: Derek Passen, Karan Ahlawat, Karthik
   Chikmagalur, Valentino, duli.
