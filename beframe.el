@@ -790,7 +790,7 @@ Also see the variable `beframe-prefix-map'."
 
 (defun beframe--generate-unique-frame-name (name)
   "Generate a unique frame name starting with NAME.
-If NAME is unique, return it as-is. Otherwise, append <2>, <3>, etc.
+If NAME is unique, return it as-is.  Otherwise, append <2>, <3>, etc.
 until a unique name is found.
 
 This is the same logic as implemented by `generate-new-buffer-name'."
