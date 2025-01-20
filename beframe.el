@@ -753,7 +753,7 @@ Also see the variable `beframe-prefix-map'."
   "Create scratch buffer in `initial-major-mode' for FRAME."
   (when beframe-create-frame-scratch-buffer
     (let* ((name (frame-parameter frame 'name))
-           (buf (get-buffer-create (format "*scratch for %s*" name))))
+           (buf (get-buffer-create (format-message "*scratch for frame `%s'*" name))))
       (with-current-buffer buf
         (funcall initial-major-mode)
         (when (and (zerop (buffer-size))
