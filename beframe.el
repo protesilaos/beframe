@@ -815,18 +815,19 @@ See `beframe-rename-frame'."
                           (listp project--list)
                           (or
                            (member (list dir) project--list)
-                           (member (list (abbreviate-file-name dir)) project--list)))))
-      (cond
-       ((and name (stringp name))
-        name)
-       ((and projectp buf-name)
-        (beframe--generate-unique-frame-name (file-name-nondirectory (directory-file-name dir))))
-       ((and (not (minibufferp)) file-name)
-        (format "%s %s" buf-name dir))
-       ((not (minibufferp))
-        buf-name)
-       (t
-        dir)))))
+                           (member (list (abbreviate-file-name dir)) project--list))))
+           (processed-name (cond
+                            ((and name (stringp name))
+                             name)
+                            ((and projectp buf-name)
+                             (file-name-nondirectory (directory-file-name dir)))
+                            ((and (not (minibufferp)) file-name)
+                             (format "%s %s" buf-name dir))
+                            ((not (minibufferp))
+                             buf-name)
+                            (t
+                             dir))))
+      (beframe--generate-unique-frame-name processed-name))))
 
 ;;;###autoload
 (defun beframe-rename-frame (frame &optional name)
