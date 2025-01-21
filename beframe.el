@@ -720,6 +720,8 @@ Meant to be assigned to a prefix key, like this:
 
 (define-key beframe-prefix-map (kbd "b") #'beframe-switch-buffer)
 (define-key beframe-prefix-map (kbd "m") #'beframe-buffer-menu)
+(define-key beframe-prefix-map (kbd "r") #'beframe-rename-current-frame)
+(define-key beframe-prefix-map (kbd "R") #'beframe-rename-frame)
 (define-key beframe-prefix-map (kbd "k") #'beframe-kill-buffers-matching-regexp)
 (define-key beframe-prefix-map (kbd "a f") #'beframe-assume-frame-buffers-selectively)
 (define-key beframe-prefix-map (kbd "a F") #'beframe-assume-frame-buffers)
