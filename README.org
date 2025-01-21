@@ -216,13 +216,13 @@ The ~beframe-mode~ does the following:
 - Add a filter to newly created frames so that their
   ~buffer-predicate~ parameter beframes buffers.
 
-  #+vindex: beframe-rename-function
+#+vindex: beframe-rename-function
 - Renames newly created frames so that they have a potentially more
   meaningful title.  The user option ~beframe-rename-function~
   specifies the function that handles this process.  When its value is
   nil, no renaming is performed.
 
- #+vindex: beframe-functions-in-frames
+#+vindex: beframe-functions-in-frames
 - When the user option ~beframe-functions-in-frames~ contains a list
   of functions, it makes them run with ~other-frame-prefix~, meaning
   that they are called in a new frame.  For example, the user can add
