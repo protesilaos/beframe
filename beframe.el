@@ -868,6 +868,16 @@ while also reviewing `beframe-infer-frame-name'."
    frame
    (list (cons 'name (beframe-infer-frame-name frame name)))))
 
+;;;###autoload
+(defun beframe-rename-current-frame ()
+  "Convenience wrapper of `beframe-rename-frame' to rename the current frame."
+  (declare (interactive-only t))
+  (interactive)
+  (let ((frame (selected-frame)))
+    (modify-frame-parameters
+     frame
+     (list (cons 'name (beframe-infer-frame-name frame nil))))))
+
 (defun beframe-maybe-rename-frame (frame &optional name)
   "Helper function to determine if `beframe-rename-function' is called.
 FRAME and optional NAME arguments are passed to the
