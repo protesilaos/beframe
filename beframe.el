@@ -603,7 +603,7 @@ Also see the other Beframe commands:
       (beframe--modify-buffer-list :assume buffers)
     (user-error "No buffers match `%s'" regexp)))
 
-(defalias 'beframe-assume-buffers-matching-regexp 'beframe-assume-buffers-matching-regexp-all-frames
+(defalias 'beframe-assume-buffers-matching-regexp-all-frames 'beframe-assume-buffers-matching-regexp
   "Alias for `beframe-assume-buffers-matching-regexp'.")
 
 ;;;###autoload
@@ -627,7 +627,7 @@ Also see the other Beframe commands:
     (user-error "No buffers match `%s'" regexp)))
 
 
-(defalias 'beframe-unassume-buffers-matching-regexp 'beframe-unassume-buffers-matching-regexp-all-frames
+(defalias 'beframe-unassume-buffers-matching-regexp-all-frames 'beframe-unassume-buffers-matching-regexp
   "Alias for `beframe-unassume-buffers-matching-regexp'.")
 
 (define-obsolete-function-alias
