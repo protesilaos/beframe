@@ -236,7 +236,7 @@ The ~beframe-mode~ does the following:
   ~beframe-kill-frame-scratch-buffer~ ([[#h:9979c363-d7b6-4382-b2ce-a93f64043b4b][Overview]]).
 
 Those granted, it is not necessary to enable the ~beframe-mode~ to use
-Beframe's commands.  Those are available on demand ([[*The Beframe keymap][The Beframe keymap]]).
+Beframe's commands.  Those are available on demand ([[#h:737253ad-f671-46df-bdb9-6be20a982470][The Beframe keymap]]).
 
 * The Beframe keymap or transient user interface
 :PROPERTIES:
