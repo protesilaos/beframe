@@ -714,6 +714,7 @@ Meant to be assigned to a prefix key, like this:
 (define-prefix-command 'beframe-prefix-map)
 
 (define-key beframe-prefix-map (kbd "b") #'beframe-switch-buffer)
+(define-key beframe-prefix-map (kbd "B") #'beframe-switch-buffer-in-frame)
 (define-key beframe-prefix-map (kbd "m") #'beframe-buffer-menu)
 (define-key beframe-prefix-map (kbd "r") #'beframe-rename-current-frame)
 (define-key beframe-prefix-map (kbd "R") #'beframe-rename-frame)
