@@ -785,7 +785,7 @@ Also see the variable `beframe-prefix-map'."
 (defvar project--list) ; from project.el
 
 (defun beframe--get-frame-names (name)
-  "Return frame names equal to NAME."
+  "Return frame names equal to NAME as a list of strings."
   (delq nil
         (mapcar
          (lambda (frame)
