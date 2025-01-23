@@ -50,6 +50,7 @@
     ("a" "ALL buffers except `beframe-global-buffers'"  beframe-unassume-all-buffers-no-prompts)
     ("r" "All buffer NAMES matching the REGEXP" beframe-unassume-buffers-matching-regexp)]])
 
+;;;###autoload
 (transient-define-prefix beframe-transient nil
   "Beframe commands."
   ["Beframe"
