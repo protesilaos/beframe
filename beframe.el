@@ -360,16 +360,11 @@ Also see the other Beframe commands:
 BUFFER is selected with completion among a list of buffers that
 belong to FRAME.
 
-Either bind this command to a key as an alternative to
-`switch-to-buffer', or enable the minor mode
-`beframe-mode' which makes all buffer prompts limit the
-candidates to those that belong to the selected frame.
-
 Also see `beframe-switch-buffer'.
 
-Raising and then selecting FRAME does not depend solely on Emacs.
-The window manager must permit such an operation.  See bug#61319:
-<https://debbugs.gnu.org/cgi/bugreport.cgi?bug=61319>."
+Note that raising and then selecting FRAME does not depend solely on
+Emacs.  The window manager must permit such an operation.  See
+bug#61319: <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=61319>."
   (interactive
    (let ((obj (beframe--frame-object (beframe--frame-prompt))))
      (list obj (beframe--buffer-prompt obj))))
