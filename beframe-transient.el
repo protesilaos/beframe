@@ -31,6 +31,7 @@
 
 ;; TODO 2025-01-23: How to process the prefix argument in a transient?
 
+;;;###autoload (autoload 'beframe-transient-assume "beframe-transient")
 (transient-define-prefix beframe-transient-assume nil
   "Beframe commands to assume buffers."
   ["Beframe"
@@ -41,6 +42,7 @@
     ("a" "All the buffers from EVERYWHERE"  beframe-assume-all-buffers-no-prompts)
     ("r" "All buffer NAMES matching the REGEXP" beframe-assume-buffers-matching-regexp)]])
 
+;;;###autoload (autoload 'beframe-transient-unassume "beframe-transient")
 (transient-define-prefix beframe-transient-unassume nil
   "Beframe commands to unassume buffers."
   ["Beframe"
