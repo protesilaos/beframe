@@ -251,16 +251,15 @@ more information."
   'beframe-buffer-names
   "0.2.0")
 
-(defun beframe--read-buffer-p (buf &optional frame)
-  "Return non-nil if BUF belongs to the current FRAME.
-BUF is a string or a cons cell, per `beframe-read-buffer'.
-If optional FRAME is nil, then default to the current one.  Else
-it must satisfy `framep'."
-  (let ((b buf))
-    (when (consp buf)
-      (setq b (car buf)))
-    (unless (string-prefix-p " " b)
-      (seq-contains-p (beframe-buffer-names frame) b))))
+(defun beframe--read-buffer-p (buffer &optional frame)
+  "Return non-nil if BUFFER belongs to the current FRAME.
+BUFFER is a string or a cons cell, per `beframe-read-buffer'.  If
+optional FRAME is nil, then default to the current one.  Else FRAME is
+an object that satisfies `framep'."
+  (when (consp buffer)
+    (setq buffer (car buffer)))
+  (unless (string-prefix-p " " buffer)
+    (seq-contains-p (beframe-buffer-names frame) buffer)))
 
 (defvar beframe-history nil
   "Minibuffer history of frame specific buffers.")
