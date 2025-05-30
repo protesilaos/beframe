@@ -728,6 +728,22 @@ Meant to be assigned to a prefix key, like this:
 (define-key beframe-prefix-map (kbd "a s") #'beframe-assume-buffers-matching-regexp)
 (define-key beframe-prefix-map (kbd "u s") #'beframe-unassume-buffers-matching-regexp)
 
+(defvar xref-history-storage)
+
+(defvar beframe-xref-history-storage xref-history-storage
+  "Store the last known value of `xref-history-storage'.")
+
+(defun beframe-xref-frame-history (&optional new-value)
+  "Return frame-specific Xref history for the current frame.
+Override existing value with NEW-VALUE if NEW-VALUE is set.
+
+This function is based on `xref-window-local-history'."
+  (let ((frame (selected-frame)))
+    (if new-value
+        (set-frame-parameter frame 'xref--history new-value)
+      (or (frame-parameter frame 'xref--history)
+          (set-frame-parameter frame 'xref--history (cons nil nil))))))
+
 ;;;###autoload
 (define-minor-mode beframe-mode
   "Make all buffer prompts limit candidates per frame.
@@ -736,12 +752,14 @@ Also see the variable `beframe-prefix-map'."
   (if beframe-mode
       (progn
         (setq beframe--read-buffer-function read-buffer-function
-              read-buffer-function #'beframe-read-buffer)
+              read-buffer-function #'beframe-read-buffer
+              xref-history-storage #'beframe-xref-frame-history)
         (add-hook 'after-make-frame-functions #'beframe-setup-frame)
         (add-hook 'context-menu-functions #'beframe-context-menu)
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
-          beframe--read-buffer-function nil)
+          beframe--read-buffer-function nil
+          xref-history-storage beframe-xref-history-storage)
     (remove-hook 'after-make-frame-functions #'beframe-setup-frame)
     (remove-hook 'context-menu-functions #'beframe-context-menu)
     (beframe--functions-in-frames :disable)))
