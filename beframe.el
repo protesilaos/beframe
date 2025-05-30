@@ -1001,7 +1001,6 @@ This function can be used as the :sort key of
   "Menu with all Beframe commands, each available in the right context."
   beframe--menu-contents)
 
-;; Add Beframe menu at the end of global-map after Tools
 (easy-menu-add-item global-map '(menu-bar "Buffers") beframe-global-menu)
 
 (defun beframe-context-menu (menu _click)
