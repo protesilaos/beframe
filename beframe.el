@@ -166,6 +166,31 @@ through `beframe--remove-internal-buffers'."
          (string-match-p regexp (buffer-name buffer))))
      buffers)))
 
+(defun beframe--parse-global-buffers ()
+  "Parse `beframe-global-buffers' into (regexp . symbols).
+Make strings a single regular expression out of all strings and collect
+any symbols into a list."
+  (let ((strings nil)
+        (symbols nil))
+    (dolist (element beframe-global-buffers)
+      (or (and (stringp element) (push element strings))
+          (and (symbolp element) (push element symbols))))
+    (cons (string-join strings "\\|") symbols)))
+
+(defun beframe--global-buffers ()
+  "Return list of `beframe-global-buffers' buffer objects."
+  (pcase-let* ((public-buffers (beframe--get-buffers 'public))
+               (global-buffers nil)
+               (`(,regexp . ,modes) (beframe--parse-global-buffers)))
+    (dolist (buffer public-buffers)
+      (cond
+       ((string-match-p regexp (buffer-name buffer))
+        (push buffer global-buffers))
+       ((with-current-buffer buffer
+          (when (derived-mode-p modes)
+            (push buffer global-buffers))))))
+    global-buffers))
+
 (defun beframe--get-buffers (&optional arg)
   "Return list of buffers from different sources depending on ARG.
 
@@ -199,19 +224,6 @@ The following values of ARG can be used:
     ((or (pred null) (pred frame-live-p))
      (beframe--remove-internal-buffers (frame-parameter arg 'buffer-list)))
     (_ (user-error "Wrong argument in `beframe--get-buffers' pcase"))))
-
-(defun beframe--global-buffers ()
-  "Return list of `beframe-global-buffers' buffer objects."
-  (pcase-let* ((pub-buffs (beframe--get-buffers 'public))
-               (`(,str-re ,modes-lst)
-                (cl-loop for E in beframe-global-buffers
-                         if (stringp E) collect E into str
-                         else if (symbolp E) collect E into sym
-                         finally return (list (string-join str "\\|") sym))))
-    (cl-loop for b in pub-buffs
-             if (string-match-p str-re (buffer-name b)) collect b
-             else if (with-current-buffer b (derived-mode-p modes-lst))
-             collect b)))
 
 (cl-defun beframe-buffer-list (&optional frame &key sort)
   "Return list of buffers that are used by the current frame.
