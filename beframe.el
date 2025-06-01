@@ -742,7 +742,7 @@ Meant to be assigned to a prefix key, like this:
 
 (defvar xref-history-storage)
 
-(defvar beframe-xref-history-storage xref-history-storage
+(defvar beframe-xref-history-storage (bound-and-true-p xref-history-storage)
   "Store the last known value of `xref-history-storage'.")
 
 (defun beframe-xref-frame-history (&optional new-value)
