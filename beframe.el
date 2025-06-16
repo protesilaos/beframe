@@ -751,10 +751,13 @@ Override existing value with NEW-VALUE if NEW-VALUE is set.
 
 This function is based on `xref-window-local-history'."
   (let ((frame (selected-frame)))
-    (if new-value
-        (set-frame-parameter frame 'xref--history new-value)
-      (or (frame-parameter frame 'xref--history)
-          (set-frame-parameter frame 'xref--history (cons nil nil))))))
+    (cond
+     (new-value
+      (set-frame-parameter frame 'xref--history new-value))
+     ((frame-parameter frame 'xref--history))
+     (t
+      (set-frame-parameter frame 'xref--history (cons nil nil))
+      (cons nil nil)))))
 
 ;;;###autoload
 (define-minor-mode beframe-mode
