@@ -756,8 +756,7 @@ This function is based on `xref-window-local-history'."
       (set-frame-parameter frame 'xref--history new-value))
      ((frame-parameter frame 'xref--history))
      (t
-      (set-frame-parameter frame 'xref--history (cons nil nil))
-      (cons nil nil)))))
+      (beframe-create-xref-history frame)))))
 
 ;;;###autoload
 (define-minor-mode beframe-mode
@@ -925,6 +924,13 @@ FRAME and optional NAME arguments are passed to the
   (when beframe-rename-function
     (funcall beframe-rename-function frame name)))
 
+(defun beframe-create-xref-history (frame)
+  "Create new Xref history for FRAME unless it already exists."
+  (unless (frame-parameter frame 'xref--history)
+    (let ((history (cons nil nil)))
+      (set-frame-parameter frame 'xref--history history)
+      history)))
+
 (defun beframe-setup-frame (frame)
   "Rename FRAME and create scratch buffer for it, if appropriate.
 Call the functions `beframe-frame-predicate',
@@ -934,7 +940,8 @@ this order."
   (dolist (fn '(beframe-frame-predicate
                 beframe-do-not-assume-last-selected-buffer
                 beframe-maybe-rename-frame
-                beframe-create-scratch-buffer))
+                beframe-create-scratch-buffer
+                beframe-create-xref-history))
     (funcall fn frame)))
 
 (defun beframe--frame-buffer-p (buf &optional frame)
