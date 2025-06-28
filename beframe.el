@@ -66,6 +66,16 @@ buffers from a frame's buffer list ad-hoc.  The full list of commands:
                    (symbol :tag "Symbol to match a buffer's major mode" :value "")))
           (const :tag "No global buffers" nil)))
 
+(defcustom beframe-prompt-prefix "[Beframed]"
+  "String prefix for buffer prompts affected by `beframe-mode'.
+Set to nil or an empty string to have no prefix.
+
+The text is styled with the face `beframe-face-prompt-prefix'."
+  :group 'beframe
+  :package-version '(beframe . "1.4.0")
+  :type '(choice (string :tag "Text prefix for buffer prompts")
+                 (const :tag "No prefix" nil)))
+
 (defcustom beframe-create-frame-scratch-buffer t
   "Create a frame-specific scratch buffer for new frames.
 Do it when `beframe-mode' is enabled.
@@ -139,6 +149,16 @@ has a running process, and the like."
   :group 'beframe
   :package-version '(beframe . "1.2.0")
   :type 'boolean)
+
+(defgroup beframe-faces nil
+  "Faces used by Beframe."
+  :group 'beframe
+  :group 'faces)
+
+(defface beframe-face-prompt-prefix '((t :inherit italic))
+  "Face applied to `beframe-prompt-prefix'."
+  :group 'beframe-faces
+  :package-version '(beframe . "1.4.0"))
 
 (defun beframe--remove-internal-buffers (buffers)
   "Remove internal buffers from BUFFERS."
@@ -276,19 +296,29 @@ an object that satisfies `framep'."
 (defvar beframe-history nil
   "Minibuffer history of frame specific buffers.")
 
+(defun beframe--propertize-prompt-prefix ()
+  "Return `beframe-prompt-prefix' with face `beframe-face-prompt-prefix'.
+If `beframe-prompt-prefix' is nil or an empty string, then return an
+empty string."
+  (if (and (stringp beframe-prompt-prefix)
+           (not (string-blank-p beframe-prompt-prefix)))
+      (format "​%s " (propertize beframe-prompt-prefix 'face 'beframe-face-prompt-prefix))
+    ""))
+
 ;;;###autoload
 (defun beframe-read-buffer (prompt &optional def require-match _predicate)
   "The `read-buffer-function' that limits buffers to frames.
 PROMPT, DEF, REQUIRE-MATCH, and PREDICATE are the same as
 `read-buffer'.  The PREDICATE is ignored, however, to apply the
 per-frame filter."
-  (completing-read (format "[Beframed] %s" prompt)
-                   (beframe-buffer-names)
-                   #'beframe--read-buffer-p
-                   require-match
-                   nil
-                   'beframe-history
-                   def))
+  (completing-read
+   (format "%s%s" (beframe--propertize-prompt-prefix) prompt)
+   (beframe-buffer-names)
+   #'beframe--read-buffer-p
+   require-match
+   nil
+   'beframe-history
+   def))
 
 (defun beframe--buffer-prompt (&optional frame)
   "Prompt for buffer among `beframe-buffer-names'.
