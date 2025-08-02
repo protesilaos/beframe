@@ -359,9 +359,15 @@ possibly other sources in a single interface.  With ~consult-buffer~
 the user can see previews of the given completion candidate and also
 narrow to a specific source.
 
+*** Beframed buffers as a Consult buffer source
+:PROPERTIES:
+:CUSTOM_ID: h:f16747e6-ebd3-45ac-bb5c-6e9fdf937ba8
+:END:
+
 It is possible to add beframed buffers to the list of sources the
-~consult-buffer~ command reads from. Just add the following to the
-~beframe~ configuration:
+~consult-buffer~ command reads from. The alternative is to replace the
+full list altogether ([[#h:8f23bcd4-829c-4f8c-b1ee-00f91d07c783][Beframed buffers as the complete Consult buffer list]]).
+Just add the following to the ~beframe~ configuration:
 
 #+begin_src emacs-lisp
 (defvar consult-buffer-sources)
@@ -391,11 +397,32 @@ With optional argument FRAME, return the list of buffers of FRAME."
 #+end_src
 
 #+findex: beframe-buffer-names
-As you can see from the snippet above, much like ~consult--buffer-query~
-itself, the ~beframe-buffer-names~ function may take a keyword argument
+The ~beframe-buffer-names~ function may take a keyword argument
 ~:sort~.  In our case, it is set to ~beframe-buffer-sort-visibility~,
 which groups buffers by visibility, the first element of the list
 being the most recently selected buffer other than the current one.
+
+*** Beframed buffers as the complete Consult buffer list
+:PROPERTIES:
+:CUSTOM_ID: h:8f23bcd4-829c-4f8c-b1ee-00f91d07c783
+:END:
+
+Other than defining a ~consult-buffer~ source ([[#h:f16747e6-ebd3-45ac-bb5c-6e9fdf937ba8][Beframed buffers as a Consult buffer source]]),
+it is possible to limit the ~consult-buffer-list~ completely to only
+show beframed buffers:
+
+#+begin_src emacs-lisp
+(defun consult-beframe-buffer-list (&optional frame)
+  "Return the list of buffers from `beframe-buffer-names' sorted by visibility.
+With optional argument FRAME, return the list of buffers of FRAME."
+  (beframe-buffer-list frame :sort #'beframe-buffer-sort-visibility))
+
+(setq consult-buffer-list #'consult-beframe-buffer-list)
+#+end_src
+
+#+findex: beframe-buffer-list
+Similar to ~beframe-buffer-names~, the function ~beframe-buffer-list~
+takes a keyword argument ~:sort~, which we use to sort by visibility.
 
 ** Integration with Ibuffer
 :PROPERTIES:
@@ -443,8 +470,9 @@ matters.
 
 + Author/maintainer :: Protesilaos Stavrou.
 
-+ Contributions to code or the manual :: Bruno Boal, Edgar Vincent,
-  Fritz Grabo, Stefan Monnier, Tony Zorman, Vedang Manerikar.
++ Contributions to code or the manual :: Bruno Boal, Daniel Mendler,
+  Edgar Vincent, Fritz Grabo, Stefan Monnier, Tony Zorman, Vedang
+  Manerikar.
 
 + Ideas and/or user feedback :: Derek Passen, Karan Ahlawat, Karthik
   Chikmagalur, Valentino, duli.
