@@ -424,6 +424,11 @@ With optional argument FRAME, return the list of buffers of FRAME."
 Similar to ~beframe-buffer-names~, the function ~beframe-buffer-list~
 takes a keyword argument ~:sort~, which we use to sort by visibility.
 
+With this configuration, the command ~consult-buffer~ only shows
+buffers from the current frame. But it is still possible to widen it
+to all buffers by first typing =SPC= at the empty prompt, which will
+activate the "hidden buffers" view.
+
 ** Integration with Ibuffer
 :PROPERTIES:
 :CUSTOM_ID: h:ae6c4c6b-179a-4d35-86b5-8b63bf614697
