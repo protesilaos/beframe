@@ -408,7 +408,7 @@ being the most recently selected buffer other than the current one.
 :END:
 
 Other than defining a ~consult-buffer~ source ([[#h:f16747e6-ebd3-45ac-bb5c-6e9fdf937ba8][Beframed buffers as a Consult buffer source]]),
-it is possible to limit the ~consult-buffer-list~ completely to only
+it is possible to limit the ~consult-buffer-list-function~ completely to only
 show beframed buffers:
 
 #+begin_src emacs-lisp
@@ -417,7 +417,7 @@ show beframed buffers:
 With optional argument FRAME, return the list of buffers of FRAME."
   (beframe-buffer-list frame :sort #'beframe-buffer-sort-visibility))
 
-(setq consult-buffer-list #'consult-beframe-buffer-list)
+(setq consult-buffer-list-function #'consult-beframe-buffer-list)
 #+end_src
 
 #+findex: beframe-buffer-list
@@ -426,8 +426,8 @@ takes a keyword argument ~:sort~, which we use to sort by visibility.
 
 With this configuration, the command ~consult-buffer~ only shows
 buffers from the current frame. But it is still possible to widen it
-to all buffers by first typing =SPC= at the empty prompt, which will
-activate the "hidden buffers" view.
+to all buffers by first typing =o= at the empty prompt, which will
+activate the "other buffers" source.
 
 ** Integration with Ibuffer
 :PROPERTIES:
