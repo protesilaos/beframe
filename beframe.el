@@ -256,11 +256,12 @@ for example, be used to prefer hidden buffers to visible ones—see
 `beframe-buffer-sort-visibility'.
 
 Include `beframe-global-buffers' in the list."
-  (funcall (or sort #'identity)
-           (delq nil
-                 (delete-dups
-                  (append (beframe--get-buffers frame)
-                          (beframe--global-buffers))))))
+  (let ((buffers (seq-union
+                  (beframe--get-buffers frame)
+                  (beframe--global-buffers))))
+    (if sort
+        (funcall sort buffers)
+      buffers)))
 
 (define-obsolete-function-alias
   'beframe--buffer-list
