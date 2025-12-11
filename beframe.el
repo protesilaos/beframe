@@ -312,14 +312,15 @@ empty string."
 PROMPT, DEF, REQUIRE-MATCH, and PREDICATE are the same as
 `read-buffer'.  The PREDICATE is ignored, however, to apply the
 per-frame filter."
-  (completing-read
-   (format "%s%s" (beframe--propertize-prompt-prefix) prompt)
-   (beframe-buffer-names)
-   #'beframe--read-buffer-p
-   require-match
-   nil
-   'beframe-history
-   def))
+  (let ((completion-extra-properties (list :category 'buffer)))
+    (completing-read
+     (format "%s%s" (beframe--propertize-prompt-prefix) prompt)
+     (beframe-buffer-names)
+     #'beframe--read-buffer-p
+     require-match
+     nil
+     'beframe-history
+     def)))
 
 (defun beframe--buffer-prompt (&optional frame)
   "Prompt for buffer among `beframe-buffer-names'.
