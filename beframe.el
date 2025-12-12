@@ -306,21 +306,27 @@ empty string."
       (format "​%s " (propertize beframe-prompt-prefix 'face 'beframe-face-prompt-prefix))
     ""))
 
+(defun beframe-completion-table ()
+  "Return new completion table with `beframe-buffer-names'."
+  (lambda (string pred action)
+    (if (eq action 'metadata)
+        (list 'metadata '(category . buffer))
+      (complete-with-action action (beframe-buffer-names) string pred))))
+
 ;;;###autoload
 (defun beframe-read-buffer (prompt &optional def require-match _predicate)
   "The `read-buffer-function' that limits buffers to frames.
 PROMPT, DEF, REQUIRE-MATCH, and PREDICATE are the same as
 `read-buffer'.  The PREDICATE is ignored, however, to apply the
 per-frame filter."
-  (let ((completion-extra-properties (list :category 'buffer)))
-    (completing-read
-     (format "%s%s" (beframe--propertize-prompt-prefix) prompt)
-     (beframe-buffer-names)
-     #'beframe--read-buffer-p
-     require-match
-     nil
-     'beframe-history
-     def)))
+  (completing-read
+   (format "%s%s" (beframe--propertize-prompt-prefix) prompt)
+   (beframe-completion-table)
+   #'beframe--read-buffer-p
+   require-match
+   nil
+   'beframe-history
+   def))
 
 (defun beframe--buffer-prompt (&optional frame)
   "Prompt for buffer among `beframe-buffer-names'.
