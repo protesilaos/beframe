@@ -347,43 +347,31 @@ frame name."
      (lambda (buffer)
        (beframe--read-buffer-p buffer buffers)))))
 
-(defun beframe--buffers-with-current ()
-  "Return frame list with current one renamed appropriately."
-  (let ((frames (make-frame-names-alist)))
-    (mapcar
-     (lambda (frame)
-       (let ((name (car frame))
-             (obj (cdr frame))
-             (selected-frame (selected-frame)))
-         (cond
-          ((and (eq selected-frame obj)
-                (string-prefix-p " " name))
-           (setcar frame "Current frame")
-           frame)
-          ((eq selected-frame obj)
-           (setcar frame (format "%s (Current frame)" name))
-           frame)
-          (t
-           frame))))
-     frames)))
-
 (defun beframe--multiple-frames-p ()
   "Return non-nil if `frame-list' is longer than 1."
   (> (length (frame-list)) 1))
+
+(defun beframe-frame-prompt-annotate (frame-name)
+  "Return annotation for FRAME-NAME if it is the current one."
+  (when (string= frame-name (frame-parameter nil 'name))
+    (format " -- CURRENT FRAME")))
 
 (defun beframe--frame-prompt (&optional force)
   "Prompt to select a frame among the list of frames.
 Return user-error if `beframe--multiple-frames-p' is nil.  Skip
 this check if FORCE is non-nil."
   (if (or force (beframe--multiple-frames-p))
-      (let ((frames (beframe--buffers-with-current)))
-        (completing-read "Select Frame: " frames nil t nil 'frame-name-history (caar frames)))
+      (let ((frames (make-frame-names-alist)))
+        (completing-read
+         "Select Frame: "
+         (beframe-get-completion-table frames '(category . frame) '(annotation-function . beframe-frame-prompt-annotate))
+         nil t nil 'frame-name-history (caar frames)))
     (user-error "Only a single frame is available; aborting")))
 
 (defun beframe--frame-object (frame)
   "Retun frame object of named FRAME.
 FRAME is the human-readable representation of a frame."
-  (let* ((frames (beframe--buffers-with-current))
+  (let* ((frames (make-frame-names-alist))
          (names (mapcar #'car frames)))
     (when (seq-contains-p names frame #'string-match-p)
       (alist-get frame frames nil nil #'string-match-p))))
