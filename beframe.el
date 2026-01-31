@@ -483,13 +483,13 @@ operation."
                               buffers))
                (`(,consolidated-buffers . ,action)
                 (pcase operation
-                  (:assume (cons (append new-buffers frame-buffers) "Assumed"))
+                  (:assume (cons (append new-buffers frame-buffers) "ASSUMED"))
                   (:unassume (cons
                               (seq-filter
                                (lambda (buf)
                                  (not (member buf new-buffers)))
                                frame-buffers)
-                              "Unassumed"))
+                              "UNASSUMED"))
                   (_ (error "`%s' is an unknown operation to modify frame buffers" operation)))))
     (if-let* ((lists (beframe--get-longest-list-first frame-buffers consolidated-buffers))
               (difference (seq-difference
@@ -498,7 +498,7 @@ operation."
         (progn
           (modify-frame-parameters nil `((buffer-list . ,consolidated-buffers)))
           (unless no-message
-            (message "%s current frame %s buffers: %s"
+            (message "Current frame %s %s buffers: %s"
                      (propertize action 'face 'error)
                      (propertize (format "%s" (length difference)) 'face 'warning)
                      (propertize (format "%s" difference) 'face 'success))))
