@@ -479,8 +479,8 @@ matters.
   Edgar Vincent, Fritz Grabo, Stefan Monnier, Tony Zorman, Vedang
   Manerikar.
 
-+ Ideas and/or user feedback :: Derek Passen, Karan Ahlawat, Karthik
-  Chikmagalur, Valentino, duli.
++ Ideas and/or user feedback :: Alexandre Rousseau, Derek Passen,
+  Karan Ahlawat, Karthik Chikmagalur, Valentino, duli.
 
 * COPYING
 :PROPERTIES:

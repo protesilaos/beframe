@@ -284,15 +284,12 @@ more information."
   'beframe-buffer-names
   "0.2.0")
 
-(defun beframe--read-buffer-p (buffer &optional frame)
-  "Return non-nil if BUFFER belongs to the current FRAME.
-BUFFER is a string or a cons cell, per `beframe-read-buffer'.  If
-optional FRAME is nil, then default to the current one.  Else FRAME is
-an object that satisfies `framep'."
+(defun beframe--read-buffer-p (buffer buffers)
+  "Return non-nil if BUFFER belongs to the BUFFERS.
+BUFFER is a string or a cons cell whose `car' is the buffer name."
   (when (consp buffer)
     (setq buffer (car buffer)))
-  (unless (string-prefix-p " " buffer)
-    (seq-contains-p (beframe-buffer-names frame) buffer)))
+  (memq buffer buffers))
 
 (defvar beframe-history nil
   "Minibuffer history of frame specific buffers.")
@@ -306,12 +303,14 @@ empty string."
       (format "​%s " (propertize beframe-prompt-prefix 'face 'beframe-face-prompt-prefix))
     ""))
 
-(defun beframe-completion-table ()
-  "Return new completion table with `beframe-buffer-names'."
+(defun beframe-get-completion-table (candidates &rest metadata)
+  "Return completion table with CANDIDATES and METADATA.
+CANDIDATES is a list of strings.  METADATA is described in
+`completion-metadata'."
   (lambda (string pred action)
     (if (eq action 'metadata)
-        (list 'metadata '(category . buffer))
-      (complete-with-action action (beframe-buffer-names) string pred))))
+        (cons 'metadata metadata)
+      (complete-with-action action candidates string pred))))
 
 ;;;###autoload
 (defun beframe-read-buffer (prompt &optional def require-match _predicate)
@@ -319,14 +318,17 @@ empty string."
 PROMPT, DEF, REQUIRE-MATCH, and PREDICATE are the same as
 `read-buffer'.  The PREDICATE is ignored, however, to apply the
 per-frame filter."
-  (completing-read
-   (format "%s%s" (beframe--propertize-prompt-prefix) prompt)
-   (beframe-completion-table)
-   #'beframe--read-buffer-p
-   require-match
-   nil
-   'beframe-history
-   def))
+  (let* ((buffers (beframe-buffer-names))
+         (table (beframe-get-completion-table buffers '(category . buffer))))
+    (completing-read
+     (format "%s%s" (beframe--propertize-prompt-prefix) prompt)
+     table
+     (lambda (buffer)
+       (beframe--read-buffer-p buffer buffers))
+     require-match
+     nil
+     'beframe-history
+     def)))
 
 (defun beframe--buffer-prompt (&optional frame)
   "Prompt for buffer among `beframe-buffer-names'.
@@ -337,14 +339,13 @@ and previous buffers.
 
 With optional FRAME, use list of buffers specific to the given
 frame name."
-  (read-buffer
-   "Switch to frame buffer: "
-   (other-buffer (current-buffer))
-   (confirm-nonexistent-file-or-buffer)
-   ;; NOTE: This predicate is not needed if `beframe-mode' is
-   ;; non-nil because it sets the `read-buffer-function'.
-   (lambda (buf)
-     (beframe--read-buffer-p buf frame))))
+  (let ((buffers (beframe-buffer-names frame)))
+    (read-buffer
+     "Switch to frame buffer: "
+     (other-buffer (current-buffer))
+     (confirm-nonexistent-file-or-buffer)
+     (lambda (buffer)
+       (beframe--read-buffer-p buffer buffers)))))
 
 (defun beframe--buffers-with-current ()
   "Return frame list with current one renamed appropriately."
