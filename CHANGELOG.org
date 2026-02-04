@@ -9,6 +9,31 @@ project's main git repository: <https://github.com/protesilaos/beframe>.
 The newest release is at the top.  For further details, please consult
 the manual: <https://protesilaos.com/emacs/beframe>.
 
+* Version 1.5.0 on 2026-02-04
+:PROPERTIES:
+:CUSTOM_ID: h:a4e574ce-6f72-4222-83e5-0c48a72d887a
+:END:
+
+This version fixes two bugs and makes other minor tweaks.
+
+The first bug pertains to the performance of the command
+~beframe-switch-buffer~ or the command ~switch-to-buffer~ when
+~beframe-mode~ is enabled: they were really slow when the list of
+buffers was long. Now they are always fast. Thanks to Alexandre
+Rousseau for reporting the problem in issue 17:
+<https://github.com/protesilaos/beframe/issues/17>.
+
+The second bug is more subtle. It is about persisting the completion
+metadata =category= value in all prompts that read a buffer, when
+~beframe-mode~ is enabled. This change means that users who configure
+the user option ~completion-category-overrides~ will not get the
+expected results in buffer prompts affected by Beframe.
+
+Thanks to Stefan Monnier for commenting on the initial implementation,
+specifically telling me that ~let~ binding the metadata can affect
+nested minibuffers, which we do not want. This was done on the
+emacs-devel mailing list: <https://lists.gnu.org/archive/html/emacs-devel/2025-12/msg00264.html>.
+
 * Version 1.4.0 on 2025-06-28
 :PROPERTIES:
 :CUSTOM_ID: h:43536015-8c68-4aca-a02a-1a80f23350be
