@@ -1,6 +1,6 @@
 ;;; beframe-transient.el --- Transient user interface for Beframe -*- lexical-binding: t -*-
 
-;; Copyright (C) 2025  Free Software Foundation, Inc.
+;; Copyright (C) 2025-2026  Free Software Foundation, Inc.
 
 ;; Author: Protesilaos Stavrou <info@protesilaos.com>
 ;; Maintainer: Protesilaos Stavrou <info@protesilaos.com>
