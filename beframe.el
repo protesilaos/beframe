@@ -217,7 +217,7 @@ any symbols into a list."
 The following values of ARG can be used:
 
 - A list of one to three elements that are passed to the function
-  `beframe--get-buffers-matching-regexp' (refer to its doc string from
+  `beframe--get-buffers-matching-regexp' (refer to its docstring from
   the arguments).
 
 - A string, which is passed to `beframe--get-buffers-matching-regexp' as
