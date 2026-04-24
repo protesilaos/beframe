@@ -1,5 +1,5 @@
 #+title: Change log of Beframe
-#+author: Protesilaos Stavrou
+#+author: Protesilaos
 #+email: info@protesilaos.com
 #+options: ':nil toc:nil num:nil author:nil email:nil
 

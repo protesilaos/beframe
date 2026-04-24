@@ -1,5 +1,5 @@
 #+title: beframe: isolate buffers per frame
-#+author: Protesilaos Stavrou
+#+author: Protesilaos
 #+email: info@protesilaos.com
 #+language: en
 #+options: ':t toc:nil author:t email:t num:t
@@ -13,13 +13,13 @@
 #+texinfo_dir_title: Beframe: (beframe)
 #+texinfo_dir_desc: Isolate buffers per frame
 #+texinfo_header: @set MAINTAINERSITE @uref{https://protesilaos.com,maintainer webpage}
-#+texinfo_header: @set MAINTAINER Protesilaos Stavrou
+#+texinfo_header: @set MAINTAINER Protesilaos
 #+texinfo_header: @set MAINTAINEREMAIL @email{info@protesilaos.com}
 #+texinfo_header: @set MAINTAINERCONTACT @uref{mailto:info@protesilaos.com,contact the maintainer}
 
 #+texinfo: @insertcopying
 
-This manual, written by Protesilaos Stavrou, describes the
+This manual, written by Protesilaos, describes the
 customization options for the Emacs package called ~beframe~ (or
 ~beframe.el~), and provides every other piece of information pertinent
 to it.
@@ -473,7 +473,7 @@ works:
 Beframe is meant to be a collective effort.  Every bit of help
 matters.
 
-+ Author/maintainer :: Protesilaos Stavrou.
++ Author/maintainer :: Protesilaos.
 
 + Contributions to code or the manual :: Bruno Boal, Daniel Mendler,
   Edgar Vincent, Fritz Grabo, Stefan Monnier, Tony Zorman, Vedang
