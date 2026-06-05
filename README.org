@@ -476,8 +476,8 @@ matters.
 + Author/maintainer :: Protesilaos.
 
 + Contributions to code or the manual :: Bruno Boal, Daniel Mendler,
-  Edgar Vincent, Fritz Grabo, Stefan Monnier, Tony Zorman, Vedang
-  Manerikar.
+  Daniel Russo, Edgar Vincent, Fritz Grabo, Stefan Monnier, Tony
+  Zorman, Vedang Manerikar.
 
 + Ideas and/or user feedback :: Alexandre Rousseau, Derek Passen,
   Karan Ahlawat, Karthik Chikmagalur, Valentino, duli.
