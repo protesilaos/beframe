@@ -313,10 +313,10 @@ CANDIDATES is a list of strings.  METADATA is described in
       (complete-with-action action candidates string pred))))
 
 ;;;###autoload
-(defun beframe-read-buffer (prompt &optional def require-match _predicate)
+(defun beframe-read-buffer (prompt &optional def require-match predicate)
   "The `read-buffer-function' that limits buffers to frames.
 PROMPT, DEF, REQUIRE-MATCH, and PREDICATE are the same as
-`read-buffer'.  The PREDICATE is ignored, however, to apply the
+`read-buffer'.  The PREDICATE is applied in addition to the
 per-frame filter."
   (let* ((buffers (beframe-buffer-names))
          (table (beframe-get-completion-table buffers '(category . buffer))))
@@ -324,7 +324,9 @@ per-frame filter."
      (format "%s%s" (beframe--propertize-prompt-prefix) prompt)
      table
      (lambda (buffer)
-       (beframe--read-buffer-p buffer buffers))
+       (and (beframe--read-buffer-p buffer buffers)
+            (or (not predicate)
+                (funcall predicate buffer))))
      require-match
      nil
      'beframe-history
