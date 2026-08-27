@@ -65,7 +65,10 @@
     ("R" "Rename a given frame" beframe-rename-frame)]
    ["Modify"
     ("a" "Assume buffers..." beframe-transient-assume)
-    ("u" "Unassume buffers..." beframe-transient-unassume)]])
+    ("u" "Unassume buffers..." beframe-transient-unassume)]
+   ["Kill"
+    ("k" "All frame buffers" beframe-kill-frame-buffers)
+    ("K" "All frame buffers matching regexp" beframe-kill-frame-buffers-matching-regexp)]])
 
 (provide 'beframe-transient)
 ;;; beframe-transient.el ends here
