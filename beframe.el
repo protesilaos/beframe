@@ -780,6 +780,31 @@ Also see the other Beframe commands:
       (beframe--frame-object name))))
   (beframe--kill-frame-buffers-subr frame nil nil))
 
+;;; Integration with `undelete-frame'
+
+(defvar beframe-undelete-frame-lists nil
+  "Alist of `frame-id' and buffers needed by `undelete-frame'.")
+
+(defun beframe-undelete-frame-store-frame-list (frame)
+  "Store FRAME buffer list for `undelete-frame'."
+  (when-let* ((buffers (beframe--get-buffers-public-no-global frame))
+              (frame-id (frame-id frame)))
+    (add-to-list 'beframe-undelete-frame-lists (cons frame-id buffers))))
+
+(defun beframe-undelete-frame-restore (&rest args)
+  "Apply ARGS and restore frame buffer list.
+Use this as `undelete-frame' :around advice."
+  (let* ((frame (apply args))
+         (frame-id (frame-id frame)))
+    (when-let* ((old-buffers (alist-get frame-id beframe-undelete-frame-lists))
+                (frame-buffers (beframe-buffer-list frame))
+                (all-buffers (append old-buffers frame-buffers))
+                (all-no-duplicates (delete-dups all-buffers)))
+      (modify-frame-parameters
+       frame
+       `((buffer-list . ,all-no-duplicates))))
+    frame))
+
 ;;; Minor mode setup
 
 (defvar beframe--read-buffer-function nil
@@ -841,12 +866,18 @@ Also see the variable `beframe-prefix-map'."
               xref-history-storage #'beframe-xref-frame-history)
         (add-hook 'after-make-frame-functions #'beframe-setup-frame)
         (add-hook 'context-menu-functions #'beframe-context-menu)
+        (when (functionp 'frame-id)
+          (add-hook 'delete-frame-functions #'beframe-undelete-frame-store-frame-list)
+          (advice-add #'undelete-frame :around #'beframe-undelete-frame-restore))
         (beframe--functions-in-frames))
     (setq read-buffer-function beframe--read-buffer-function
           beframe--read-buffer-function nil
           xref-history-storage beframe-xref-history-storage)
     (remove-hook 'after-make-frame-functions #'beframe-setup-frame)
     (remove-hook 'context-menu-functions #'beframe-context-menu)
+    (when (functionp 'frame-id)
+      (remove-hook 'delete-frame-functions #'beframe-undelete-frame-store-frame-list)
+      (advice-remove #'undelete-frame #'beframe-undelete-frame-restore))
     (beframe--functions-in-frames :disable)))
 
 (defun beframe-create-scratch-buffer (frame)

@@ -240,6 +240,10 @@ The ~beframe-mode~ does the following:
 - Add a filter to newly created frames so that their
   ~buffer-predicate~ parameter beframes buffers.
 
+- On Emacs version 31 on higher, it makes the ~undelete-frame~ command
+  also restore the buffer list of the given frame. [ This is part of
+  {{{development-version}}}. ]
+
 #+vindex: beframe-rename-function
 - Renames newly created frames so that they have a potentially more
   meaningful title.  The user option ~beframe-rename-function~
