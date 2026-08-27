@@ -139,10 +139,11 @@ automatically, use `customize-set-variable' or `setopt' (Emacs
 
 (defcustom beframe-kill-buffers-no-confirm nil
   "When non-nil, do not prompt for confirmation when killing buffers.
-This concerns the command `beframe-kill-buffers-matching-regexp'.
+This concerns the commands `beframe-kill-buffers-matching-regexp' and
+`beframe-kill-frame-buffers'.
 
-If nil (the default), `beframe-kill-buffers-matching-regexp' asks for
-confirmation once and then proceeds to kill all the buffers it has found.
+If nil (the default), the aforementioned commands ask for confirmation
+once and then proceed to kill all the relevant buffers.
 
 Emacs may still prompt to confirm each action if the buffer is unsaved,
 has a running process, and the like."
@@ -697,7 +698,8 @@ matches REGEXP.
 
 Note that this operation applies to all frames, because buffers are
 shared by the Emacs session even though Beframe only exposes those that
-pertain to a given frame.
+pertain to a given frame.  To only kill the buffers of a given frame,
+call the command `beframe-kill-frame-buffers' instead.
 
 Also see the other Beframe commands:
 
@@ -715,6 +717,27 @@ Also see the other Beframe commands:
                 (y-or-n-p (format "Kill %d buffers matching `%s'?" (length buffers) regexp)))
         (mapc #'kill-buffer buffers))
     (user-error "No buffers match `%s'" regexp)))
+
+;;;###autoload
+(defun beframe-kill-frame-buffers (frame)
+  "Delete all buffers belonging to FRAME.
+
+Also see the other Beframe commands:
+
+\\{beframe-prefix-map}"
+  (interactive
+   (list
+    (when-let* ((name (beframe--frame-prompt)))
+      (beframe--frame-object name))))
+  (if-let* ((buffers (beframe--get-buffers-public frame)))
+      (when (or beframe-kill-buffers-no-confirm
+                (y-or-n-p
+                 (format
+                  "Kill %d buffers belonging to frame `%s' and delete the frame? "
+                  (length buffers)
+                  (frame-parameter frame 'name))))
+        (mapc #'kill-buffer buffers))
+    (user-error "No buffers belong to frame `%s'" frame)))
 
 ;;; Minor mode setup
 
