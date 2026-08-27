@@ -55,20 +55,19 @@
 ;;;###autoload (autoload 'beframe-transient "beframe-transient")
 (transient-define-prefix beframe-transient nil
   "Beframe commands."
-  ["Beframe"
-   ["Switch"
-    ("b" "Current frame buffer" beframe-switch-buffer)
-    ("B" "Buffer of given frame" beframe-switch-buffer-in-frame)
-    ("l" "List buffers" beframe-buffer-menu)]
-   ["Rename (`beframe-rename-function')"
-    ("r" "Rename this frame" beframe-rename-current-frame)
-    ("R" "Rename a given frame" beframe-rename-frame)]
-   ["Modify"
-    ("a" "Assume buffers..." beframe-transient-assume)
-    ("u" "Unassume buffers..." beframe-transient-unassume)]
-   ["Kill"
-    ("k" "All frame buffers" beframe-kill-frame-buffers)
-    ("K" "All frame buffers matching regexp" beframe-kill-frame-buffers-matching-regexp)]])
+  ["Switch"
+   ("b" "Current frame buffer" beframe-switch-buffer)
+   ("B" "Buffer of given frame" beframe-switch-buffer-in-frame)
+   ("l" "List buffers" beframe-buffer-menu)]
+  ["Rename (`beframe-rename-function')"
+   ("r" "Rename this frame" beframe-rename-current-frame)
+   ("R" "Rename a given frame" beframe-rename-frame)]
+  ["Modify"
+   ("a" "Assume buffers..." beframe-transient-assume)
+   ("u" "Unassume buffers..." beframe-transient-unassume)]
+  ["Kill"
+   ("k" "All frame buffers" beframe-kill-frame-buffers)
+   ("K" "All frame buffers matching regexp" beframe-kill-frame-buffers-matching-regexp)])
 
 (provide 'beframe-transient)
 ;;; beframe-transient.el ends here
