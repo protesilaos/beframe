@@ -165,14 +165,26 @@ with the current frame.
   #+findex: beframe-kill-buffers-matching-regexp
 - The ~beframe-kill-buffers-matching-regexp~ command prompts for a
   regular expression to match against buffer names. If there are
-  matches, it asks for confirmation and then proceeds to kill them. If
-  the user option ~beframe-kill-buffers-no-confirm~ is non-nil, it
-  skips that confirmation step to carry out its action outright. Note
-  that Emacs may still prompt for further confirmation if the given
-  buffer is unsaved, has a running process, and the like. Also note
-  that this operation applies to all frames because buffers are shared
-  by the Emacs session even though Beframe only exposes those that
-  pertain to a particular frame ([[#h:5b751614-8749-4aa8-aaed-f181beaddc57][Features of ~beframe-mode~]]).
+  matches, it asks for confirmation, displays a list of the buffer to
+  be killed, and then proceeds to kill them. If the user option
+  ~beframe-kill-buffers-no-confirm~ is non-nil, it skips that
+  confirmation step to carry out its action outright, in which case no
+  buffer menu is ever displayed. Note that Emacs may still prompt for
+  further confirmation if the given buffer is unsaved, has a running
+  process, and the like. Also note that this operation applies to all
+  frames because buffers are shared by the Emacs session even though
+  Beframe only exposes those that pertain to a particular frame
+  ([[#h:5b751614-8749-4aa8-aaed-f181beaddc57][Features of ~beframe-mode~]]). [ The command now displays a menu with
+  buffers to be killed as part of {{{development-version}}}. ]
+
+  #+findex: beframe-kill-frame-buffers
+- The command ~beframe-kill-frame-buffers~ prompts for a frame and
+  then asks whether to delete all of its buffers. While the prompt is
+  active, it also displays a menu listing all the buffers to be
+  killed. If the user option ~beframe-kill-buffers-no-confirm~ is set
+  to a non-~nil~ value, then ~beframe-kill-frame-buffers~ kills the
+  buffers outright and does not display any menu. [ The command
+  ~beframe-kill-frame-buffers~ is part of {{{development-version}}}. ]
 
 ** Unassuming buffers
 :PROPERTIES:
