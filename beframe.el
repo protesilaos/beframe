@@ -139,8 +139,8 @@ automatically, use `customize-set-variable' or `setopt' (Emacs
 
 (defcustom beframe-kill-buffers-no-confirm nil
   "When non-nil, do not prompt for confirmation when killing buffers.
-This concerns the commands `beframe-kill-buffers-matching-regexp' and
-`beframe-kill-frame-buffers'.
+This concerns the commands `beframe-kill-frame-buffers' and
+`beframe-kill-frame-buffers-matching-regexp'.
 
 If nil (the default), the aforementioned commands ask for confirmation
 once and then proceed to kill all the relevant buffers.
@@ -168,16 +168,15 @@ has a running process, and the like."
      (string-prefix-p " " (buffer-name buffer)))
    buffers))
 
-(defun beframe--get-buffers-matching-regexp (regexp &optional match-mode-names no-internal-buffers)
+(defun beframe--get-buffers-matching-regexp (regexp &optional match-mode-names frame)
   "Return buffers whose name matches REGEXP.
 With optional MATCH-MODE-NAMES also return buffers whose major mode
 matches REGEXP.
 
-With optional NO-INTERNAL-BUFFERS, get the `buffer-list' filtered
-through `beframe--remove-internal-buffers'."
-  (let ((buffers (if no-internal-buffers
-                     (beframe--remove-internal-buffers (buffer-list))
-                   (buffer-list))))
+With optional FRAME only operate on those buffers."
+  (let ((buffers (if frame
+                     (beframe--get-buffers-public frame)
+                   (beframe--remove-internal-buffers (buffer-list)))))
     (seq-filter
      (lambda (buffer)
        (if match-mode-names
@@ -223,6 +222,13 @@ If FRAME is nil, return the buffer list of the current frame."
           (when (derived-mode-p modes)
             (push buffer global-buffers))))))
     global-buffers))
+
+(defun beframe--get-buffers-public-no-global (frame)
+  "Return public buffers for FRAME.
+If FRAME is nil, return the buffer list of the current frame."
+  (seq-difference
+   (beframe--get-buffers-public frame)
+   (beframe--get-buffers-global)))
 
 (cl-defun beframe-buffer-list (&optional frame &key sort)
   "Return list of buffers that are used by the current frame.
@@ -640,7 +646,7 @@ Also see the other Beframe commands:
        (if arg
            "Buffer names matching REGEXP in the name or major mode"
          "Buffer names matching REGEXP in the name")))))
-  (if-let* ((buffers (beframe--get-buffers-matching-regexp regexp match-mode-names :no-internal-buffers)))
+  (if-let* ((buffers (beframe--get-buffers-matching-regexp regexp match-mode-names)))
       (beframe--modify-buffer-list :unassume buffers)
     (user-error "No buffers match `%s'" regexp)))
 
@@ -719,16 +725,32 @@ Delete the menu afterwards."
       (with-current-buffer buffer-menu-name
         (kill-buffer-and-window)))))
 
+(define-obsolete-function-alias
+  'beframe-kill-buffers-matching-regexp
+  'beframe-kill-frame-buffers-matching-regexp
+  "1.6.0")
+
+(defun beframe--kill-frame-buffers-subr (frame regexp match-mode-names)
+  "Do the work of `beframe-kill-frame-buffers' and related.
+Kill FRAME buffers matching REGEXP.  If REGEXP is nil, then kill all of
+FRAME buffers.
+
+With MATCH-MODE-NAMES, apply REGEXP to the name of each buffer's major
+mode.  Do nothing with MATCH-MODE-NAMES if REGEXP is nil."
+  (if-let* ((buffers (if regexp
+                         (beframe--get-buffers-matching-regexp regexp match-mode-names frame)
+                       (beframe--get-buffers-public-no-global frame)))
+            (buffer-length (length buffers))
+            (frame-name (frame-parameter frame 'name))
+            (prompt-text (format "Kill %d buffers belonging to frame `%s'? " buffer-length frame-name)))
+      (beframe--kill-buffers-and-display-menu buffers prompt-text)
+    (error "No matching-buffers")))
+
 ;;;###autoload
-(defun beframe-kill-buffers-matching-regexp (regexp &optional match-mode-names)
-  "Delete all buffers whose name matches REGEXP.
+(defun beframe-kill-frame-buffers-matching-regexp (frame regexp &optional match-mode-names)
+  "Delete all FRAME buffers whose name matches REGEXP.
 With optional MATCH-MODE-NAMES delete buffers whose name or major mode
 matches REGEXP.
-
-Note that this operation applies to all frames, because buffers are
-shared by the Emacs session even though Beframe only exposes those that
-pertain to a given frame.  To only kill the buffers of a given frame,
-call the command `beframe-kill-frame-buffers' instead.
 
 Also see the other Beframe commands:
 
@@ -736,16 +758,14 @@ Also see the other Beframe commands:
   (interactive
    (let ((arg current-prefix-arg))
      (list
+      (when-let* ((name (beframe--frame-prompt)))
+        (beframe--frame-object name))
       (beframe-buffers-matching-regexp-prompt
        (if arg
            "Delete buffers matching REGEXP in the name or major mode"
          "Delete buffers matching REGEXP in the name"))
       arg)))
-  (if-let* ((buffers (beframe--get-buffers-matching-regexp regexp match-mode-names :no-internal-buffers))
-            (buffer-length (length buffers))
-            (prompt-text (format "Kill %d buffers matching `%s'?" buffer-length regexp)))
-      (beframe--kill-buffers-and-display-menu buffers prompt-text)
-    (user-error "No buffers match `%s'" regexp)))
+  (beframe--kill-frame-buffers-subr frame regexp match-mode-names))
 
 ;;;###autoload
 (defun beframe-kill-frame-buffers (frame)
@@ -758,12 +778,7 @@ Also see the other Beframe commands:
    (list
     (when-let* ((name (beframe--frame-prompt)))
       (beframe--frame-object name))))
-  (if-let* ((buffers (beframe--get-buffers-public frame))
-            (buffer-length (length buffers))
-            (frame-name (frame-parameter frame 'name))
-            (prompt-text (format "Kill %d buffers belonging to frame `%s'? " buffer-length frame-name)))
-        (beframe--kill-buffers-and-display-menu buffers prompt-text)
-    (user-error "No buffers belong to frame `%s'" frame)))
+  (beframe--kill-frame-buffers-subr frame nil nil))
 
 ;;; Minor mode setup
 
@@ -785,7 +800,7 @@ Meant to be assigned to a prefix key, like this:
 (define-key beframe-prefix-map (kbd "r") #'beframe-rename-current-frame)
 (define-key beframe-prefix-map (kbd "R") #'beframe-rename-frame)
 (define-key beframe-prefix-map (kbd "k") #'beframe-kill-frame-buffers)
-(define-key beframe-prefix-map (kbd "K") #'beframe-kill-buffers-matching-regexp)
+(define-key beframe-prefix-map (kbd "K") #'beframe-kill-frame-buffers-matching-regexp)
 (define-key beframe-prefix-map (kbd "a f") #'beframe-assume-frame-buffers-selectively)
 (define-key beframe-prefix-map (kbd "a F") #'beframe-assume-frame-buffers)
 (define-key beframe-prefix-map (kbd "a a") #'beframe-assume-buffers-selectively-all-frames)
