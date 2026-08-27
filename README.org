@@ -161,32 +161,6 @@ with the current frame.
   prefix argument for =MATCH-MODE-NAMES=, the regular expression is
   matched against the buffer name or major mode.
 
-  #+vindex: beframe-kill-buffers-no-confirm
-  #+findex: beframe-kill-buffers-matching-regexp
-- The ~beframe-kill-buffers-matching-regexp~ command prompts for a
-  regular expression to match against buffer names. If there are
-  matches, it asks for confirmation, displays a list of the buffer to
-  be killed, and then proceeds to kill them. If the user option
-  ~beframe-kill-buffers-no-confirm~ is non-nil, it skips that
-  confirmation step to carry out its action outright, in which case no
-  buffer menu is ever displayed. Note that Emacs may still prompt for
-  further confirmation if the given buffer is unsaved, has a running
-  process, and the like. Also note that this operation applies to all
-  frames because buffers are shared by the Emacs session even though
-  Beframe only exposes those that pertain to a particular frame
-  ([[#h:5b751614-8749-4aa8-aaed-f181beaddc57][Features of ~beframe-mode~]]). [ The command now displays a menu with
-  buffers to be killed as part of {{{development-version}}}. ]
-
-  #+vindex: beframe-kill-buffers-no-confirm
-  #+findex: beframe-kill-frame-buffers
-- The command ~beframe-kill-frame-buffers~ prompts for a frame and
-  then asks whether to delete all of its buffers. While the prompt is
-  active, it also displays a menu listing all the buffers to be
-  killed. If the user option ~beframe-kill-buffers-no-confirm~ is set
-  to a non-~nil~ value, then ~beframe-kill-frame-buffers~ kills the
-  buffers outright and does not display any menu. [ The command
-  ~beframe-kill-frame-buffers~ is part of {{{development-version}}}. ]
-
 ** Unassuming buffers
 :PROPERTIES:
 :CUSTOM_ID: h:8fb895ac-7f99-4c92-b15a-18871b30c7b9
@@ -218,6 +192,39 @@ the current frame.
   buffers are unassumed by the current frame. With an optional prefix
   argument for =MATCH-MODE-NAMES=, the regular expression is matched
   against the buffer name or major mode.
+
+* Killing buffers
+:PROPERTIES:
+:CUSTOM_ID: h:3c3b77ab-7a98-4aa1-8073-b6e3f31d2cc3
+:END:
+
+#+vindex; beframe-kill-buffers-no-confirm The user option
+~beframe-kill-buffers-no-confirm~ controls whether the commands
+~beframe-kill-frame-buffers~ and ~beframe-kill-frame-buffers-matching-regexp~
+ prompt for confirmation before carrying out their action. By default,
+a confirmation is requested, while a menu with the buffers to be
+killed is on display. When ~beframe-kill-buffers-no-confirm~ is set to
+a non-~nil~ value, buffers are deleted outright and no menu is ever
+displayed.
+
+[ The buffers to be deleted are displayed in a menu as part of {{{development-version}}}. ]
+
+#+findex: beframe-kill-frame-buffers
+The command ~beframe-kill-frame-buffers~ prompts for a frame whose
+buffers it will kill in accordance with the user option
+~beframe-kill-buffers-no-confirm~.
+
+[ The command ~beframe-kill-frame-buffers~ is part of {{{development-version}}}. ]
+
+#+findex: beframe-kill-frame-buffers-matching-regexp
+The ~beframe-kill-frame-buffers-matching-regexp~ command kills the
+buffers of a frame that match the given regular expression. It prompts
+for the frame and then for the regular expression. It then behaves in
+accordance with the user option ~beframe-kill-buffers-no-confirm~.
+
+[ The command ~beframe-kill-frame-buffers-matching-regexp~ is revised
+  as part of {{{development-version}}} to limit its effect to a given
+  frame, which is now also prompts for. ]
 
 * Features of ~beframe-mode~
 :PROPERTIES:
