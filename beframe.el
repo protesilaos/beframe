@@ -390,6 +390,19 @@ bug#61319: <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=61319>."
   (select-frame-set-input-focus frame)
   (switch-to-buffer buffer))
 
+(defun beframe--list-buffers-menu (name buffers)
+  "Produce a buffer list menu of NAME with BUFFERS."
+  (let* ((old-buf (current-buffer))
+         (menu-buffer (get-buffer-create name)))
+    (with-current-buffer menu-buffer
+      (Buffer-menu-mode)
+      (setq-local Buffer-menu-files-only nil
+                  Buffer-menu-buffer-list buffers
+                  Buffer-menu-filter-predicate nil)
+      (list-buffers--refresh buffers old-buf)
+      (tabulated-list-print))
+    menu-buffer))
+
 (cl-defun beframe-list-buffers-noselect (&optional frame &key sort)
   "Produce a buffer list of buffers for optional FRAME.
 When FRAME is nil, use the current one.  With key SORT, apply
@@ -399,17 +412,9 @@ information.
 This is a simplified variant of `list-buffers-noselect'."
   (let* ((frame (if (framep frame) frame (selected-frame)))
          (name (frame-parameter frame 'name))
-         (old-buf (current-buffer))
-         (buf (get-buffer-create (format-message "*Buffer List for `%s' frame*" name)))
+         (buffer-list-name (get-buffer-create (format-message "*Buffer List for `%s' frame*" name)))
          (buffer-list (beframe-buffer-list frame :sort sort)))
-    (with-current-buffer buf
-      (Buffer-menu-mode)
-      (setq-local Buffer-menu-files-only nil
-                  Buffer-menu-buffer-list buffer-list
-                  Buffer-menu-filter-predicate nil)
-      (list-buffers--refresh buffer-list old-buf)
-      (tabulated-list-print))
-    buf))
+    (beframe--list-buffers-menu buffer-list-name buffer-list)))
 
 (define-obsolete-function-alias
   'beframe--list-buffers-noselect
@@ -690,6 +695,30 @@ Also see the other Beframe commands:
   (beframe--modify-buffer-list :unassume (beframe--get-buffers-public-all))
   (beframe--modify-buffer-list :assume (beframe--get-buffers-global)))
 
+(defun beframe--display-buffer-menu (buffer-name)
+  "Display buffer list menu called BUFFER-NAME."
+  (let ((display-buffer-overriding-action
+         '((display-buffer-reuse-mode-window display-buffer-at-bottom)
+           (mode . Buffer-menu-mode)
+           (window-height . fit-window-to-buffer)
+           (dedicated . t)
+           (preserve-size . (t . t)))))
+    (display-buffer buffer-name)))
+
+(defun beframe--kill-buffers-and-display-menu (buffers prompt-text)
+  "Display menu with BUFFERS and prompt with PROMPT-TEXT to kill them.
+Delete the menu afterwards."
+  (let* ((buffer-list-name "*Beframe buffers to kill*")
+         (buffer-menu-name (beframe--list-buffers-menu buffer-list-name buffers)))
+    (unwind-protect
+        (progn
+          (beframe--display-buffer-menu buffer-menu-name)
+          (when (or beframe-kill-buffers-no-confirm
+                    (y-or-n-p prompt-text))
+            (mapc #'kill-buffer buffers)))
+      (with-current-buffer buffer-menu-name
+        (kill-buffer-and-window)))))
+
 ;;;###autoload
 (defun beframe-kill-buffers-matching-regexp (regexp &optional match-mode-names)
   "Delete all buffers whose name matches REGEXP.
@@ -712,10 +741,10 @@ Also see the other Beframe commands:
            "Delete buffers matching REGEXP in the name or major mode"
          "Delete buffers matching REGEXP in the name"))
       arg)))
-  (if-let* ((buffers (beframe--get-buffers-matching-regexp regexp match-mode-names :no-internal-buffers)))
-      (when (or beframe-kill-buffers-no-confirm
-                (y-or-n-p (format "Kill %d buffers matching `%s'?" (length buffers) regexp)))
-        (mapc #'kill-buffer buffers))
+  (if-let* ((buffers (beframe--get-buffers-matching-regexp regexp match-mode-names :no-internal-buffers))
+            (buffer-length (length buffers))
+            (prompt-text (format "Kill %d buffers matching `%s'?" buffer-length regexp)))
+      (beframe--kill-buffers-and-display-menu buffers prompt-text)
     (user-error "No buffers match `%s'" regexp)))
 
 ;;;###autoload
@@ -729,14 +758,11 @@ Also see the other Beframe commands:
    (list
     (when-let* ((name (beframe--frame-prompt)))
       (beframe--frame-object name))))
-  (if-let* ((buffers (beframe--get-buffers-public frame)))
-      (when (or beframe-kill-buffers-no-confirm
-                (y-or-n-p
-                 (format
-                  "Kill %d buffers belonging to frame `%s' and delete the frame? "
-                  (length buffers)
-                  (frame-parameter frame 'name))))
-        (mapc #'kill-buffer buffers))
+  (if-let* ((buffers (beframe--get-buffers-public frame))
+            (buffer-length (length buffers))
+            (frame-name (frame-parameter frame 'name))
+            (prompt-text (format "Kill %d buffers belonging to frame `%s'? " buffer-length frame-name)))
+        (beframe--kill-buffers-and-display-menu buffers prompt-text)
     (user-error "No buffers belong to frame `%s'" frame)))
 
 ;;; Minor mode setup
