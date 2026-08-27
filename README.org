@@ -177,6 +177,7 @@ with the current frame.
   ([[#h:5b751614-8749-4aa8-aaed-f181beaddc57][Features of ~beframe-mode~]]). [ The command now displays a menu with
   buffers to be killed as part of {{{development-version}}}. ]
 
+  #+vindex: beframe-kill-buffers-no-confirm
   #+findex: beframe-kill-frame-buffers
 - The command ~beframe-kill-frame-buffers~ prompts for a frame and
   then asks whether to delete all of its buffers. While the prompt is
