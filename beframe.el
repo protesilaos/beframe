@@ -1069,7 +1069,9 @@ If FRAME is nil, use the current frame."
   "Apply APP with `other-frame-prefix'.
 Use this as :around advice to commands that must make a new
 frame.  See `beframe-functions-in-frames'."
-  (funcall #'other-frame-prefix)
+  (cl-letf (((symbol-function 'message) #'always)
+            (inhibit-message t))
+    (funcall #'other-frame-prefix))
   (apply app))
 
 (defun beframe--functions-in-frames (&optional disable)
