@@ -1071,7 +1071,7 @@ Use this as :around advice to commands that must make a new
 frame.  See `beframe-functions-in-frames'."
   (cl-letf (((symbol-function 'message) #'always)
             (inhibit-message t))
-    (funcall #'other-frame-prefix))
+    (call-interactively #'other-frame-prefix))
   (apply app))
 
 (defun beframe--functions-in-frames (&optional disable)
