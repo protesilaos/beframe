@@ -531,13 +531,13 @@ buffer list (buffers from all frames)."
    :require-match))
 
 ;;;###autoload
-(defun beframe-assume-frame-buffers-selectively (frame buffers)
+(defun beframe-assume-frame-buffers-selectively (_frame buffers)
   "Assume BUFFERS from the selected FRAME into the current buffer list.
 
-In interactive use, select a frame and then use
+In interactive use, prompt to select a frame and then use
 `completing-read-multiple' to pick the list of BUFFERS.  Multiple
 candidates can be selected, each separated by the
-`crm-separator' (typically a comma).
+`crm-separator' (typically a comma).  Ignore FRAME if called from Lisp.
 
 Also see the other Beframe commands:
 
@@ -548,7 +548,7 @@ Also see the other Beframe commands:
           (buffers (beframe--buffer-list-prompt-crm frame))
           (buffer-objects (beframe--buffers-name-to-objects buffers)))
      (list frame buffer-objects)))
-  (beframe--modify-buffer-list frame :assume buffers))
+  (beframe--modify-buffer-list nil :assume buffers))
 
 ;;;###autoload
 (defun beframe-assume-buffers-selectively-all-frames (buffers)
