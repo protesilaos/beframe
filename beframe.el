@@ -647,8 +647,11 @@ Also see the other Beframe commands:
 \\{beframe-prefix-map}"
   (declare (interactive-only t))
   (interactive)
-  (beframe--modify-buffer-list nil :unassume (beframe--get-buffers-public-all))
-  (beframe--modify-buffer-list nil :assume (beframe--get-buffers-global)))
+  (beframe--modify-buffer-list nil :unassume (beframe--get-buffers-public-all) :no-message)
+  (let ((global-buffers (beframe--get-buffers-global)))
+    (beframe--modify-buffer-list nil :assume global-buffers :no-message)
+    (message "Unassumed all buffers except the global ones: %s"
+             (propertize (format "%s" (mapconcat #'buffer-name global-buffers ", ")) 'face 'success))))
 
 (defun beframe--display-buffer-menu (buffer-name)
   "Display buffer list menu called BUFFER-NAME."
