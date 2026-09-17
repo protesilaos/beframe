@@ -385,8 +385,10 @@ Note that raising and then selecting FRAME does not depend solely on
 Emacs.  The window manager must permit such an operation.  See
 bug#61319: <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=61319>."
   (interactive
-   (let ((obj (beframe--frame-object (beframe--frame-prompt))))
-     (list obj (beframe--buffer-prompt obj))))
+   (let* ((selected-frame (beframe--frame-prompt))
+          (object (beframe--frame-object selected-frame))
+          (selected-buffer (beframe--buffer-prompt object)))
+     (list object selected-buffer)))
   (select-frame-set-input-focus frame)
   (switch-to-buffer buffer))
 
