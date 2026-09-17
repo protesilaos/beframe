@@ -630,6 +630,11 @@ Also see the other Beframe commands:
      (list frame buffer-objects)))
   (beframe--modify-buffer-list frame :unassume buffers))
 
+(defun beframe--propertize-buffer-names (buffers prefix)
+  "Format BUFFERS as a string with PREFIX prepended to it."
+  (when-let* ((names (mapconcat #'buffer-name buffers ", ")))
+    (format "%s: %s" prefix (propertize (format "%s" names) 'face 'success))))
+
 ;;;###autoload
 (defun beframe-assume-all-buffers-no-prompts ()
   "Assume the consolidated buffer list (all frames)."
@@ -637,8 +642,7 @@ Also see the other Beframe commands:
   (interactive)
   (let ((all-buffers (beframe--get-buffers-public-all)))
     (beframe--modify-buffer-list nil :assume all-buffers :no-message)
-    (message "Assumed all buffers: %s"
-             (propertize (format "%s" (mapconcat #'buffer-name all-buffers ", ")) 'face 'success))))
+    (message (beframe--propertize-buffer-names all-buffers "Assumed all buffers"))))
 
 ;;;###autoload
 (defun beframe-unassume-all-buffers-no-prompts ()
@@ -653,8 +657,7 @@ Also see the other Beframe commands:
   (beframe--modify-buffer-list nil :unassume (beframe--get-buffers-public-all) :no-message)
   (let ((global-buffers (beframe--get-buffers-global)))
     (beframe--modify-buffer-list nil :assume global-buffers :no-message)
-    (message "Unassumed all buffers except the global ones: %s"
-             (propertize (format "%s" (mapconcat #'buffer-name global-buffers ", ")) 'face 'success))))
+    (message (beframe--propertize-buffer-names global-buffers "Unassumed all buffers except the global ones"))))
 
 (defun beframe--display-buffer-menu (buffer-name)
   "Display buffer list menu called BUFFER-NAME."
