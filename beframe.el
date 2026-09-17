@@ -349,13 +349,13 @@ this check if NO-ERROR is non-nil."
          nil t nil 'frame-name-history))
     (user-error "Only a single frame is available; aborting")))
 
-(defun beframe--frame-object (frame)
-  "Retun frame object of named FRAME.
-FRAME is the human-readable representation of a frame."
-  (let* ((frames (make-frame-names-alist))
-         (names (mapcar #'car frames)))
-    (when (seq-contains-p names frame #'string-match-p)
-      (alist-get frame frames nil nil #'string-match-p))))
+(defun beframe--frame-object (frame-name)
+  "Retun frame-name object of named FRAME.
+FRAME-NAME is the human-readable representation of a frame."
+  (when-let* ((frames (make-frame-names-alist))
+              (names (mapcar #'car frames))
+              (object (alist-get frame-name frames nil nil #'string-match-p)))
+    object))
 
 ;;;###autoload
 (defun beframe-switch-buffer (buffer)
