@@ -1018,15 +1018,7 @@ this order."
                 beframe-do-not-assume-last-selected-buffer))
     (funcall fn frame)))
 
-(defun beframe--frame-buffer-p (buf &optional frame)
-  "Return non-nil if BUF belongs to the current frame.
-Use optional FRAME to test if BUF belongs to it."
-  (memq buf (beframe-buffer-list frame)))
-
-(defun beframe-frame-predicate (&optional frame)
-  "Set FRAME `buffer-predicate' parameter.
-If FRAME is nil, use the current frame."
-  (set-frame-parameter frame 'buffer-predicate #'beframe--frame-buffer-p))
+(make-obsolete 'beframe-frame-predicate nil "1.6.0")
 
 (defun beframe-do-not-assume-last-selected-buffer (frame)
   "Unassume the buffer of the most recently used window from the new FRAME."
