@@ -535,16 +535,12 @@ Optional FRAME argument is an object that satisfies `framep'.  If
 FRAME is nil, the current frame is used.  If FRAME is non-nil but
 not a frame object, treat it as a flag for the consolidated
 buffer list (buffers from all frames)."
-  (completing-read-multiple
-   "Select buffers: "
-   (cond
-    ((framep frame)
-     (beframe-buffer-names frame))
-    (frame
-     (beframe--buffer-names-consolidated))
-    (t (beframe-buffer-names)))
-   nil
-   :require-match))
+  (let* ((buffers (if frame
+                      (beframe--get-buffers-public-no-global frame)
+                    (beframe--get-buffers-public-no-global-all)))
+         (names (mapcar #'buffer-name buffers))
+         (table (beframe-get-completion-table names '(category . buffer))))
+    (completing-read-multiple "Select buffers: " table nil :require-match)))
 
 ;;;###autoload
 (defun beframe-assume-frame-buffers-selectively (_frame buffers)
