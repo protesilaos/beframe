@@ -625,6 +625,7 @@ Also see the other Beframe commands:
 ;;;###autoload
 (defun beframe-unassume-current-frame-buffers-selectively (frame buffers)
   "Unassume BUFFERS from the FRAME's buffer list.
+In interactive use FRAME is the current frame.
 
 In interactive use, FRAME is the `selected-frame'.  Call
 `completing-read-multiple' to pick the list of BUFFERS.  Multiple
