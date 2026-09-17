@@ -876,6 +876,13 @@ Also see the variable `beframe-prefix-map'."
       (advice-remove #'undelete-frame #'beframe-undelete-frame-restore))
     (beframe--functions-in-frames :disable)))
 
+(defun beframe-delete-scratch-buffer (frame)
+  "Delete the scratch buffer of FRAME.
+Do so in accordance with `beframe-kill-frame-scratch-buffer'."
+  (when-let* ((_ beframe-kill-frame-scratch-buffer)
+              (buffer (frame-parameter frame 'beframe-buffer)))
+    (kill-buffer buffer)))
+
 (defun beframe-create-scratch-buffer (frame)
   "Create scratch buffer in `initial-major-mode' for FRAME."
   (when beframe-create-frame-scratch-buffer
@@ -886,11 +893,7 @@ Also see the variable `beframe-prefix-map'."
         (when (and (zerop (buffer-size))
                    (stringp initial-scratch-message))
           (insert initial-scratch-message))
-        (add-hook 'delete-frame-functions
-                  (lambda (frame)
-                    (when (and beframe-kill-frame-scratch-buffer
-                               (null frame))
-                      (kill-buffer buf)))))
+        (add-hook 'delete-frame-functions #'beframe-delete-scratch-buffer))
       (let* ((frame-bufs (beframe-buffer-list frame))
              (frame-bufs-with-buf (append (list buf) frame-bufs)))
         (modify-frame-parameters frame `((buffer-list . ,frame-bufs-with-buf) (beframe-scratch . ,buf)))))))
