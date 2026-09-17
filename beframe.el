@@ -442,6 +442,7 @@ Also see the other Beframe commands:
 
 (defun beframe--modify-buffer-list (frame operation buffers &optional no-message)
   "Perform OPERATION to modify the FRAME buffer list.
+If FRAME is nil, use the selected frame.
 
 OPERATION is a keyword to :assume or :unassume.  To assume is to include
 buffers into the buffer list.  To unassume is to remove them from the
@@ -487,7 +488,7 @@ Also see the other Beframe commands:
 
 \\{beframe-prefix-map}"
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
-  (beframe--modify-buffer-list (selected-frame) :assume (beframe--get-buffers-public-no-global frame)))
+  (beframe--modify-buffer-list nil :assume (beframe--get-buffers-public-no-global frame)))
 
 ;;;###autoload
 (defun beframe-unassume-frame-buffers (frame)
@@ -499,7 +500,7 @@ Also see the other Beframe commands:
 
 \\{beframe-prefix-map}"
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
-  (beframe--modify-buffer-list (selected-frame) :unassume (beframe--get-buffers-public-no-global frame)))
+  (beframe--modify-buffer-list nil :unassume (beframe--get-buffers-public-no-global frame)))
 
 (defun beframe--buffers-name-to-objects (buffers)
   "Convert list of named BUFFERS to their corresponding objects."
