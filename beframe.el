@@ -502,7 +502,7 @@ Also see the other Beframe commands:
 
 \\{beframe-prefix-map}"
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
-  (beframe--modify-buffer-list frame :assume nil))
+  (beframe--modify-buffer-list (selected-frame) :assume (beframe--get-buffers-public-no-global frame)))
 
 (make-obsolete
  'beframe-add-frame-buffers
@@ -519,7 +519,7 @@ Also see the other Beframe commands:
 
 \\{beframe-prefix-map}"
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
-  (beframe--modify-buffer-list frame :unassume nil))
+  (beframe--modify-buffer-list (selected-frame) :unassume (beframe--get-buffers-public-no-global frame)))
 
 (make-obsolete
  'beframe-remove-frame-buffers
