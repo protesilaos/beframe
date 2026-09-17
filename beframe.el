@@ -952,13 +952,13 @@ See `beframe-rename-frame'."
 
 ;;;###autoload
 (defun beframe-rename-frame (frame &optional name)
-  "Rename FRAME per `beframe-rename-function'.
+  "Rename the FRAME.
 
 When called interactively, prompt for FRAME.  Else accept FRAME
 if it is an object that satisfies `framep'.
 
-With optional NAME as a string, use it to name the given FRAME.
-When called interactively, prompt for NAME when a prefix argument
+With optional NAME as a string, use it as a basis to name the given
+FRAME.  When called interactively, prompt for NAME if a prefix argument
 is given.
 
 With no NAME argument try to infer a name based on the following:
@@ -972,12 +972,10 @@ With no NAME argument try to infer a name based on the following:
 - Else use the `default-directory'.
 
 Rename the FRAME scratch buffer accordingly.  This buffer is created
-when FRAME is set up if `beframe-create-frame-scratch-buffer' is set to
-a non-nil value.
+when FRAME is first set up if `beframe-create-frame-scratch-buffer' is
+set to a non-nil value.
 
-Remember that this function doubles as an example for
-`beframe-rename-function': copy it and modify it accordingly
-while also reviewing `beframe-infer-frame-name'."
+This is the reference `beframe-rename-function'."
   (interactive
    (let ((selected-frame (beframe--frame-prompt :no-errror-even-if-single)))
      (list
