@@ -455,8 +455,8 @@ Also see the other Beframe commands:
         (cons list-1 list-2)
       (cons list-2 list-1))))
 
-(defun beframe--modify-buffer-list (operation buffers &optional no-message)
-  "Perform OPERATION to modify the current frame buffer list.
+(defun beframe--modify-buffer-list (frame operation buffers &optional no-message)
+  "Perform OPERATION to modify the FRAME buffer list.
 
 OPERATION is a keyword to :assume or :unassume.  To assume is to include
 buffers into the buffer list.  To unassume is to remove them from the
@@ -468,33 +468,29 @@ of buffers is that of the corresponding frame object.
 
 With optional NO-MESSAGE, do not produce a message reporting on the
 operation."
-  (pcase-let* ((frame-buffers (beframe--get-buffers-public nil))
-               (new-buffers (if (framep buffers)
-                                (beframe--get-buffers-public buffers)
-                              buffers))
+  (pcase-let* ((frame-buffers (beframe--get-buffers-public frame))
                (`(,consolidated-buffers . ,action)
                 (pcase operation
-                  (:assume (cons (append new-buffers frame-buffers) "ASSUMED"))
+                  (:assume (cons (append buffers frame-buffers) "ASSUMED"))
                   (:unassume (cons
                               (seq-filter
                                (lambda (buf)
-                                 (not (member buf new-buffers)))
+                                 (not (member buf buffers)))
                                frame-buffers)
                               "UNASSUMED"))
                   (_ (error "`%s' is an unknown operation to modify frame buffers" operation)))))
     (if-let* ((lists (beframe--get-longest-list-first frame-buffers consolidated-buffers))
-              (difference (seq-difference
-                           (mapcar #'buffer-name (car lists))
-                           (mapcar #'buffer-name (cdr lists)))))
+              (difference (seq-difference (car lists) (cdr lists))))
         (progn
-          (modify-frame-parameters nil `((buffer-list . ,consolidated-buffers)))
+          (modify-frame-parameters frame `((buffer-list . ,consolidated-buffers)))
           (unless no-message
-            (message "Current frame %s %s buffers: %s"
+            (message "The `%s' frame %s %s buffers: %s"
+                     (frame-parameter frame 'name)
                      (propertize action 'face 'error)
                      (propertize (format "%s" (length difference)) 'face 'warning)
-                     (propertize (format "%s" difference) 'face 'success))))
+                     (propertize (format "%s" (mapcar #'buffer-name difference)) 'face 'success))))
       (unless no-message
-        (message "No change to the frame's buffer list")))))
+        (message "No change to the frame `%s' buffer list" frame)))))
 
 ;;;###autoload
 (defun beframe-assume-frame-buffers (frame)
@@ -506,7 +502,7 @@ Also see the other Beframe commands:
 
 \\{beframe-prefix-map}"
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
-  (beframe--modify-buffer-list :assume frame))
+  (beframe--modify-buffer-list frame :assume nil))
 
 (make-obsolete
  'beframe-add-frame-buffers
@@ -523,7 +519,7 @@ Also see the other Beframe commands:
 
 \\{beframe-prefix-map}"
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
-  (beframe--modify-buffer-list :unassume frame))
+  (beframe--modify-buffer-list frame :unassume nil))
 
 (make-obsolete
  'beframe-remove-frame-buffers
@@ -557,8 +553,8 @@ buffer list (buffers from all frames)."
   "0.3.0")
 
 ;;;###autoload
-(defun beframe-assume-frame-buffers-selectively (buffers)
-  "Assume BUFFERS from a selected frame into the current buffer list.
+(defun beframe-assume-frame-buffers-selectively (frame buffers)
+  "Assume BUFFERS from the selected FRAME into the current buffer list.
 
 In interactive use, select a frame and then use
 `completing-read-multiple' to pick the list of BUFFERS.  Multiple
@@ -569,12 +565,12 @@ Also see the other Beframe commands:
 
 \\{beframe-prefix-map}"
   (interactive
-   (list
-    (beframe--buffers-name-to-objects
-     (beframe--buffer-list-prompt-crm
-      (beframe--frame-object
-       (beframe--frame-prompt))))))
-  (beframe--modify-buffer-list :assume buffers))
+   (let* ((seleted-frame-name (beframe--frame-prompt))
+          (frame (beframe--frame-object seleted-frame-name))
+          (buffers (beframe--buffer-list-prompt-crm frame))
+          (buffer-objects (beframe--buffers-name-to-objects buffers)))
+     (list frame buffer-objects)))
+  (beframe--modify-buffer-list frame :assume buffers))
 
 (make-obsolete
  'beframe-add-buffers
@@ -587,15 +583,13 @@ Also see the other Beframe commands:
   "0.3.0")
 
 ;;;###autoload
-(defun beframe-assume-buffers-selectively-all-frames ()
-  "Like `beframe-assume-frame-buffers-selectively' but for all frames."
-  (declare (interactive-only t))
-  (interactive)
-  (beframe--modify-buffer-list
-   :assume
-   (beframe--buffers-name-to-objects
-    (beframe--buffer-list-prompt-crm
-     :all-frames))))
+(defun beframe-assume-buffers-selectively-all-frames (buffers)
+  "Like `beframe-assume-frame-buffers-selectively' for BUFFERS in all frames."
+  (interactive
+   (let* ((names (beframe--buffer-list-prompt-crm :all-frames))
+          (objects (beframe--buffers-name-to-objects names)))
+     (list objects)))
+  (beframe--modify-buffer-list nil :assume buffers))
 
 (defvar beframe-buffers-matching-regexp-history nil
   "Minibuffer history of `beframe-buffers-matching-regexp-prompt'.")
@@ -608,8 +602,8 @@ Also see the other Beframe commands:
      default 'beframe-buffers-matching-regexp-history)))
 
 ;;;###autoload
-(defun beframe-assume-buffers-matching-regexp (regexp &optional match-mode-names)
-  "Assume all buffers whose name matches REGEXP.
+(defun beframe-assume-buffers-matching-regexp (frame regexp &optional match-mode-names)
+  "Assume all buffers into FRAME whose name matches REGEXP.
 With optional MATCH-MODE-NAMES return buffers whose name or major mode
 matches REGEXP.
 
@@ -617,22 +611,23 @@ Also see the other Beframe commands:
 
 \\{beframe-prefix-map}"
   (interactive
-   (let ((arg current-prefix-arg))
-     (list
-      (beframe-buffers-matching-regexp-prompt
-       (if arg
-           "Buffer names matching REGEXP in the name or major mode"
-         "Buffer names matching REGEXP in the name")))))
-      (beframe--modify-buffer-list :assume buffers)
+   (list
+    (selected-frame)
+    (beframe-buffers-matching-regexp-prompt
+     (format "Buffer names matching REGEXP in the name%s"
+             (if current-prefix-arg
+                 " or major mode"
+               "")))))
   (if-let* ((buffers (beframe--get-buffers-matching-regexp regexp match-mode-names)))
+      (beframe--modify-buffer-list frame :assume buffers)
     (user-error "No buffers match `%s'" regexp)))
 
 (defalias 'beframe-assume-buffers-matching-regexp-all-frames 'beframe-assume-buffers-matching-regexp
   "Alias for `beframe-assume-buffers-matching-regexp'.")
 
 ;;;###autoload
-(defun beframe-unassume-buffers-matching-regexp (regexp &optional match-mode-names)
-  "Unassume all buffers whose name matches REGEXP.
+(defun beframe-unassume-buffers-matching-regexp (frame regexp &optional match-mode-names)
+  "Unassume all buffers from FRAME whose name matches REGEXP.
 With optional MATCH-MODE-NAMES return buffers whose name or major mode
 matches REGEXP.
 
@@ -640,14 +635,15 @@ Also see the other Beframe commands:
 
 \\{beframe-prefix-map}"
   (interactive
-   (let ((arg current-prefix-arg))
-     (list
-      (beframe-buffers-matching-regexp-prompt
-       (if arg
-           "Buffer names matching REGEXP in the name or major mode"
-         "Buffer names matching REGEXP in the name")))))
+   (list
+    (selected-frame)
+    (beframe-buffers-matching-regexp-prompt
+     (format "Buffer names matching REGEXP in the name%s"
+             (if current-prefix-arg
+                 " or major mode"
+               "")))))
   (if-let* ((buffers (beframe--get-buffers-matching-regexp regexp match-mode-names)))
-      (beframe--modify-buffer-list :unassume buffers)
+      (beframe--modify-buffer-list frame :unassume buffers)
     (user-error "No buffers match `%s'" regexp)))
 
 
@@ -660,21 +656,23 @@ Also see the other Beframe commands:
   "0.3.0")
 
 ;;;###autoload
-(defun beframe-unassume-current-frame-buffers-selectively (buffers)
-  "Unassume BUFFERS from the current frame's buffer list.
+(defun beframe-unassume-current-frame-buffers-selectively (frame buffers)
+  "Unassume BUFFERS from the FRAME's buffer list.
 
-In interactive use, call `completing-read-multiple' to pick the
-list of BUFFERS.  Multiple candidates can be selected, each
-separated by the `crm-separator' (typically a comma).
+In interactive use, FRAME is the `selected-frame'.  Call
+`completing-read-multiple' to pick the list of BUFFERS.  Multiple
+candidates can be selected, each separated by the
+`crm-separator' (typically a comma).
 
 Also see the other Beframe commands:
 
 \\{beframe-prefix-map}"
   (interactive
-   (list
-    (beframe--buffers-name-to-objects
-     (beframe--buffer-list-prompt-crm))))
-  (beframe--modify-buffer-list :unassume buffers))
+   (let* ((frame (selected-frame))
+          (buffer-names (beframe--buffer-list-prompt-crm frame))
+          (buffer-objects (beframe--buffers-name-to-objects buffer-names)))
+     (list frame buffer-objects)))
+  (beframe--modify-buffer-list frame :unassume buffers))
 
 (make-obsolete
  'beframe-remove-buffers
@@ -686,7 +684,7 @@ Also see the other Beframe commands:
   "Assume the consolidated buffer list (all frames)."
   (declare (interactive-only t))
   (interactive)
-  (beframe--modify-buffer-list :assume (beframe--get-buffers-public-all)))
+  (beframe--modify-buffer-list nil :assume (beframe--get-buffers-public-all)))
 
 ;;;###autoload
 (defun beframe-unassume-all-buffers-no-prompts ()
@@ -698,8 +696,8 @@ Also see the other Beframe commands:
 \\{beframe-prefix-map}"
   (declare (interactive-only t))
   (interactive)
-  (beframe--modify-buffer-list :unassume (beframe--get-buffers-public-all))
-  (beframe--modify-buffer-list :assume (beframe--get-buffers-global)))
+  (beframe--modify-buffer-list nil :unassume (beframe--get-buffers-public-all))
+  (beframe--modify-buffer-list nil :assume (beframe--get-buffers-global)))
 
 (defun beframe--display-buffer-menu (buffer-name)
   "Display buffer list menu called BUFFER-NAME."
@@ -901,9 +899,6 @@ Also see the variable `beframe-prefix-map'."
          frame
          `((buffer-list . ,frame-bufs-with-buf)))))))
 
-(defvar beframe--rename-frame-history nil
-  "Minibuffer history for `beframe-rename-frame'.")
-
 ;; (defun beframe--rename-scratch-buffer (frame name)
 ;;   "Rename the scratch buffer associated with FRAME according to NAME."
 ;;   (when-let* ((buf (get-buffer (format "*scratch for %s*" frame)))
@@ -944,6 +939,13 @@ until a unique name is found."
                 n (1+ n)))
         candidate-name))))
 
+(defun beframe--is-project-p (directory)
+  "Return non-nil if DIRECTORY is a project."
+  (and (bound-and-true-p project--list)
+       (listp project--list)
+       (or (member (list directory) project--list)
+           (member (list (abbreviate-file-name directory)) project--list))))
+
 (defun beframe-infer-frame-name (frame name)
   "Infer a suitable name for FRAME with given NAME.
 See `beframe-rename-frame'."
@@ -952,15 +954,10 @@ See `beframe-rename-frame'."
            (file-name (when (bufferp buffer) (buffer-file-name buffer)))
            (buf-name (buffer-name buffer))
            (dir (with-current-buffer buffer (or (vc-root-dir) default-directory)))
-           (projectp (and (bound-and-true-p project--list)
-                          (listp project--list)
-                          (or
-                           (member (list dir) project--list)
-                           (member (list (abbreviate-file-name dir)) project--list))))
            (processed-name (cond
                             ((and name (stringp name))
                              name)
-                            ((and projectp buf-name)
+                            ((and (beframe--is-project-p dir) buf-name)
                              (file-name-nondirectory (directory-file-name dir)))
                             ((and (not (minibufferp)) file-name)
                              (format "%s %s" buf-name dir))
@@ -969,6 +966,15 @@ See `beframe-rename-frame'."
                             (t
                              dir))))
       (beframe--generate-unique-frame-name processed-name))))
+
+(defvar beframe-rename-frame-history nil
+  "Minibuffer history for `beframe-rename-frame-prompt'.")
+
+(defun beframe-rename-frame-prompt (frame)
+  "Prompt for `beframe-rename-frame' given FRAME."
+  (read-string
+   (format "Rename the frame now called `%s' to: " frame)
+   nil 'beframe-rename-frame-history frame))
 
 ;;;###autoload
 (defun beframe-rename-frame (frame &optional name)
@@ -995,29 +1001,21 @@ Remember that this function doubles as an example for
 `beframe-rename-function': copy it and modify it accordingly
 while also reviewing `beframe-infer-frame-name'."
   (interactive
-   (let ((select-frame (beframe--frame-prompt :force-even-if-one)))
+   (let ((selected-frame (beframe--frame-prompt :force-even-if-one)))
      (list
-      (beframe--frame-object select-frame)
+      (beframe--frame-object selected-frame)
       (when current-prefix-arg
-        (read-string
-         (format "Rename the frame now called `%s' to: "
-                 select-frame)
-         nil 'beframe--rename-frame-history select-frame)))))
+        (beframe-rename-frame-prompt selected-frame)))))
   ;; (when name
   ;;   (beframe--rename-scratch-buffer frame name))
-  (modify-frame-parameters
-   frame
-   (list (cons 'name (beframe-infer-frame-name frame name)))))
+  (modify-frame-parameters frame (list (cons 'name (beframe-infer-frame-name frame name)))))
 
 ;;;###autoload
 (defun beframe-rename-current-frame ()
   "Convenience wrapper of `beframe-rename-frame' to rename the current frame."
   (declare (interactive-only t))
   (interactive)
-  (let ((frame (selected-frame)))
-    (modify-frame-parameters
-     frame
-     (list (cons 'name (beframe-infer-frame-name frame nil))))))
+  (beframe-rename-frame (selected-frame) nil))
 
 (defun beframe-maybe-rename-frame (frame &optional name)
   "Helper function to determine if `beframe-rename-function' is called.
@@ -1040,10 +1038,10 @@ Call the functions `beframe-frame-predicate',
 `beframe-maybe-rename-frame', `beframe-create-scratch-buffer' in
 this order."
   (dolist (fn '(beframe-frame-predicate
-                beframe-do-not-assume-last-selected-buffer
                 beframe-maybe-rename-frame
                 beframe-create-scratch-buffer
-                beframe-create-xref-history))
+                beframe-create-xref-history
+                beframe-do-not-assume-last-selected-buffer))
     (funcall fn frame)))
 
 (defun beframe--frame-buffer-p (buf &optional frame)
@@ -1061,9 +1059,11 @@ Use optional FRAME to test if BUF belongs to it."
 If FRAME is nil, use the current frame."
   (set-frame-parameter frame 'buffer-predicate #'beframe--frame-buffer-p))
 
-(defun beframe-do-not-assume-last-selected-buffer (&rest _)
-  "Unassume the buffer of the most recently used window from the new frame."
-  (beframe--modify-buffer-list :unassume (list (window-buffer (get-mru-window))) :no-message))
+(defun beframe-do-not-assume-last-selected-buffer (frame)
+  "Unassume the buffer of the most recently used window from the new FRAME."
+  (when-let* ((buffers (list (window-buffer (get-mru-window t))))
+              (_ (mapc #'buffer-live-p buffers)))
+    (beframe--modify-buffer-list frame :unassume buffers :no-message)))
 
 (defun beframe--with-other-frame (&rest app)
   "Apply APP with `other-frame-prefix'.
