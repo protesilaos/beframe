@@ -337,16 +337,16 @@ frame name."
                 (buffers (beframe--get-buffers-public-no-global frame-object)))
       (format " -- %s beframed buffers" (length buffers))))))
 
-(defun beframe--frame-prompt (&optional force)
+(defun beframe--frame-prompt (&optional no-error)
   "Prompt to select a frame among the list of frames.
 Return user-error if `beframe--multiple-frames-p' is nil.  Skip
-this check if FORCE is non-nil."
-  (if (or force (beframe--multiple-frames-p))
+this check if NO-ERROR is non-nil."
+  (if (or no-error (beframe--multiple-frames-p))
       (let ((frames (make-frame-names-alist)))
         (completing-read
-         "Select Frame: "
+         (format-prompt "Select Frame" nil)
          (beframe-get-completion-table frames '(category . frame) '(annotation-function . beframe-frame-prompt-annotate))
-         nil t nil 'frame-name-history (caar frames)))
+         nil t nil 'frame-name-history))
     (user-error "Only a single frame is available; aborting")))
 
 (defun beframe--frame-object (frame)
@@ -971,7 +971,7 @@ Remember that this function doubles as an example for
 `beframe-rename-function': copy it and modify it accordingly
 while also reviewing `beframe-infer-frame-name'."
   (interactive
-   (let ((selected-frame (beframe--frame-prompt :force-even-if-one)))
+   (let ((selected-frame (beframe--frame-prompt :no-errror-even-if-single)))
      (list
       (beframe--frame-object selected-frame)
       (when current-prefix-arg
