@@ -143,12 +143,13 @@ This concerns the commands `beframe-kill-frame-buffers' and
 `beframe-kill-frame-buffers-matching-regexp'.
 
 If nil (the default), the aforementioned commands ask for confirmation
-once and then proceed to kill all the relevant buffers.
+once and then proceed to kill all the relevant buffers.  When they ask
+for confirmation, they also display teh list of buffers to be deleted.
 
 Emacs may still prompt to confirm each action if the buffer is unsaved,
 has a running process, and the like."
   :group 'beframe
-  :package-version '(beframe . "1.2.0")
+  :package-version '(beframe . "1.6.0")
   :type 'boolean)
 
 (defgroup beframe-faces nil
