@@ -488,7 +488,7 @@ operation."
                      (frame-parameter frame 'name)
                      (propertize action 'face 'error)
                      (propertize (format "%s" (length difference)) 'face 'warning)
-                     (propertize (format "%s" (mapcar #'buffer-name difference)) 'face 'success))))
+                     (propertize (format "%s" (mapconcat #'buffer-name difference ", ")) 'face 'success))))
       (unless no-message
         (message "No change to the frame `%s' buffer list" frame)))))
 
