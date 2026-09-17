@@ -874,7 +874,7 @@ Do so in accordance with `beframe-kill-frame-scratch-buffer'."
 
 (defvar project--list) ; from project.el
 
-(defun beframe--get-frame-names (name)
+(defun beframe--get-frame-with-given-name (name)
   "Return frame names equal to NAME as a list of strings."
   (delq nil
         (mapcar
@@ -889,7 +889,7 @@ Do so in accordance with `beframe-kill-frame-scratch-buffer'."
   "Generate a unique frame name starting with NAME.
 If NAME is unique, return it as-is.  Otherwise, append <2>, <3>, etc.
 until a unique name is found."
-  (let ((frame-names (beframe--get-frame-names name)))
+  (let ((frame-names (beframe--get-frame-with-given-name name)))
     ;; Because this happens after the frame is created, if the length
     ;; is 1, then we do not need to uniquify the name: it should be
     ;; unique already.  This way, we avoid the scenario where some
@@ -900,7 +900,7 @@ until a unique name is found."
         name
       (let ((n 2)
             (candidate-name name))
-        (while (beframe--get-frame-names candidate-name)
+        (while (beframe--get-frame-with-given-name candidate-name)
           (setq candidate-name (format "%s<%d>" name n)
                 n (1+ n)))
         candidate-name))))
