@@ -572,6 +572,8 @@ Also see the other Beframe commands:
 ;;;###autoload
 (defun beframe-assume-buffers-matching-regexp (frame regexp &optional match-mode-names)
   "Assume all buffers into FRAME whose name matches REGEXP.
+In interactive use FRAME is the current frame.
+
 With optional MATCH-MODE-NAMES return buffers whose name or major mode
 matches REGEXP.
 
@@ -580,7 +582,7 @@ Also see the other Beframe commands:
 \\{beframe-prefix-map}"
   (interactive
    (list
-    (selected-frame)
+    nil
     (beframe-buffers-matching-regexp-prompt
      (format "Buffer names matching REGEXP in the name%s"
              (if current-prefix-arg
