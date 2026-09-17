@@ -1026,14 +1026,14 @@ If FRAME is nil, use the current frame."
               (_ (mapc #'buffer-live-p buffers)))
     (beframe--modify-buffer-list frame :unassume buffers :no-message)))
 
-(defun beframe--with-other-frame (&rest app)
-  "Apply APP with `other-frame-prefix'.
+(defun beframe--with-other-frame (&rest args)
+  "Apply ARGS after `other-frame-prefix'.
 Use this as :around advice to commands that must make a new
 frame.  See `beframe-functions-in-frames'."
   (cl-letf (((symbol-function 'message) #'always)
             (inhibit-message t))
     (call-interactively #'other-frame-prefix))
-  (apply app))
+  (apply args))
 
 (defun beframe--functions-in-frames (&optional disable)
   "Install advice for `beframe-functions-in-frames'.
