@@ -476,7 +476,7 @@ operation."
                      (propertize (format "%s" (length difference)) 'face 'warning)
                      (propertize (format "%s" (mapconcat #'buffer-name difference ", ")) 'face 'success))))
       (unless no-message
-        (message "No change to the frame `%s' buffer list" frame)))))
+        (message "No change to the frame `%s' buffer list" (frame-parameter frame 'name))))))
 
 ;;;###autoload
 (defun beframe-assume-frame-buffers (frame)
