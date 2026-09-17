@@ -971,6 +971,10 @@ With no NAME argument try to infer a name based on the following:
 
 - Else use the `default-directory'.
 
+Rename the FRAME scratch buffer accordingly.  This buffer is created
+when FRAME is set up if `beframe-create-frame-scratch-buffer' is set to
+a non-nil value.
+
 Remember that this function doubles as an example for
 `beframe-rename-function': copy it and modify it accordingly
 while also reviewing `beframe-infer-frame-name'."
