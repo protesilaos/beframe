@@ -880,8 +880,8 @@ Do so in accordance with `beframe-kill-frame-scratch-buffer'."
         (mapcar
          (lambda (frame)
            (when-let* ((frame-name (frame-parameter frame 'name))
-                       ((not (string-empty-p frame-name)))
-                       ((string= frame-name name)))
+                       (_ (not (string-empty-p frame-name)))
+                       (_ (string= frame-name name)))
              frame-name))
          (frame-list))))
 
