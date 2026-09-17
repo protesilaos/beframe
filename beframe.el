@@ -330,8 +330,12 @@ frame name."
 
 (defun beframe-frame-prompt-annotate (frame-name)
   "Return annotation for FRAME-NAME if it is the current one."
-  (when (string= frame-name (frame-parameter nil 'name))
-    (format " -- CURRENT FRAME")))
+  (cond
+   ((string= frame-name (frame-parameter nil 'name))
+    (format " -- CURRENT FRAME"))
+   ((when-let* ((frame-object (beframe--frame-object frame-name))
+                (buffers (beframe--get-buffers-public-no-global frame-object)))
+      (format " -- %s beframed buffers" (length buffers))))))
 
 (defun beframe--frame-prompt (&optional force)
   "Prompt to select a frame among the list of frames.
