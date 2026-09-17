@@ -893,7 +893,7 @@ Also see the variable `beframe-prefix-map'."
                       (kill-buffer buf)))))
       (let* ((frame-bufs (beframe-buffer-list frame))
              (frame-bufs-with-buf (append (list buf) frame-bufs)))
-        (modify-frame-parameters frame `((buffer-list . ,frame-bufs-with-buf)))))))
+        (modify-frame-parameters frame `((buffer-list . ,frame-bufs-with-buf) (beframe-scratch . ,buf)))))))
 
 ;; (defun beframe--rename-scratch-buffer (frame name)
 ;;   "Rename the scratch buffer associated with FRAME according to NAME."
