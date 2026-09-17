@@ -248,11 +248,6 @@ Include `beframe-global-buffers' in the list."
         (funcall sort buffers)
       buffers)))
 
-(define-obsolete-function-alias
-  'beframe--buffer-list
-  'beframe-buffer-list
-  "0.2.0")
-
 (cl-defun beframe-buffer-names (&optional frame &key sort)
   "Return list of names of `beframe-buffer-list' as strings.
 With optional FRAME, do it for the given frame name.  With key
@@ -263,11 +258,6 @@ more information."
 (defun beframe--buffer-names-consolidated ()
   "Return list of names of all buffers as strings."
   (mapcar #'buffer-name (beframe--get-buffers-public-all)))
-
-(define-obsolete-function-alias
-  'beframe--buffer-names
-  'beframe-buffer-names
-  "0.2.0")
 
 (defun beframe--read-buffer-p (buffer buffers)
   "Return non-nil if BUFFER belongs to the BUFFERS.
@@ -422,11 +412,6 @@ This is a simplified variant of `list-buffers-noselect'."
          (buffer-list (beframe-buffer-list frame :sort sort)))
     (beframe--list-buffers-menu buffer-list-name buffer-list)))
 
-(define-obsolete-function-alias
-  'beframe--list-buffers-noselect
-  'beframe-list-buffers-noselect
-  "0.2.0")
-
 ;;;###autoload
 (cl-defun beframe-buffer-menu (&optional frame &key sort)
   "Produce a `buffer-menu' for the current FRAME.
@@ -504,11 +489,6 @@ Also see the other Beframe commands:
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
   (beframe--modify-buffer-list (selected-frame) :assume (beframe--get-buffers-public-no-global frame)))
 
-(make-obsolete
- 'beframe-add-frame-buffers
- 'beframe-assume-frame-buffers
- "0.3.0")
-
 ;;;###autoload
 (defun beframe-unassume-frame-buffers (frame)
   "Unassume FRAME buffer list, removing it from current buffer list.
@@ -520,11 +500,6 @@ Also see the other Beframe commands:
 \\{beframe-prefix-map}"
   (interactive (list (beframe--frame-object (beframe--frame-prompt))))
   (beframe--modify-buffer-list (selected-frame) :unassume (beframe--get-buffers-public-no-global frame)))
-
-(make-obsolete
- 'beframe-remove-frame-buffers
- 'beframe-unassume-frame-buffers
- "0.3.0")
 
 (defun beframe--buffers-name-to-objects (buffers)
   "Convert list of named BUFFERS to their corresponding objects."
@@ -547,11 +522,6 @@ buffer list (buffers from all frames)."
    nil
    :require-match))
 
-(define-obsolete-function-alias
-  'beframe-assume-buffers
-  'beframe-assume-frame-buffers-selectively
-  "0.3.0")
-
 ;;;###autoload
 (defun beframe-assume-frame-buffers-selectively (frame buffers)
   "Assume BUFFERS from the selected FRAME into the current buffer list.
@@ -571,16 +541,6 @@ Also see the other Beframe commands:
           (buffer-objects (beframe--buffers-name-to-objects buffers)))
      (list frame buffer-objects)))
   (beframe--modify-buffer-list frame :assume buffers))
-
-(make-obsolete
- 'beframe-add-buffers
- 'beframe-assume-frame-buffers-selectively
- "0.3.0")
-
-(define-obsolete-function-alias
-  'beframe-assume-buffers-all-frames
-  'beframe-assume-buffers-selectively-all-frames
-  "0.3.0")
 
 ;;;###autoload
 (defun beframe-assume-buffers-selectively-all-frames (buffers)
@@ -650,11 +610,6 @@ Also see the other Beframe commands:
 (defalias 'beframe-unassume-buffers-matching-regexp-all-frames 'beframe-unassume-buffers-matching-regexp
   "Alias for `beframe-unassume-buffers-matching-regexp'.")
 
-(define-obsolete-function-alias
-  'beframe-unassume-buffers
-  'beframe-unassume-current-frame-buffers-selectively
-  "0.3.0")
-
 ;;;###autoload
 (defun beframe-unassume-current-frame-buffers-selectively (frame buffers)
   "Unassume BUFFERS from the FRAME's buffer list.
@@ -673,11 +628,6 @@ Also see the other Beframe commands:
           (buffer-objects (beframe--buffers-name-to-objects buffer-names)))
      (list frame buffer-objects)))
   (beframe--modify-buffer-list frame :unassume buffers))
-
-(make-obsolete
- 'beframe-remove-buffers
- 'beframe-unassume-current-frame-buffers-selectively
- "0.3.0")
 
 ;;;###autoload
 (defun beframe-assume-all-buffers-no-prompts ()
@@ -1047,11 +997,6 @@ this order."
   "Return non-nil if BUF belongs to the current frame.
 Use optional FRAME to test if BUF belongs to it."
   (memq buf (beframe-buffer-list frame)))
-
-(define-obsolete-function-alias
-  'beframe--frame-predicate
-  'beframe-frame-predicate
-  "0.4.0")
 
 (defun beframe-frame-predicate (&optional frame)
   "Set FRAME `buffer-predicate' parameter.
