@@ -623,8 +623,8 @@ Also see the other Beframe commands:
        (if arg
            "Buffer names matching REGEXP in the name or major mode"
          "Buffer names matching REGEXP in the name")))))
-  (if-let* ((buffers (beframe--get-buffers-matching-regexp regexp match-mode-names :no-internal-buffers)))
       (beframe--modify-buffer-list :assume buffers)
+  (if-let* ((buffers (beframe--get-buffers-matching-regexp regexp match-mode-names)))
     (user-error "No buffers match `%s'" regexp)))
 
 (defalias 'beframe-assume-buffers-matching-regexp-all-frames 'beframe-assume-buffers-matching-regexp
