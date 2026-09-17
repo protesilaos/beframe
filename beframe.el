@@ -392,8 +392,8 @@ bug#61319: <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=61319>."
   (select-frame-set-input-focus frame)
   (switch-to-buffer buffer))
 
-(defun beframe--list-buffers-menu (name buffers)
-  "Produce a buffer list menu of NAME with BUFFERS."
+(defun beframe--list-buffers-menu (name buffers frame)
+  "Produce a buffer list menu of NAME with BUFFERS for FRAME."
   (let* ((old-buf (current-buffer))
          (menu-buffer (get-buffer-create name)))
     (with-current-buffer menu-buffer
@@ -402,7 +402,11 @@ bug#61319: <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=61319>."
                   Buffer-menu-buffer-list buffers
                   Buffer-menu-filter-predicate nil)
       (list-buffers--refresh buffers old-buf)
-      (tabulated-list-print))
+      (tabulated-list-print)
+      (setq-local revert-buffer-function
+                  (lambda (&rest _)
+                    (let ((buffers (beframe-buffer-list frame)))
+                      (beframe--list-buffers-menu name buffers frame)))))
     menu-buffer))
 
 (cl-defun beframe-list-buffers-noselect (&optional frame &key sort)
@@ -416,7 +420,7 @@ This is a simplified variant of `list-buffers-noselect'."
          (name (frame-parameter frame 'name))
          (buffer-list-name (get-buffer-create (format-message "*Buffer List for `%s' frame*" name)))
          (buffer-list (beframe-buffer-list frame :sort sort)))
-    (beframe--list-buffers-menu buffer-list-name buffer-list)))
+    (beframe--list-buffers-menu buffer-list-name buffer-list frame)))
 
 ;;;###autoload
 (cl-defun beframe-buffer-menu (&optional frame &key sort)
@@ -686,7 +690,7 @@ Also see the other Beframe commands:
   "Display menu with BUFFERS and prompt with PROMPT-TEXT to kill them.
 Delete the menu afterwards."
   (let* ((buffer-list-name "*Beframe buffers to kill*")
-         (buffer-menu-name (beframe--list-buffers-menu buffer-list-name buffers)))
+         (buffer-menu-name (beframe--list-buffers-menu buffer-list-name buffers (selected-frame))))
     (unwind-protect
         (progn
           (beframe--display-buffer-menu buffer-menu-name)
