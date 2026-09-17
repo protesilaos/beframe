@@ -9,6 +9,94 @@ project's main git repository: <https://github.com/protesilaos/beframe>.
 The newest release is at the top.  For further details, please consult
 the manual: <https://protesilaos.com/emacs/beframe>.
 
+* Version 1.6.0 on 2026-09-17
+:PROPERTIES:
+:CUSTOM_ID: h:5fa3b772-be80-423e-8e5c-0444de4d449e
+:END:
+
+I rewrote large parts of =beframe.el= to make them more clear and/or
+to align them with the Elisp style I have developed over time. Those
+changes do not affect existing functionality.
+
+That granted, I have made user-facing changes that refine this
+otherwise stable package.
+
+** ~beframe-rename-frame~ also renames the frame's scratch buffer
+:PROPERTIES:
+:CUSTOM_ID: h:1835aa81-5bc7-4be8-a54a-0e3df464126b
+:END:
+
+~beframe-mode~ makes a scratch buffer for each new frame that is
+created if the user option ~beframe-create-frame-scratch-buffer~ is
+set to ~t~. Those buffers are named like:
+
+#+begin_src
+,*scratch for frame 'beframe'*
+#+end_src
+
+The commands ~beframe-rename-frame~ and ~beframe-rename-current-frame~
+will now update the name of that buffer to reflect the new name of the frame.
+
+Read the docstring of ~beframe-rename-frame~ for the technicalities.
+
+** Commands to kill beframed buffers
+:PROPERTIES:
+:CUSTOM_ID: h:e48fab0f-bdfb-4bff-adc8-7d9c4773b0af
+:END:
+
+The command ~beframe-kill-frame-buffers~ deletes all buffers that
+belong to the given frame.
+
+The command ~beframe-kill-frame-buffers-matching-regexp~ deletes all
+of a frame's buffers that match the given regular expression.
+
+Both commands are subject to the user option ~beframe-kill-buffers-no-confirm~.
+When it is set to ~nil~, the above commands ask for confirmation while
+also displaying a menu with the buffers to be deleted. When the user
+option is set to ~t~, they kill the buffers outright.
+
+Note though that Emacs may still prompt on a case-by-case basis, such
+as if the buffer is running a process.
+
+** Reorganised the ~beframe-transient~
+:PROPERTIES:
+:CUSTOM_ID: h:b9d10464-6d15-4bd6-8f16-085a330cf1f5
+:END:
+
+With the optional =(require 'beframe-transient)= the command
+~beframe-transient~ becomes available. I have tweaked its layout to
+have one group of commands below the other. This makes it easier to
+read everything, regardless of font size. Plus, I do not need to make
+the code any more complex.
+
+** ~beframe-mode~ integrates with the ~undelete-frame~ command
+:PROPERTIES:
+:CUSTOM_ID: h:d3b9eb0b-ca02-493d-9b15-d466b1075bb2
+:END:
+
+The ~undelete-frame~ command restores a frame that was deleted. In the
+past, this would not restore the frame's original beframed buffer
+list. Now ~beframe-mode~ takes care to store the buffer list of each
+frame in case ~undelete-frame~ is invoked.
+
+Note that deleted buffers cannot be restored. This is merely a matter
+of associating live buffers with a frame (thus "beframing" them again
+exactly where they were).
+
+** ~beframe-read-buffer~ no longer ignores the predicate function
+:PROPERTIES:
+:CUSTOM_ID: h:ef177647-f2d8-45d7-933d-fe993cce8e6a
+:END:
+
+This concerns cases where ~read-buffer~ is using a predicate function.
+~beframe-read-buffer~ takes over ~read-buffer~ when ~beframe-mode~ is
+enabled.
+
+Thanks to Daniel Russo for the modification. This was done in pull
+request 18: <https://github.com/protesilaos/beframe/pull/18>. The
+change is small, meaning that Daniel does not need to assign copyright
+to the Free Software Foundation.
+
 * Version 1.5.0 on 2026-02-04
 :PROPERTIES:
 :CUSTOM_ID: h:a4e574ce-6f72-4222-83e5-0c48a72d887a

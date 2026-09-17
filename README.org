@@ -4,9 +4,9 @@
 #+language: en
 #+options: ':t toc:nil author:t email:t num:t
 #+startup: content
-#+macro: stable-version 1.5.0
-#+macro: release-date 2026-02-04
-#+macro: development-version 1.6.0-dev
+#+macro: stable-version 1.6.0
+#+macro: release-date 2026-09-17
+#+macro: development-version 1.7.0-dev
 #+export_file_name: beframe.texi
 #+texinfo_filename: beframe.info
 #+texinfo_dir_category: Emacs misc features
@@ -198,33 +198,25 @@ the current frame.
 :CUSTOM_ID: h:3c3b77ab-7a98-4aa1-8073-b6e3f31d2cc3
 :END:
 
-#+vindex; beframe-kill-buffers-no-confirm The user option
-~beframe-kill-buffers-no-confirm~ controls whether the commands
-~beframe-kill-frame-buffers~ and ~beframe-kill-frame-buffers-matching-regexp~
- prompt for confirmation before carrying out their action. By default,
-a confirmation is requested, while a menu with the buffers to be
-killed is on display. When ~beframe-kill-buffers-no-confirm~ is set to
-a non-~nil~ value, buffers are deleted outright and no menu is ever
-displayed.
-
-[ The buffers to be deleted are displayed in a menu as part of {{{development-version}}}. ]
+#+vindex: beframe-kill-buffers-no-confirm
+The user option ~beframe-kill-buffers-no-confirm~ controls whether the
+commands ~beframe-kill-frame-buffers~ and
+~beframe-kill-frame-buffers-matching-regexp~ prompt for confirmation
+before carrying out their action. By default, a confirmation is
+requested, while a menu with the buffers to be killed is on display.
+When ~beframe-kill-buffers-no-confirm~ is set to a non-~nil~ value,
+buffers are deleted outright and no menu is ever displayed.
 
 #+findex: beframe-kill-frame-buffers
 The command ~beframe-kill-frame-buffers~ prompts for a frame whose
 buffers it will kill in accordance with the user option
 ~beframe-kill-buffers-no-confirm~.
 
-[ The command ~beframe-kill-frame-buffers~ is part of {{{development-version}}}. ]
-
 #+findex: beframe-kill-frame-buffers-matching-regexp
 The ~beframe-kill-frame-buffers-matching-regexp~ command kills the
 buffers of a frame that match the given regular expression. It prompts
 for the frame and then for the regular expression. It then behaves in
 accordance with the user option ~beframe-kill-buffers-no-confirm~.
-
-[ The command ~beframe-kill-frame-buffers-matching-regexp~ is revised
-  as part of {{{development-version}}} to limit its effect to a given
-  frame, which is now also prompts for. ]
 
 * Features of ~beframe-mode~
 :PROPERTIES:
@@ -241,8 +233,7 @@ The ~beframe-mode~ does the following:
   ~buffer-predicate~ parameter beframes buffers.
 
 - On Emacs version 31 on higher, it makes the ~undelete-frame~ command
-  also restore the buffer list of the given frame. [ This is part of
-  {{{development-version}}}. ]
+  also restore the buffer list of the given frame.
 
 #+vindex: beframe-rename-function
 - Renames newly created frames so that they have a potentially more

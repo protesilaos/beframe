@@ -5,7 +5,7 @@
 ;; Author: Protesilaos <info@protesilaos.com>
 ;; Maintainer: Protesilaos <info@protesilaos.com>
 ;; URL: https://github.com/protesilaos/beframe
-;; Version: 1.5.0
+;; Version: 1.6.0
 ;; Package-Requires: ((emacs "28.1"))
 
 ;; This file is NOT part of GNU Emacs.
