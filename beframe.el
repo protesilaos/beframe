@@ -1040,12 +1040,12 @@ frame.  See `beframe-functions-in-frames'."
 (defun beframe--functions-in-frames (&optional disable)
   "Install advice for `beframe-functions-in-frames'.
 With optional DISABLE remove the advice."
-  (dolist (cmd beframe-functions-in-frames)
+  (dolist (fn beframe-functions-in-frames)
     (cond
      (disable
-      (advice-remove cmd #'beframe--with-other-frame))
+      (advice-remove fn #'beframe--with-other-frame))
      (beframe-mode
-      (advice-add cmd :around #'beframe--with-other-frame)))))
+      (advice-add fn :around #'beframe--with-other-frame)))))
 
 (defun beframe-buffer-sort-visibility (buffers)
   "Group the given BUFFERS by visibility and sort them accordingly.
