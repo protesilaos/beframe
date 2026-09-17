@@ -861,6 +861,7 @@ Also see the variable `beframe-prefix-map'."
               read-buffer-function #'beframe-read-buffer
               xref-history-storage #'beframe-xref-frame-history)
         (add-hook 'after-make-frame-functions #'beframe-setup-frame)
+        (add-hook 'delete-frame-functions #'beframe-delete-scratch-buffer)
         (add-hook 'context-menu-functions #'beframe-context-menu)
         (when (functionp 'frame-id)
           (add-hook 'delete-frame-functions #'beframe-undelete-frame-store-frame-list)
@@ -870,18 +871,12 @@ Also see the variable `beframe-prefix-map'."
           beframe--read-buffer-function nil
           xref-history-storage beframe-xref-history-storage)
     (remove-hook 'after-make-frame-functions #'beframe-setup-frame)
+    (remove-hook 'delete-frame-functions #'beframe-delete-scratch-buffer)
     (remove-hook 'context-menu-functions #'beframe-context-menu)
     (when (functionp 'frame-id)
       (remove-hook 'delete-frame-functions #'beframe-undelete-frame-store-frame-list)
       (advice-remove #'undelete-frame #'beframe-undelete-frame-restore))
     (beframe--functions-in-frames :disable)))
-
-(defun beframe-delete-scratch-buffer (frame)
-  "Delete the scratch buffer of FRAME.
-Do so in accordance with `beframe-kill-frame-scratch-buffer'."
-  (when-let* ((_ beframe-kill-frame-scratch-buffer)
-              (buffer (frame-parameter frame 'beframe-buffer)))
-    (kill-buffer buffer)))
 
 (defun beframe-create-scratch-buffer (frame)
   "Create scratch buffer in `initial-major-mode' for FRAME."
@@ -892,11 +887,17 @@ Do so in accordance with `beframe-kill-frame-scratch-buffer'."
         (funcall initial-major-mode)
         (when (and (zerop (buffer-size))
                    (stringp initial-scratch-message))
-          (insert initial-scratch-message))
-        (add-hook 'delete-frame-functions #'beframe-delete-scratch-buffer))
+          (insert initial-scratch-message)))
       (let* ((frame-bufs (beframe-buffer-list frame))
              (frame-bufs-with-buf (append (list buf) frame-bufs)))
         (modify-frame-parameters frame `((buffer-list . ,frame-bufs-with-buf) (beframe-scratch . ,buf)))))))
+
+(defun beframe-delete-scratch-buffer (frame)
+  "Delete the scratch buffer of FRAME.
+Do so in accordance with `beframe-kill-frame-scratch-buffer'."
+  (when-let* ((_ beframe-kill-frame-scratch-buffer)
+              (buffer (frame-parameter frame 'beframe-buffer)))
+    (kill-buffer buffer)))
 
 (defun beframe--rename-scratch-buffer (frame frame-name)
   "Rename the scratch buffer associated with FRAME to have FRAME-NAME."
