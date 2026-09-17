@@ -798,9 +798,7 @@ Use this as `undelete-frame' :around advice."
                 (frame-buffers (beframe-buffer-list frame))
                 (all-buffers (append old-buffers frame-buffers))
                 (all-no-duplicates (delete-dups all-buffers)))
-      (modify-frame-parameters
-       frame
-       `((buffer-list . ,all-no-duplicates))))
+      (modify-frame-parameters frame `((buffer-list . ,all-no-duplicates))))
     frame))
 
 ;;; Minor mode setup
