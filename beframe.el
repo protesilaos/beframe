@@ -230,6 +230,12 @@ If FRAME is nil, return the buffer list of the current frame."
    (beframe--get-buffers-public frame)
    (beframe--get-buffers-global)))
 
+(defun beframe--get-buffers-public-no-global-all ()
+  "Return public buffers for all FRAMES."
+  (seq-difference
+   (beframe--get-buffers-public-all)
+   (beframe--get-buffers-global)))
+
 (cl-defun beframe-buffer-list (&optional frame &key sort)
   "Return list of buffers that are used by the current frame.
 With optional FRAME as an object that satisfies `framep', return
