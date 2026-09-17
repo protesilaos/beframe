@@ -440,6 +440,13 @@ Also see the other Beframe commands:
         (cons list-1 list-2)
       (cons list-2 list-1))))
 
+(defun beframe--propertize-buffer-names (buffers prefix)
+  "Format BUFFERS as a string with PREFIX prepended to it."
+  (when-let* ((names (mapconcat #'buffer-name buffers ", ")))
+    (if prefix
+        (format "%s: %s" prefix (propertize (format "%s" names) 'face 'success))
+      (propertize (format "%s" names) 'face 'success))))
+
 (defun beframe--modify-buffer-list (frame operation buffers &optional no-message)
   "Perform OPERATION to modify the FRAME buffer list.
 If FRAME is nil, use the selected frame.
@@ -474,7 +481,7 @@ operation."
                      (frame-parameter frame 'name)
                      (propertize action 'face 'error)
                      (propertize (format "%s" (length difference)) 'face 'warning)
-                     (propertize (format "%s" (mapconcat #'buffer-name difference ", ")) 'face 'success))))
+                     (beframe--propertize-buffer-names difference nil))))
       (unless no-message
         (message "No change to the frame `%s' buffer list" (frame-parameter frame 'name))))))
 
@@ -629,11 +636,6 @@ Also see the other Beframe commands:
           (buffer-objects (beframe--buffers-name-to-objects buffer-names)))
      (list frame buffer-objects)))
   (beframe--modify-buffer-list frame :unassume buffers))
-
-(defun beframe--propertize-buffer-names (buffers prefix)
-  "Format BUFFERS as a string with PREFIX prepended to it."
-  (when-let* ((names (mapconcat #'buffer-name buffers ", ")))
-    (format "%s: %s" prefix (propertize (format "%s" names) 'face 'success))))
 
 ;;;###autoload
 (defun beframe-assume-all-buffers-no-prompts ()
