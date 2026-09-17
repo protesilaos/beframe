@@ -261,10 +261,6 @@ SORT, apply this sorting function—see `beframe-buffer-list' for
 more information."
   (mapcar #'buffer-name (beframe-buffer-list frame :sort sort)))
 
-(defun beframe--buffer-names-consolidated ()
-  "Return list of names of all buffers as strings."
-  (mapcar #'buffer-name (beframe--get-buffers-public-all)))
-
 (defun beframe--read-buffer-p (buffer buffers)
   "Return non-nil if BUFFER belongs to the BUFFERS.
 BUFFER is a string or a cons cell whose `car' is the buffer name."
