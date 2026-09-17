@@ -895,12 +895,11 @@ Also see the variable `beframe-prefix-map'."
              (frame-bufs-with-buf (append (list buf) frame-bufs)))
         (modify-frame-parameters frame `((buffer-list . ,frame-bufs-with-buf) (beframe-scratch . ,buf)))))))
 
-;; (defun beframe--rename-scratch-buffer (frame name)
-;;   "Rename the scratch buffer associated with FRAME according to NAME."
-;;   (when-let* ((buf (get-buffer (format "*scratch for %s*" frame)))
-;;               ((member (format "*scratch for %s*" frame) (beframe-buffer-list))))
-;;     (with-current-buffer buf
-;;       (rename-buffer (format "*scratch for %s*" name)))))
+(defun beframe--rename-scratch-buffer (frame frame-name)
+  "Rename the scratch buffer associated with FRAME to have FRAME-NAME."
+  (when-let* ((buffer (frame-parameter frame 'beframe-scratch)))
+    (with-current-buffer buffer
+      (rename-buffer (format-message "*scratch for frame `%s'*" frame-name)))))
 
 (defvar project--list) ; from project.el
 
@@ -1002,9 +1001,9 @@ while also reviewing `beframe-infer-frame-name'."
       (beframe--frame-object selected-frame)
       (when current-prefix-arg
         (beframe-rename-frame-prompt selected-frame)))))
-  ;; (when name
-  ;;   (beframe--rename-scratch-buffer frame name))
-  (modify-frame-parameters frame (list (cons 'name (beframe-infer-frame-name frame name)))))
+  (let ((inferred-name (beframe-infer-frame-name frame name)))
+    (beframe--rename-scratch-buffer frame inferred-name)
+    (modify-frame-parameters frame (list (cons 'name inferred-name)))))
 
 ;;;###autoload
 (defun beframe-rename-current-frame ()
