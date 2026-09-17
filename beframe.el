@@ -1005,17 +1005,19 @@ FRAME and optional NAME arguments are passed to the
       (set-frame-parameter frame 'xref--history history)
       history)))
 
+;; NOTE 2026-09-17: I am not calling this "-functions" to not mistake
+;; it for an abnormal hook.
+(defvar beframe-setup-frame-function-list
+  '(beframe-maybe-rename-frame
+    beframe-create-scratch-buffer
+    beframe-create-xref-history
+    beframe-do-not-assume-last-selected-buffer)
+  "Functions called by `beframe-setup-frame'.")
+
 (defun beframe-setup-frame (frame)
   "Rename FRAME and create scratch buffer for it, if appropriate.
-Call the functions `beframe-frame-predicate',
-`beframe-do-not-assume-last-selected-buffer',
-`beframe-maybe-rename-frame', `beframe-create-scratch-buffer' in
-this order."
-  (dolist (fn '(beframe-frame-predicate
-                beframe-maybe-rename-frame
-                beframe-create-scratch-buffer
-                beframe-create-xref-history
-                beframe-do-not-assume-last-selected-buffer))
+Call the `beframe-setup-frame-function-list'."
+  (dolist (fn beframe-setup-frame-function-list)
     (funcall fn frame)))
 
 (make-obsolete 'beframe-frame-predicate nil "1.6.0")
