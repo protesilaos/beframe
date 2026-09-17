@@ -635,7 +635,10 @@ Also see the other Beframe commands:
   "Assume the consolidated buffer list (all frames)."
   (declare (interactive-only t))
   (interactive)
-  (beframe--modify-buffer-list nil :assume (beframe--get-buffers-public-all)))
+  (let ((all-buffers (beframe--get-buffers-public-all)))
+    (beframe--modify-buffer-list nil :assume all-buffers :no-message)
+    (message "Assumed all buffers: %s"
+             (propertize (format "%s" (mapconcat #'buffer-name all-buffers ", ")) 'face 'success))))
 
 ;;;###autoload
 (defun beframe-unassume-all-buffers-no-prompts ()
