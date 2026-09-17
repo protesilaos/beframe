@@ -224,7 +224,7 @@ If FRAME is nil, return the buffer list of the current frame."
     global-buffers))
 
 (defun beframe--get-buffers-public-no-global (frame)
-  "Return public buffers for FRAME.
+  "Return public buffers for FRAME, except `beframe-global-buffers'.
 If FRAME is nil, return the buffer list of the current frame."
   (seq-difference
    (beframe--get-buffers-public frame)
